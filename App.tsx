@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import './src/i18n/i18n.config';
 import AppNavigator from './src/navigation/AppNavigator';
 import { Colors, Typography } from './src/constants/theme';
+import { AuthProvider } from './src/context/AuthContext';
 import { HistoryProvider } from './src/context/HistoryContext';
 
 function LoadingScreen() {
@@ -18,11 +19,13 @@ function LoadingScreen() {
 export default function App() {
   return (
     <Suspense fallback={<LoadingScreen />}>
-      <HistoryProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </HistoryProvider>
+      <AuthProvider>
+        <HistoryProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </HistoryProvider>
+      </AuthProvider>
     </Suspense>
   );
 }
