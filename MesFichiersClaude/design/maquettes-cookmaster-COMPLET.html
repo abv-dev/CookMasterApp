@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookmaster - TOUTES LES MAQUETTES</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF0F0;
+            --accent: #F97066;
+            --accent-light: #FFB5B5;
+            --text-dark: #2D3436;
+            --text-light: #636E72;
+            --white: #FFFFFF;
+            --green: #8BC34A;
+            --yellow: #FFD93D;
+            --yellow-light: #FFF3CD;
+            --surface: #FFEAEA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #3D3D3D;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        .nav-maquettes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: #3D3D3D;
+            padding: 15px;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .nav-maquettes button {
+            padding: 8px 16px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 11px;
+        }
+
+        .nav-maquettes button:hover { background: var(--accent-light); transform: scale(1.05); }
+        .nav-maquettes button.green { background: var(--green); }
+        .nav-maquettes button.yellow { background: var(--yellow); color: var(--text-dark); }
+
+        /* Section titles */
+        h2.section-title {
+            color: white;
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 22px;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            border-radius: 15px;
+        }
+
+        h2.section-title.green { background: linear-gradient(135deg, var(--green), #A5D66B); }
+        h2.section-title.yellow { background: var(--yellow); color: var(--text-dark); }
+
+        .section-desc {
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Maquettes container */
+        .maquettes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+
+        /* Maquette */
+        .maquette {
+            width: 375px;
+            min-height: 700px;
+            max-height: 800px;
+            background: var(--bg-color);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .maquette-title {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        .maquette-title.green { background: var(--green); }
+        .maquette-title.yellow { background: var(--yellow); color: var(--text-dark); }
+
+        .maquette-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 70px;
+        }
+
+        /* Common styles */
+        .page-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb span { color: var(--accent); font-weight: 600; }
+
+        .separator {
+            height: 2px;
+            background: var(--accent-light);
+            margin: 15px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 25px rgba(249, 112, 102, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 13px;
+            width: 100%;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--green), #A5D66B);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .footer-bar {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .footer-bar.green { background: var(--green); }
+
+        /* Navigation bar bottom */
+        .nav-bottom {
+            display: flex;
+            background: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            color: var(--text-light);
+            font-size: 10px;
+        }
+
+        .nav-item.active { color: var(--accent); }
+        .nav-item-icon { font-size: 20px; margin-bottom: 3px; }
+
+        /* Category grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .category-tile {
+            background: white;
+            border-radius: 18px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .category-tile:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(249, 112, 102, 0.2); }
+
+        .category-tile-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .category-tile-name { font-weight: 700; color: var(--text-dark); font-size: 13px; margin-bottom: 3px; }
+
+        .category-tile-count {
+            font-size: 10px;
+            color: var(--text-light);
+            background: var(--yellow-light);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* Type cards */
+        .type-card {
+            background: white;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .type-card:hover { background: var(--surface); transform: translateX(5px); }
+
+        .type-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .type-info { flex: 1; }
+        .type-name { font-weight: 700; font-size: 15px; color: var(--text-dark); margin-bottom: 2px; }
+        .type-desc { font-size: 11px; color: var(--text-light); }
+        .type-arrow { font-size: 18px; color: var(--accent); }
+
+        /* Subcat items */
+        .subcat-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .subcat-item:hover { background: var(--surface); transform: translateX(5px); }
+
+        .subcat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .subcat-name { flex: 1; font-weight: 600; color: var(--text-dark); font-size: 14px; }
+
+        .subcat-count {
+            background: var(--yellow);
+            color: var(--text-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Meat list */
+        .meat-list-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .meat-list-item:hover { background: var(--surface); transform: translateX(5px); }
+
+        .meat-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .meat-info { flex: 1; }
+        .meat-name { font-weight: 600; color: var(--text-dark); font-size: 13px; }
+        .meat-tags { display: flex; gap: 4px; margin-top: 3px; }
+
+        .meat-tag {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 8px;
+            background: var(--yellow-light);
+            color: var(--text-dark);
+        }
+
+        /* Input styles */
+        .input-group { margin-bottom: 12px; }
+        .input-label { font-size: 12px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; display: block; }
+
+        .input-field {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus-within { border-color: var(--accent); }
+        .input-field input { border: none; flex: 1; font-family: 'Poppins', sans-serif; font-size: 14px; outline: none; background: transparent; }
+        .input-icon { color: var(--accent); margin-right: 8px; font-size: 16px; }
+
+        /* Doneness */
+        .doneness-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+        .doneness-btn {
+            padding: 8px 12px;
+            border: 2px solid var(--accent-light);
+            border-radius: 12px;
+            background: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 11px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .doneness-btn.selected { background: var(--accent); border-color: var(--accent); color: white; }
+        .doneness-btn small { display: block; font-size: 9px; color: var(--text-light); margin-top: 1px; }
+        .doneness-btn.selected small { color: rgba(255,255,255,0.8); }
+
+        /* Slider */
+        .slider-container { background: white; border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .slider-value { font-weight: 700; color: var(--accent); background: var(--yellow); padding: 2px 8px; border-radius: 8px; font-size: 12px; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; background: var(--surface); -webkit-appearance: none; appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--text-light); }
+
+        /* Timer */
+        .timer-circle-container { display: flex; justify-content: center; margin: 20px 0; }
+
+        .timer-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(249, 112, 102, 0.4);
+            position: relative;
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .timer-time { font-size: 44px; font-weight: 700; color: white; }
+        .timer-label { color: rgba(255,255,255,0.8); font-size: 11px; }
+
+        .timer-controls { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+
+        .timer-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .timer-btn.pause { background: var(--surface); color: var(--accent); }
+        .timer-btn.stop { background: var(--accent); color: white; }
+
+        /* Result */
+        .result-header {
+            background: var(--green);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: -20px -20px 15px -20px;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .result-title { font-size: 22px; font-weight: 900; text-transform: uppercase; }
+        .result-subtitle { font-size: 12px; opacity: 0.9; margin-top: 3px; }
+
+        .result-stat { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--surface); }
+        .result-stat-value { font-size: 26px; font-weight: 700; color: var(--text-dark); min-width: 80px; }
+        .result-stat-label { font-size: 12px; color: var(--text-light); }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 22px; }
+        .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 3px; background: var(--green); }
+
+        .timeline-item { position: relative; margin-bottom: 18px; }
+        .timeline-item::before { content: ''; position: absolute; left: -18px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+
+        .timeline-title { font-weight: 700; color: var(--text-dark); margin-bottom: 3px; font-size: 13px; }
+        .timeline-content { font-size: 11px; color: var(--text-light); }
+
+        .cooking-methods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 8px 0; }
+        .method-item { background: white; border-radius: 10px; padding: 8px 6px; text-align: center; font-size: 10px; font-weight: 500; }
+        .method-icon { font-size: 18px; margin-bottom: 2px; }
+
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-bar input {
+            border: none;
+            flex: 1;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            outline: none;
+            margin-left: 8px;
+        }
+
+        /* History item */
+        .history-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        .history-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .history-info { flex: 1; }
+        .history-title { font-weight: 600; color: var(--text-dark); font-size: 14px; }
+        .history-date { font-size: 11px; color: var(--text-light); }
+        .history-badge { background: var(--green); color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+
+        /* Settings item */
+        .settings-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        .settings-icon { font-size: 22px; margin-right: 12px; }
+        .settings-label { flex: 1; font-weight: 500; color: var(--text-dark); font-size: 14px; }
+        .settings-arrow { color: var(--text-light); }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background: var(--green);
+            border-radius: 14px;
+            position: relative;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-icon { font-size: 60px; margin-bottom: 15px; }
+        .empty-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .empty-text { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
+
+        /* Quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .quick-action {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-action:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .quick-action-icon { font-size: 32px; margin-bottom: 8px; }
+        .quick-action-label { font-weight: 600; font-size: 12px; color: var(--text-dark); }
+
+        /* Onboarding */
+        .onboarding-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 25px;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-light);
+        }
+
+        .dot.active { background: var(--accent); width: 25px; border-radius: 5px; }
+
+        /* Recipe card */
+        .recipe-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .recipe-image {
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .recipe-content { padding: 12px; }
+        .recipe-title { font-weight: 700; font-size: 14px; color: var(--text-dark); margin-bottom: 4px; }
+        .recipe-meta { font-size: 11px; color: var(--text-light); }
+
+        /* Section hidden */
+        .section-hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-maquettes">
+    <button onclick="showSection('all')">📱 Tout</button>
+    <button onclick="showSection('splash')" class="yellow">🚀 Splash</button>
+    <button onclick="showSection('onboarding')" class="yellow">👋 Onboarding</button>
+    <button onclick="showSection('accueil')">🏠 Accueil</button>
+    <button onclick="showSection('calculateur')">🧮 Calculateur</button>
+    <button onclick="showSection('encyclopedie')">📚 Encyclopédie</button>
+    <button onclick="showSection('timer')">⏱️ Timer</button>
+    <button onclick="showSection('resultat')" class="green">✅ Résultat</button>
+    <button onclick="showSection('recettes')">🍳 Recettes</button>
+    <button onclick="showSection('historique')">📋 Historique</button>
+    <button onclick="showSection('favoris')">⭐ Favoris</button>
+    <button onclick="showSection('profil')">👤 Profil</button>
+    <button onclick="showSection('recherche')">🔍 Recherche</button>
+</nav>
+
+<!-- ==================== SPLASH SCREEN ==================== -->
+<section id="section-splash">
+    <h2 class="section-title yellow">🚀 SPLASH SCREEN</h2>
+    <p class="section-desc">Écran de chargement au lancement</p>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title yellow">Splash Screen</div>
+            <div class="maquette-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🥩</div>
+                <h1 style="font-size: 42px; font-weight: 900; color: var(--accent); letter-spacing: -2px;">COOKMASTER</h1>
+                <p style="color: var(--text-light); margin-top: 10px; font-size: 14px;">La cuisson parfaite, simplement.</p>
+                <div style="margin-top: 40px;">
+                    <div style="width: 40px; height: 40px; border: 3px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+</section>
+
+<!-- ==================== ONBOARDING ==================== -->
+<section id="section-onboarding">
+    <h2 class="section-title yellow">👋 ONBOARDING</h2>
+    <p class="section-desc">Première utilisation - 3 écrans</p>
+
+    <div class="maquettes-container">
+        <!-- Onboarding 1 -->
+        <div class="maquette">
+            <div class="maquette-title yellow">Onboarding 1/3</div>
+            <div class="maquette-content" style="text-align: center;">
+                <div class="onboarding-image">🧮</div>
+                <h2 style="font-size: 22px; font-weight: 900; color: var(--text-dark); margin-bottom: 10px;">Calculez le temps parfait</h2>
+                <p style="color: var(--text-light); font-size: 13px; line-height: 1.5;">Entrez le type de viande, le poids et le niveau de cuisson souhaité. Notre algorithme calcule le temps idéal.</p>
+                <div class="onboarding-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="btn-primary" style="margin-top: 20px;">Suivant →</button>
+                <p style="margin-top: 15px; color: var(--text-light); font-size: 12px; cursor: pointer;">Passer</p>
+            </div>
+        </div>
+
+        <!-- Onboarding 2 -->
+        <div class="maquette">
+            <div class="maquette-title yellow">Onboarding 2/3</div>
+            <div class="maquette-content" style="text-align: center;">
+                <div class="onboarding-image">⏱️</div>
+                <h2 style="font-size: 22px; font-weight: 900; color: var(--text-dark); margin-bottom: 10px;">Timer intelligent</h2>
+                <p style="color: var(--text-light); font-size: 13px; line-height: 1.5;">Lancez le minuteur et recevez une notification quand c'est prêt. Plus jamais de viande trop cuite !</p>
+                <div class="onboarding-dots">
+                    <div class="dot"></div>
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="btn-primary" style="margin-top: 20px;">Suivant →</button>
+                <p style="margin-top: 15px; color: var(--text-light); font-size: 12px; cursor: pointer;">Passer</p>
+            </div>
+        </div>
+
+        <!-- Onboarding 3 -->
+        <div class="maquette">
+            <div class="maquette-title yellow">Onboarding 3/3</div>
+            <div class="maquette-content" style="text-align: center;">
+                <div class="onboarding-image">📚</div>
+                <h2 style="font-size: 22px; font-weight: 900; color: var(--text-dark); margin-bottom: 10px;">Encyclopédie complète</h2>
+                <p style="color: var(--text-light); font-size: 13px; line-height: 1.5;">Découvrez tous les morceaux de viande, leurs caractéristiques et les meilleures méthodes de cuisson.</p>
+                <div class="onboarding-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot active"></div>
+                </div>
+                <button class="btn-green" style="margin-top: 20px;">Commencer 🎉</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ACCUEIL ==================== -->
+<section id="section-accueil">
+    <h2 class="section-title">🏠 ACCUEIL</h2>
+    <p class="section-desc">Page d'accueil principale</p>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Accueil Principal</div>
+            <div class="maquette-content">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="font-size: 28px; font-weight: 900; color: var(--accent);">COOKMASTER</h1>
+                    <p style="color: var(--text-light); font-size: 12px;">Bienvenue, Chef ! 👨‍🍳</p>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="quick-action">
+                        <div class="quick-action-icon">🧮</div>
+                        <div class="quick-action-label">Calculateur</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon">⏱️</div>
+                        <div class="quick-action-label">Quick Timer</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon">📚</div>
+                        <div class="quick-action-label">Encyclopédie</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon">🍳</div>
+                        <div class="quick-action-label">Recettes</div>
+                    </div>
+                </div>
+
+                <div class="separator"></div>
+
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px;">📋 Dernières cuissons</h3>
+
+                <div class="history-item">
+                    <div class="history-icon">🥩</div>
+                    <div class="history-info">
+                        <div class="history-title">Entrecôte - Saignant</div>
+                        <div class="history-date">Aujourd'hui, 12:30</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-icon">🍗</div>
+                    <div class="history-info">
+                        <div class="history-title">Poulet - Bien cuit</div>
+                        <div class="history-date">Hier, 19:45</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+
+                <button class="btn-secondary" style="margin-top: 10px;">Voir tout l'historique →</button>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item active">
+                    <div class="nav-item-icon">🏠</div>
+                    Accueil
+                </div>
+                <div class="nav-item">
+                    <div class="nav-item-icon">🧮</div>
+                    Calculer
+                </div>
+                <div class="nav-item">
+                    <div class="nav-item-icon">📚</div>
+                    Explorer
+                </div>
+                <div class="nav-item">
+                    <div class="nav-item-icon">👤</div>
+                    Profil
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CALCULATEUR ==================== -->
+<section id="section-calculateur">
+    <h2 class="section-title">🧮 CALCULATEUR</h2>
+    <p class="section-desc">Parcours en 5 étapes</p>
+
+    <div class="maquettes-container">
+        <!-- Calc 1 -->
+        <div class="maquette">
+            <div class="maquette-title">Calc 1/5 - Viande</div>
+            <div class="maquette-content">
+                <h1 class="page-title">CALCULATEUR</h1>
+                <p class="page-subtitle">Choisissez votre type de viande</p>
+
+                <div class="category-grid">
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🥩</div>
+                        <div class="category-tile-name">Boeuf</div>
+                        <div class="category-tile-count">45 morceaux</div>
+                    </div>
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🍖</div>
+                        <div class="category-tile-name">Veau</div>
+                        <div class="category-tile-count">28 morceaux</div>
+                    </div>
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🥓</div>
+                        <div class="category-tile-name">Porc</div>
+                        <div class="category-tile-count">35 morceaux</div>
+                    </div>
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🍗</div>
+                        <div class="category-tile-name">Volaille</div>
+                        <div class="category-tile-count">22 morceaux</div>
+                    </div>
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🐑</div>
+                        <div class="category-tile-name">Agneau</div>
+                        <div class="category-tile-count">18 morceaux</div>
+                    </div>
+                    <div class="category-tile">
+                        <div class="category-tile-icon">🦆</div>
+                        <div class="category-tile-name">Gibier</div>
+                        <div class="category-tile-count">15 morceaux</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bar">Sélectionnez une catégorie</div>
+        </div>
+
+        <!-- Calc 2 -->
+        <div class="maquette">
+            <div class="maquette-title">Calc 2/5 - Type</div>
+            <div class="maquette-content">
+                <h1 class="page-title">BOEUF</h1>
+                <p class="page-subtitle">Choisissez le type de morceau</p>
+                <div class="breadcrumb"><span>🥩 Boeuf</span></div>
+
+                <div class="type-card">
+                    <div class="type-icon">⭐</div>
+                    <div class="type-info">
+                        <div class="type-name">Morceaux Classiques</div>
+                        <div class="type-desc">Entrecôte, faux-filet, bavette...</div>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+
+                <div class="type-card">
+                    <div class="type-icon">👨‍🍳</div>
+                    <div class="type-info">
+                        <div class="type-name">Pièces du Boucher</div>
+                        <div class="type-desc">Onglet, hampe, araignée...</div>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+
+                <div class="type-card">
+                    <div class="type-icon">🍲</div>
+                    <div class="type-info">
+                        <div class="type-name">Morceaux à Mijoter</div>
+                        <div class="type-desc">Paleron, gîte, joue...</div>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+
+                <div class="type-card">
+                    <div class="type-icon">🫀</div>
+                    <div class="type-info">
+                        <div class="type-name">Abats</div>
+                        <div class="type-desc">Foie, rognons, ris...</div>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <!-- Calc 3 -->
+        <div class="maquette">
+            <div class="maquette-title">Calc 3/5 - Sous-cat</div>
+            <div class="maquette-content">
+                <h1 class="page-title">CLASSIQUES</h1>
+                <p class="page-subtitle">Sous-catégories</p>
+                <div class="breadcrumb"><span>🥩 Boeuf</span> › <span>Classiques</span></div>
+
+                <div class="subcat-item">
+                    <div class="subcat-icon">🏆</div>
+                    <span class="subcat-name">Morceaux Nobles</span>
+                    <span class="subcat-count">8</span>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="subcat-item">
+                    <div class="subcat-icon">🔥</div>
+                    <span class="subcat-name">À Griller</span>
+                    <span class="subcat-count">12</span>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="subcat-item">
+                    <div class="subcat-icon">🍳</div>
+                    <span class="subcat-name">À Poêler</span>
+                    <span class="subcat-count">10</span>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="subcat-item">
+                    <div class="subcat-icon">🥘</div>
+                    <span class="subcat-name">À Rôtir</span>
+                    <span class="subcat-count">7</span>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <!-- Calc 4 -->
+        <div class="maquette">
+            <div class="maquette-title">Calc 4/5 - Morceaux</div>
+            <div class="maquette-content">
+                <h1 class="page-title">NOBLES</h1>
+                <p class="page-subtitle">Sélectionnez un morceau</p>
+                <div class="breadcrumb"><span>🥩</span> › <span>Classiques</span> › <span>Nobles</span></div>
+
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Filet de boeuf</div>
+                        <div class="meat-tags"><span class="meat-tag">Tendre</span><span class="meat-tag">Griller</span></div>
+                    </div>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Entrecôte</div>
+                        <div class="meat-tags"><span class="meat-tag">Persillé</span><span class="meat-tag">Poêler</span></div>
+                    </div>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Côte de boeuf</div>
+                        <div class="meat-tags"><span class="meat-tag">À l'os</span><span class="meat-tag">BBQ</span></div>
+                    </div>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Faux-filet</div>
+                        <div class="meat-tags"><span class="meat-tag">Juteux</span></div>
+                    </div>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Rumsteck</div>
+                        <div class="meat-tags"><span class="meat-tag">Maigre</span></div>
+                    </div>
+                    <span style="color: var(--accent);">›</span>
+                </div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <!-- Calc 5 -->
+        <div class="maquette">
+            <div class="maquette-title">Calc 5/5 - Config</div>
+            <div class="maquette-content">
+                <h1 class="page-title">CONFIGURATION</h1>
+
+                <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid var(--accent); padding: 10px; border-radius: 14px; margin-bottom: 15px;">
+                    <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 10px;">🥩</div>
+                    <div style="flex: 1;"><div style="font-weight: 700; font-size: 14px;">Entrecôte</div><div style="font-size: 10px; color: var(--text-light);">Boeuf › Classiques › Nobles</div></div>
+                    <span style="color: var(--accent); font-size: 18px;">✕</span>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Poids (g)</label>
+                    <div class="input-field"><span class="input-icon">⚖️</span><input type="text" placeholder="ex: 300"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Épaisseur (cm)</label>
+                    <div class="input-field"><span class="input-icon">📏</span><input type="text" placeholder="ex: 2.5"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Cuisson</label>
+                    <div class="doneness-options">
+                        <button class="doneness-btn">Bleu<small>48°C</small></button>
+                        <button class="doneness-btn selected">Saignant<small>52°C</small></button>
+                        <button class="doneness-btn">À point<small>58°C</small></button>
+                        <button class="doneness-btn">Bien cuit<small>65°C</small></button>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span class="input-label">Température initiale</span><span class="slider-value">4°C</span></div>
+                    <input type="range" class="slider" min="-18" max="25" value="4">
+                    <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+                </div>
+
+                <button class="btn-primary">🔥 Calculer</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ENCYCLOPEDIE ==================== -->
+<section id="section-encyclopedie">
+    <h2 class="section-title">📚 ENCYCLOPÉDIE</h2>
+    <p class="section-desc">Parcours en 5 étapes</p>
+
+    <div class="maquettes-container">
+        <!-- Ency 1 -->
+        <div class="maquette">
+            <div class="maquette-title">Ency 1/5 - Viandes</div>
+            <div class="maquette-content">
+                <h1 class="page-title">ENCYCLOPÉDIE</h1>
+                <p class="page-subtitle">Explorez les viandes</p>
+
+                <div class="type-card">
+                    <div class="category-tile-icon" style="width: 60px; height: 60px; margin-right: 12px;">🥩</div>
+                    <div class="type-info"><div class="type-name">BOEUF</div><div class="type-desc">Viande riche en protéines</div></div>
+                    <span class="type-arrow">›</span>
+                </div>
+                <div class="type-card">
+                    <div class="category-tile-icon" style="width: 60px; height: 60px; margin-right: 12px;">🍖</div>
+                    <div class="type-info"><div class="type-name">VEAU</div><div class="type-desc">Texture délicate</div></div>
+                    <span class="type-arrow">›</span>
+                </div>
+                <div class="type-card">
+                    <div class="category-tile-icon" style="width: 60px; height: 60px; margin-right: 12px;">🐑</div>
+                    <div class="type-info"><div class="type-name">AGNEAU</div><div class="type-desc">Saveur unique</div></div>
+                    <span class="type-arrow">›</span>
+                </div>
+                <div class="type-card">
+                    <div class="category-tile-icon" style="width: 60px; height: 60px; margin-right: 12px;">🥓</div>
+                    <div class="type-info"><div class="type-name">PORC</div><div class="type-desc">Polyvalent et savoureux</div></div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            <div class="footer-bar">Explorez!</div>
+        </div>
+
+        <!-- Ency 2-5 similar to calculateur... -->
+        <div class="maquette">
+            <div class="maquette-title">Ency 2/5 - Types</div>
+            <div class="maquette-content">
+                <h1 class="page-title">BOEUF</h1>
+                <div class="breadcrumb"><span>🥩 Boeuf</span></div>
+
+                <div class="type-card"><div class="type-icon">⭐</div><div class="type-info"><div class="type-name">Classiques</div><div class="type-desc">Morceaux populaires</div></div><span class="type-arrow">›</span></div>
+                <div class="type-card"><div class="type-icon">👨‍🍳</div><div class="type-info"><div class="type-name">Pièces du Boucher</div><div class="type-desc">Pour connaisseurs</div></div><span class="type-arrow">›</span></div>
+                <div class="type-card"><div class="type-icon">🍲</div><div class="type-info"><div class="type-name">À Mijoter</div><div class="type-desc">Plats en sauce</div></div><span class="type-arrow">›</span></div>
+                <div class="type-card"><div class="type-icon">🫀</div><div class="type-info"><div class="type-name">Abats</div><div class="type-desc">Délicatesses</div></div><span class="type-arrow">›</span></div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Ency 3/5 - Sous-cat</div>
+            <div class="maquette-content">
+                <h1 class="page-title">CLASSIQUES</h1>
+                <div class="breadcrumb"><span>🥩</span> › <span>Classiques</span></div>
+
+                <div class="subcat-item"><div class="subcat-icon">🏆</div><span class="subcat-name">Nobles</span><span class="subcat-count">8</span><span style="color: var(--accent);">›</span></div>
+                <div class="subcat-item"><div class="subcat-icon">🍖</div><span class="subcat-name">Côtes</span><span class="subcat-count">5</span><span style="color: var(--accent);">›</span></div>
+                <div class="subcat-item"><div class="subcat-icon">🥘</div><span class="subcat-name">Rôtis</span><span class="subcat-count">6</span><span style="color: var(--accent);">›</span></div>
+                <div class="subcat-item"><div class="subcat-icon">🔪</div><span class="subcat-name">Steaks</span><span class="subcat-count">10</span><span style="color: var(--accent);">›</span></div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Ency 4/5 - Liste</div>
+            <div class="maquette-content">
+                <h1 class="page-title">NOBLES</h1>
+                <div class="breadcrumb"><span>🥩</span> › <span>Classiques</span> › <span>Nobles</span></div>
+
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Filet de boeuf</div><div class="meat-tags"><span class="meat-tag">Premium</span></div></div><span style="color: var(--accent);">›</span></div>
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Persillé</span></div></div><span style="color: var(--accent);">›</span></div>
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Côte de boeuf</div><div class="meat-tags"><span class="meat-tag">Festif</span></div></div><span style="color: var(--accent);">›</span></div>
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Faux-filet</div><div class="meat-tags"><span class="meat-tag">Juteux</span></div></div><span style="color: var(--accent);">›</span></div>
+            </div>
+            <div class="footer-bar">‹ Retour</div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Ency 5/5 - Détail</div>
+            <div class="maquette-content">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 11px; color: var(--text-light);">Détails</div>
+                    <h1 style="font-size: 28px; font-weight: 900; color: var(--accent); font-style: italic;">Entrecôte</h1>
+                    <div style="display: inline-block; background: var(--accent); color: white; padding: 5px 12px; border-radius: 12px; font-size: 10px; margin-top: 5px;">Boeuf › Classiques › Nobles</div>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item"><div class="timeline-title">Caractéristiques</div><div class="timeline-content">Viande tendre et persillée</div></div>
+                    <div class="timeline-item"><div class="timeline-title">Modes de cuisson</div>
+                        <div class="cooking-methods">
+                            <div class="method-item"><div class="method-icon">🍳</div>Poêle</div>
+                            <div class="method-item"><div class="method-icon">🔥</div>Grill</div>
+                            <div class="method-item"><div class="method-icon">♨️</div>Plancha</div>
+                            <div class="method-item"><div class="method-icon">🍖</div>BBQ</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item"><div class="timeline-title">Températures</div><div class="timeline-content">Bleu: 48°C • Saignant: 52°C • À point: 58°C</div></div>
+                </div>
+
+                <button class="btn-primary">🧮 Calculer le temps</button>
+            </div>
+            <div class="footer-bar green">Notes</div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TIMER ==================== -->
+<section id="section-timer">
+    <h2 class="section-title">⏱️ TIMER</h2>
+    <p class="section-desc">3 écrans</p>
+
+    <div class="maquettes-container">
+        <!-- Timer Accueil -->
+        <div class="maquette">
+            <div class="maquette-title">Timer - Accueil</div>
+            <div class="maquette-content" style="text-align: center;">
+                <h1 class="page-title">QUICK TIMER</h1>
+                <p class="page-subtitle">Lancez un minuteur rapide</p>
+
+                <div style="margin: 30px 0;">
+                    <div style="font-size: 60px; font-weight: 900; color: var(--accent);">00:00</div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px;">
+                    <button style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 20px; font-weight: 700; color: var(--accent);">+1</button>
+                    <button style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 20px; font-weight: 700; color: var(--accent);">+5</button>
+                    <button style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 20px; font-weight: 700; color: var(--accent);">+10</button>
+                </div>
+
+                <div class="input-field" style="margin-bottom: 20px;">
+                    <span class="input-icon">⏱️</span>
+                    <input type="text" placeholder="Ou entrez les minutes...">
+                </div>
+
+                <button class="btn-primary">▶️ Démarrer</button>
+
+                <div class="separator"></div>
+
+                <button class="btn-secondary">🧮 Utiliser le calculateur</button>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item active"><div class="nav-item-icon">⏱️</div>Timer</div>
+                <div class="nav-item"><div class="nav-item-icon">📚</div>Explorer</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+
+        <!-- Timer En cours -->
+        <div class="maquette">
+            <div class="maquette-title">Timer - En cours</div>
+            <div class="maquette-content">
+                <h1 class="page-title">CÔTE DE BOEUF</h1>
+                <p class="page-subtitle">Saignant • 1.2 kg</p>
+
+                <div class="timer-circle-container">
+                    <div class="timer-circle">
+                        <div class="timer-time">15:30</div>
+                        <div class="timer-label">en cours...</div>
+                    </div>
+                </div>
+
+                <div class="timer-controls">
+                    <div style="text-align: center;"><button class="timer-btn pause">⏸</button><div style="font-size: 10px; color: var(--text-light); margin-top: 4px;">Pause</div></div>
+                    <div style="text-align: center;"><button class="timer-btn stop">⏹</button><div style="font-size: 10px; color: var(--text-light); margin-top: 4px;">Stop</div></div>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-around; text-align: center;">
+                        <div><div style="font-size: 20px; font-weight: 700; color: var(--accent);">52°C</div><div style="font-size: 10px; color: var(--text-light);">Cible</div></div>
+                        <div><div style="font-size: 20px; font-weight: 700; color: var(--text-dark);">1.2 kg</div><div style="font-size: 10px; color: var(--text-light);">Poids</div></div>
+                        <div><div style="font-size: 20px; font-weight: 700; color: var(--green);">Poêle</div><div style="font-size: 10px; color: var(--text-light);">Méthode</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer Terminé -->
+        <div class="maquette">
+            <div class="maquette-title green">Timer - Terminé</div>
+            <div class="maquette-content" style="padding-top: 0;">
+                <div style="background: var(--green); padding: 35px 20px; margin: 0 -20px 15px; text-align: center; border-radius: 0 0 25px 25px;">
+                    <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+                    <div style="font-size: 26px; font-weight: 900; color: white;">C'EST PRÊT!</div>
+                    <div style="color: rgba(255,255,255,0.9); margin-top: 5px; font-size: 13px;">Côte de boeuf • Saignant</div>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 16px; font-weight: 700; color: var(--text-dark);">Temps de repos</div>
+                    <div style="font-size: 42px; font-weight: 900; color: var(--accent); margin: 8px 0;">5 min</div>
+                    <div style="font-size: 11px; color: var(--text-light);">Améliore la tendreté</div>
+                </div>
+
+                <div class="card">
+                    <div style="font-weight: 700; margin-bottom: 6px; font-size: 13px;">💡 Conseil</div>
+                    <div style="font-size: 12px; color: var(--text-light);">Couvrez légèrement d'aluminium pendant le repos.</div>
+                </div>
+
+                <button class="btn-green">🍽️ Bon appétit!</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== RESULTAT ==================== -->
+<section id="section-resultat">
+    <h2 class="section-title green">✅ RÉSULTAT</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title green">Résultat Calcul</div>
+            <div class="maquette-content" style="padding-top: 0;">
+                <div style="height: 100px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 -20px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 45px;">🥩</span></div>
+
+                <div class="result-header">
+                    <div class="result-title">CUISSON PARFAITE</div>
+                    <div class="result-subtitle">Entrecôte • Saignant • 300g</div>
+                </div>
+
+                <div class="result-stat"><div class="result-stat-value">8 min</div><div class="result-stat-label">Temps total (4 min/face)</div></div>
+                <div class="result-stat"><div class="result-stat-value">52°C</div><div class="result-stat-label">Température à coeur</div></div>
+                <div class="result-stat"><div class="result-stat-value">3 min</div><div class="result-stat-label">Temps de repos</div></div>
+
+                <div style="background: var(--yellow-light); padding: 10px; border-radius: 12px; margin-top: 12px;">
+                    <div style="font-weight: 700; font-size: 12px; margin-bottom: 4px;">💡 Astuce</div>
+                    <div style="font-size: 11px; color: var(--text-light);">Sortez la viande 30 min avant pour une cuisson uniforme.</div>
+                </div>
+
+                <button class="btn-primary" style="margin-top: 12px;">⏱️ Lancer le timer</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== RECETTES ==================== -->
+<section id="section-recettes">
+    <h2 class="section-title">🍳 RECETTES & ACCOMPAGNEMENTS</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Recettes - Accueil</div>
+            <div class="maquette-content">
+                <h1 class="page-title">RECETTES</h1>
+                <p class="page-subtitle">Sauces et accompagnements</p>
+
+                <div class="search-bar"><span>🔍</span><input type="text" placeholder="Rechercher..."></div>
+
+                <h3 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">🥄 Sauces</h3>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🥄</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Sauce Béarnaise</div>
+                        <div class="recipe-meta">⏱️ 15 min • Facile</div>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🥄</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Sauce au Poivre</div>
+                        <div class="recipe-meta">⏱️ 10 min • Facile</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin: 15px 0 10px;">🥗 Accompagnements</h3>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🍟</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Frites Maison</div>
+                        <div class="recipe-meta">⏱️ 30 min • Moyen</div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item active"><div class="nav-item-icon">🍳</div>Recettes</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Recette - Détail</div>
+            <div class="maquette-content" style="padding-top: 0;">
+                <div style="height: 150px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 -20px 15px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 60px;">🥄</span></div>
+
+                <h1 style="font-size: 22px; font-weight: 900; color: var(--text-dark);">Sauce Béarnaise</h1>
+                <div style="display: flex; gap: 10px; margin: 10px 0 15px;">
+                    <span class="meat-tag">⏱️ 15 min</span>
+                    <span class="meat-tag">👨‍🍳 Facile</span>
+                    <span class="meat-tag">🥩 Boeuf</span>
+                </div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Ingrédients</h3>
+                <div class="card" style="font-size: 12px; color: var(--text-light);">
+                    • 3 jaunes d'oeufs<br>
+                    • 200g de beurre<br>
+                    • 2 échalotes<br>
+                    • Estragon, cerfeuil<br>
+                    • Vinaigre de vin
+                </div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin: 12px 0 8px;">Préparation</h3>
+                <div class="card" style="font-size: 12px; color: var(--text-light);">
+                    1. Faire réduire le vinaigre avec les échalotes...<br>
+                    2. Ajouter les jaunes d'oeufs...<br>
+                    3. Incorporer le beurre fondu...
+                </div>
+            </div>
+            <div class="footer-bar">⭐ Ajouter aux favoris</div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== HISTORIQUE ==================== -->
+<section id="section-historique">
+    <h2 class="section-title">📋 HISTORIQUE</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Historique</div>
+            <div class="maquette-content">
+                <h1 class="page-title">HISTORIQUE</h1>
+                <p class="page-subtitle">Vos dernières cuissons</p>
+
+                <div class="history-item">
+                    <div class="history-icon">🥩</div>
+                    <div class="history-info">
+                        <div class="history-title">Entrecôte - Saignant</div>
+                        <div class="history-date">Aujourd'hui, 12:30 • 300g</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-icon">🍗</div>
+                    <div class="history-info">
+                        <div class="history-title">Poulet - Bien cuit</div>
+                        <div class="history-date">Hier, 19:45 • 1.2kg</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-icon">🥩</div>
+                    <div class="history-info">
+                        <div class="history-title">Côte de boeuf - À point</div>
+                        <div class="history-date">15 déc, 13:00 • 800g</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-icon">🐑</div>
+                    <div class="history-info">
+                        <div class="history-title">Gigot d'agneau - Rosé</div>
+                        <div class="history-date">12 déc, 12:00 • 2kg</div>
+                    </div>
+                    <div class="history-badge">Réussie</div>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item active"><div class="nav-item-icon">📋</div>Historique</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Historique - Vide</div>
+            <div class="maquette-content">
+                <h1 class="page-title">HISTORIQUE</h1>
+
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-title">Aucune cuisson</div>
+                    <div class="empty-text">Vous n'avez pas encore utilisé le calculateur. Lancez votre première cuisson!</div>
+                    <button class="btn-primary">🧮 Calculer une cuisson</button>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item active"><div class="nav-item-icon">📋</div>Historique</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FAVORIS ==================== -->
+<section id="section-favoris">
+    <h2 class="section-title">⭐ FAVORIS</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Favoris</div>
+            <div class="maquette-content">
+                <h1 class="page-title">FAVORIS</h1>
+                <p class="page-subtitle">Vos morceaux préférés</p>
+
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Entrecôte</div>
+                        <div class="meat-tags"><span class="meat-tag">Boeuf</span></div>
+                    </div>
+                    <span style="color: var(--yellow); font-size: 20px;">⭐</span>
+                </div>
+
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🥩</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Côte de boeuf</div>
+                        <div class="meat-tags"><span class="meat-tag">Boeuf</span></div>
+                    </div>
+                    <span style="color: var(--yellow); font-size: 20px;">⭐</span>
+                </div>
+
+                <div class="meat-list-item">
+                    <div class="meat-thumb">🍗</div>
+                    <div class="meat-info">
+                        <div class="meat-name">Magret de canard</div>
+                        <div class="meat-tags"><span class="meat-tag">Volaille</span></div>
+                    </div>
+                    <span style="color: var(--yellow); font-size: 20px;">⭐</span>
+                </div>
+
+                <div class="separator"></div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">🥄 Recettes favorites</h3>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🥄</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Sauce Béarnaise</div>
+                        <div class="recipe-meta">⏱️ 15 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item active"><div class="nav-item-icon">⭐</div>Favoris</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Favoris - Vide</div>
+            <div class="maquette-content">
+                <h1 class="page-title">FAVORIS</h1>
+
+                <div class="empty-state">
+                    <div class="empty-icon">⭐</div>
+                    <div class="empty-title">Aucun favori</div>
+                    <div class="empty-text">Ajoutez des morceaux et recettes à vos favoris pour y accéder rapidement.</div>
+                    <button class="btn-primary">📚 Explorer l'encyclopédie</button>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item active"><div class="nav-item-icon">⭐</div>Favoris</div>
+                <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROFIL ==================== -->
+<section id="section-profil">
+    <h2 class="section-title">👤 PROFIL & PARAMÈTRES</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Profil</div>
+            <div class="maquette-content">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 35px;">👨‍🍳</div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--text-dark);">Chef Amateur</h2>
+                    <p style="font-size: 12px; color: var(--text-light);">42 cuissons réalisées</p>
+                </div>
+
+                <div class="card" style="display: flex; justify-content: space-around; text-align: center;">
+                    <div><div style="font-size: 22px; font-weight: 700; color: var(--accent);">42</div><div style="font-size: 10px; color: var(--text-light);">Cuissons</div></div>
+                    <div><div style="font-size: 22px; font-weight: 700; color: var(--green);">98%</div><div style="font-size: 10px; color: var(--text-light);">Réussite</div></div>
+                    <div><div style="font-size: 22px; font-weight: 700; color: var(--yellow);">5</div><div style="font-size: 10px; color: var(--text-light);">Favoris</div></div>
+                </div>
+
+                <div class="separator"></div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">⚙️ Paramètres</h3>
+
+                <div class="settings-item">
+                    <span class="settings-icon">🔔</span>
+                    <span class="settings-label">Notifications</span>
+                    <div class="toggle-switch"></div>
+                </div>
+
+                <div class="settings-item">
+                    <span class="settings-icon">🌡️</span>
+                    <span class="settings-label">Unité de température</span>
+                    <span class="settings-arrow">°C ›</span>
+                </div>
+
+                <div class="settings-item">
+                    <span class="settings-icon">⚖️</span>
+                    <span class="settings-label">Unité de poids</span>
+                    <span class="settings-arrow">kg ›</span>
+                </div>
+
+                <div class="settings-item">
+                    <span class="settings-icon">🎨</span>
+                    <span class="settings-label">Thème</span>
+                    <span class="settings-arrow">Clair ›</span>
+                </div>
+
+                <div class="settings-item">
+                    <span class="settings-icon">ℹ️</span>
+                    <span class="settings-label">À propos</span>
+                    <span class="settings-arrow">›</span>
+                </div>
+            </div>
+            <div class="nav-bottom">
+                <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+                <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+                <div class="nav-item"><div class="nav-item-icon">📚</div>Explorer</div>
+                <div class="nav-item active"><div class="nav-item-icon">👤</div>Profil</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== RECHERCHE ==================== -->
+<section id="section-recherche">
+    <h2 class="section-title">🔍 RECHERCHE</h2>
+
+    <div class="maquettes-container">
+        <div class="maquette">
+            <div class="maquette-title">Recherche</div>
+            <div class="maquette-content">
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Rechercher un morceau, une recette...">
+                </div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">🕐 Recherches récentes</h3>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                    <span class="meat-tag" style="padding: 6px 12px; font-size: 12px;">Entrecôte</span>
+                    <span class="meat-tag" style="padding: 6px 12px; font-size: 12px;">Béarnaise</span>
+                    <span class="meat-tag" style="padding: 6px 12px; font-size: 12px;">Côte de boeuf</span>
+                </div>
+
+                <div class="separator"></div>
+
+                <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">🔥 Populaires</h3>
+
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div></div>
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Côte de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div></div>
+                <div class="meat-list-item"><div class="meat-thumb">🍗</div><div class="meat-info"><div class="meat-name">Magret</div><div class="meat-tags"><span class="meat-tag">Canard</span></div></div></div>
+            </div>
+            <div class="footer-bar">Tapez pour rechercher</div>
+        </div>
+
+        <div class="maquette">
+            <div class="maquette-title">Recherche - Résultats</div>
+            <div class="maquette-content">
+                <div class="search-bar" style="margin-bottom: 15px;">
+                    <span>🔍</span>
+                    <input type="text" value="entrecôte">
+                    <span style="color: var(--accent);">✕</span>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-light); margin-bottom: 15px;">3 résultats pour "entrecôte"</p>
+
+                <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">🥩 Morceaux</h3>
+
+                <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Boeuf</span><span class="meat-tag">Noble</span></div></div><span style="color: var(--accent);">›</span></div>
+
+                <h3 style="font-size: 12px; font-weight: 700; margin: 15px 0 8px;">🍳 Recettes</h3>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🥩</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Entrecôte grillée parfaite</div>
+                        <div class="recipe-meta">⏱️ 20 min</div>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-image">🥄</div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">Sauce pour entrecôte</div>
+                        <div class="recipe-meta">⏱️ 10 min</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function showSection(section) {
+        const sections = ['splash', 'onboarding', 'accueil', 'calculateur', 'encyclopedie', 'timer', 'resultat', 'recettes', 'historique', 'favoris', 'profil', 'recherche'];
+
+        if (section === 'all') {
+            sections.forEach(s => document.getElementById('section-' + s).classList.remove('section-hidden'));
+        } else {
+            sections.forEach(s => {
+                document.getElementById('section-' + s).classList.toggle('section-hidden', s !== section);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

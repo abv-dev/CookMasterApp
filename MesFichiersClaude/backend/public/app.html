@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CookMaster - Application Complète</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAF6F1;
+            color: #3E2723;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #F5EBE0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            color: #8D6E63;
+        }
+
+        .nav-item.active {
+            color: #8B4513;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Container */
+        .app-container {
+            padding-bottom: 80px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .card h3 {
+            color: #6D4C41;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        /* Quick action cards */
+        .action-card {
+            background: linear-gradient(135deg, #F5EBE0 0%, #FAF6F1 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(139, 69, 19, 0.2);
+            border-color: #8B4513;
+        }
+
+        .action-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .action-card .title {
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 5px;
+        }
+
+        .action-card .subtitle {
+            font-size: 0.85em;
+            color: #6D4C41;
+        }
+
+        /* Meat cards */
+        .meat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #F5EBE0;
+        }
+
+        .meat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #8B4513;
+        }
+
+        .meat-card .emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .meat-card .name {
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 5px;
+        }
+
+        .meat-card .category {
+            font-size: 0.85em;
+            color: #8B4513;
+        }
+
+        /* Method chips */
+        .method-chip {
+            background: #F5EBE0;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .method-chip:hover {
+            background: white;
+            border-color: #E07B39;
+        }
+
+        .method-chip .icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .method-chip .label {
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #3E2723;
+        }
+
+        /* Search bar */
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            border: 2px solid #F5EBE0;
+            border-radius: 12px;
+            font-size: 1em;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #8B4513;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8B4513;
+            font-size: 1.2em;
+        }
+
+        /* Filter chips */
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: white;
+            border: 2px solid #F5EBE0;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .filter-chip.active {
+            background: #8B4513;
+            color: white;
+            border-color: #8B4513;
+        }
+
+        /* Timer card */
+        .timer-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-progress {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .timer-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 12px solid #F5EBE0;
+            position: relative;
+        }
+
+        .timer-time {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .timer-time .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3E2723;
+        }
+
+        .timer-time .label {
+            color: #6D4C41;
+            font-size: 0.9em;
+        }
+
+        .timer-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Community post */
+        .post-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .post-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .post-info .name {
+            font-weight: bold;
+            color: #3E2723;
+        }
+
+        .post-info .time {
+            font-size: 0.85em;
+            color: #8D6E63;
+        }
+
+        .stars {
+            color: #E07B39;
+            font-size: 1.1em;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #8B4513;
+            border: 2px solid #8B4513;
+        }
+
+        .btn-secondary:hover {
+            background: #8B4513;
+            color: white;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #F5EBE0;
+            border-radius: 12px;
+        }
+
+        .stat-item .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .stat-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 4px;
+        }
+
+        .stat-item .label {
+            font-size: 0.85em;
+            color: #6D4C41;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tip card */
+        .tip-card {
+            background: linear-gradient(135deg, #E07B39 10%, #F57C00 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tip-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .tip-card h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        /* Profile section */
+        .profile-header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #F5EBE0 0%, #FAF6F1 100%);
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: #6D4C41;
+        }
+
+        /* Achievement badge */
+        .achievement {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: #F5EBE0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .achievement .emoji {
+            font-size: 2.5em;
+        }
+
+        .achievement-info .title {
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 4px;
+        }
+
+        .achievement-info .desc {
+            font-size: 0.9em;
+            color: #6D4C41;
+        }
+
+        /* Modal détail morceau */
+        .cut-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cut-modal.active {
+            display: block;
+        }
+
+        .cut-modal-content {
+            background: #FAF6F1;
+            border-radius: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .cut-modal-header {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .cut-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .cut-modal-body {
+            padding: 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8B4513;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #F5EBE0;
+        }
+
+        .section-title .icon {
+            font-size: 1.3em;
+        }
+
+        /* Anatomie */
+        .anatomie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .anatomie-item {
+            background: #F5EBE0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .anatomie-item .label {
+            font-size: 0.85em;
+            color: #6D4C41;
+            margin-bottom: 4px;
+        }
+
+        .anatomie-item .value {
+            font-weight: 600;
+            color: #3E2723;
+        }
+
+        /* Techniques chef */
+        .technique-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .technique-list li {
+            padding: 12px 15px 12px 45px;
+            background: #F5EBE0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .technique-list li::before {
+            content: attr(data-num);
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: #8B4513;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        /* Caractéristiques */
+        .carac-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .carac-item {
+            background: linear-gradient(135deg, #F5EBE0 0%, #FAF6F1 100%);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .carac-item:hover {
+            border-color: #8B4513;
+        }
+
+        .carac-item .icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .carac-item .label {
+            font-size: 0.8em;
+            color: #6D4C41;
+            margin-bottom: 4px;
+        }
+
+        .carac-item .value {
+            font-weight: 600;
+            color: #3E2723;
+            font-size: 0.95em;
+        }
+
+        /* Sauces & Accompagnements */
+        .sauce-chip, .accomp-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #F5EBE0;
+            padding: 10px 15px;
+            border-radius: 25px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sauce-chip:hover, .accomp-chip:hover {
+            background: #8B4513;
+            color: white;
+        }
+
+        .accomp-chip.clickable {
+            background: linear-gradient(135deg, #E07B39 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .accomp-chip.clickable:hover {
+            transform: scale(1.05);
+        }
+
+        /* Erreurs à éviter */
+        .erreur-card {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            border-left: 4px solid #E07B39;
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
+        }
+
+        .erreur-card .erreur-titre {
+            color: #E65100;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .erreur-card .consequence {
+            color: #BF360C;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .erreur-card .solution {
+            color: #2E7D32;
+            font-size: 0.9em;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .erreur-card .solution::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Le saviez-vous */
+        .saviez-vous {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .saviez-vous .icon {
+            font-size: 2.5em;
+        }
+
+        .saviez-vous .content {
+            flex: 1;
+        }
+
+        .saviez-vous .title {
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 8px;
+        }
+
+        .saviez-vous .text {
+            color: #1B5E20;
+            line-height: 1.6;
+        }
+
+        /* Bouton calculateur */
+        .calc-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #E07B39 0%, #F57C00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(224, 123, 57, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(224, 123, 57, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HOME SCREEN -->
+        <div id="home" class="screen active">
+            <div class="header">
+                <h1>🥩 CookMaster</h1>
+                <p>Bonjour, Chef! Prêt à cuisiner?</p>
+            </div>
+
+            <div class="content">
+                <!-- Quick Actions -->
+                <div class="grid-2" style="margin-bottom: 25px;">
+                    <div class="action-card" onclick="showScreen('calculator')">
+                        <div class="icon">🧮</div>
+                        <div class="title">Calculer</div>
+                        <div class="subtitle">Temps de cuisson</div>
+                    </div>
+                    <div class="action-card" onclick="showScreen('timer')">
+                        <div class="icon">⏱️</div>
+                        <div class="title">Timer</div>
+                        <div class="subtitle">Minuteur</div>
+                    </div>
+                </div>
+
+                <!-- Popular Meats -->
+                <div class="card">
+                    <h2>Viandes Populaires</h2>
+                    <div class="grid-3" id="popularMeats"></div>
+                </div>
+
+                <!-- Cooking Methods -->
+                <div class="card">
+                    <h2>Méthodes de Cuisson</h2>
+                    <div class="grid-3">
+                        <div class="method-chip">
+                            <div class="icon">🔥</div>
+                            <div class="label">Four</div>
+                        </div>
+                        <div class="method-chip">
+                            <div class="icon">🍳</div>
+                            <div class="label">Poêle</div>
+                        </div>
+                        <div class="method-chip">
+                            <div class="icon">🔥</div>
+                            <div class="label">Barbecue</div>
+                        </div>
+                        <div class="method-chip">
+                            <div class="icon">💧</div>
+                            <div class="label">Sous-vide</div>
+                        </div>
+                        <div class="method-chip">
+                            <div class="icon">🥘</div>
+                            <div class="label">Mijoter</div>
+                        </div>
+                        <div class="method-chip">
+                            <div class="icon">⚡</div>
+                            <div class="label">Air Fryer</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip of the day -->
+                <div class="tip-card">
+                    <div class="icon">💡</div>
+                    <h3>Conseil du jour</h3>
+                    <p id="tipOfDay"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPLORER SCREEN -->
+        <div id="explorer" class="screen">
+            <div class="header">
+                <h1>Explorer les Viandes</h1>
+                <p>Découvrez notre catalogue</p>
+            </div>
+
+            <div class="content">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Rechercher une viande...">
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <div class="filter-chips" id="filterChips"></div>
+
+                <div id="meatsList"></div>
+            </div>
+        </div>
+
+        <!-- TIMER SCREEN -->
+        <div id="timer" class="screen">
+            <div class="header">
+                <h1>Minuteurs Actifs</h1>
+                <p>Suivez vos cuissons</p>
+            </div>
+
+            <div class="content" id="timersList"></div>
+        </div>
+
+        <!-- COMMUNITY SCREEN -->
+        <div id="community" class="screen">
+            <div class="header">
+                <h1>Communauté</h1>
+                <p>Partagez vos expériences</p>
+            </div>
+
+            <div class="content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="icon">👥</div>
+                        <div class="value">1,234</div>
+                        <div class="label">Membres</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon">🍽️</div>
+                        <div class="value">5,678</div>
+                        <div class="label">Recettes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon">⭐</div>
+                        <div class="value">12,345</div>
+                        <div class="label">Reviews</div>
+                    </div>
+                </div>
+
+                <div id="postsList"></div>
+            </div>
+        </div>
+
+        <!-- PROFILE SCREEN -->
+        <div id="profile" class="screen">
+            <div class="header">
+                <h1>Profil</h1>
+                <p>Vos statistiques</p>
+            </div>
+
+            <div class="content">
+                <div class="profile-header">
+                    <div class="profile-avatar">M</div>
+                    <div class="profile-name">Chef Marcel</div>
+                    <div class="profile-email">marcel@cookmaster.app</div>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        ✏️ Modifier le profil
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2>Statistiques de cuisson</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="icon">🍽️</div>
+                            <div class="value">47</div>
+                            <div class="label">Cuissons</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="icon">📖</div>
+                            <div class="value">23</div>
+                            <div class="label">Recettes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="icon">❤️</div>
+                            <div class="value">15</div>
+                            <div class="label">Favoris</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Réalisations</h2>
+                    <div class="achievement">
+                        <div class="emoji">🏆</div>
+                        <div class="achievement-info">
+                            <div class="title">Maître Grill</div>
+                            <div class="desc">50 cuissons au barbecue</div>
+                        </div>
+                    </div>
+                    <div class="achievement">
+                        <div class="emoji">⭐</div>
+                        <div class="achievement-info">
+                            <div class="title">Chef Expert</div>
+                            <div class="desc">Toutes les viandes maîtrisées</div>
+                        </div>
+                    </div>
+                    <div class="achievement">
+                        <div class="emoji">🔥</div>
+                        <div class="achievement-info">
+                            <div class="title">Pyroman</div>
+                            <div class="desc">100 cuissons au four</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CALCULATOR SCREEN -->
+        <div id="calculator" class="screen">
+            <div class="header">
+                <h1>Calculateur</h1>
+                <p>Calculez votre temps de cuisson</p>
+            </div>
+
+            <div class="content">
+                <div class="card">
+                    <h2>Paramètres de cuisson</h2>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Type de viande</label>
+                        <select id="calcMeatSelect" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;">
+                            <option value="">Sélectionnez...</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Morceau</label>
+                        <select id="calcCutSelect" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;" disabled>
+                            <option value="">Sélectionnez d'abord une viande...</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Poids (kg)</label>
+                        <input type="number" id="calcWeight" placeholder="Ex: 0.5" step="0.1" min="0.1" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Épaisseur (cm)</label>
+                        <input type="number" id="calcThickness" placeholder="Ex: 2.5" step="0.1" min="0.5" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Cuisson désirée</label>
+                        <select id="calcDoneness" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;">
+                            <option value="">Sélectionnez...</option>
+                            <option value="saignant">Saignant (55°C)</option>
+                            <option value="à point">À point (60°C)</option>
+                            <option value="bien cuit">Bien cuit (70°C)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Méthode de cuisson</label>
+                        <select id="calcMethod" style="width: 100%; padding: 12px; border: 2px solid #F5EBE0; border-radius: 10px; font-size: 1em;">
+                            <option value="four_traditionnel">Four traditionnel</option>
+                            <option value="four_chaleur_tournante">Four chaleur tournante</option>
+                            <option value="poele">Poêle</option>
+                            <option value="grill">Grill</option>
+                            <option value="barbecue_charbon">Barbecue charbon</option>
+                            <option value="barbecue_gaz">Barbecue gaz</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="calculate()" style="width: 100%;">
+                        🔥 Calculer le temps de cuisson
+                    </button>
+
+                    <div id="calcResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="showScreen('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Accueil</div>
+            </button>
+            <button class="nav-item" onclick="showScreen('explorer')">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">Explorer</div>
+            </button>
+            <button class="nav-item" onclick="showScreen('timer')">
+                <div class="nav-icon">⏱️</div>
+                <div class="nav-label">Timer</div>
+            </button>
+            <button class="nav-item" onclick="showScreen('community')">
+                <div class="nav-icon">👥</div>
+                <div class="nav-label">Communauté</div>
+            </button>
+            <button class="nav-item" onclick="showScreen('profile')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profil</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal détail morceau -->
+    <div id="cutModal" class="cut-modal" onclick="closeCutModal(event)">
+        <div class="cut-modal-content" onclick="event.stopPropagation()">
+            <div class="cut-modal-header">
+                <button class="cut-modal-close" onclick="closeCutModal()">&times;</button>
+                <div id="cutModalTitle"></div>
+            </div>
+            <div class="cut-modal-body" id="cutModalBody">
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

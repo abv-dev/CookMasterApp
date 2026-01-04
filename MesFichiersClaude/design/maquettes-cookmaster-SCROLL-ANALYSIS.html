@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookmaster - ANALYSE SCROLLING</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF0F0;
+            --accent: #F97066;
+            --accent-light: #FFB5B5;
+            --text-dark: #2D3436;
+            --text-light: #636E72;
+            --white: #FFFFFF;
+            --green: #8BC34A;
+            --yellow: #FFD93D;
+            --yellow-light: #FFF3CD;
+            --surface: #FFEAEA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #3D3D3D;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1.main-title {
+            color: white;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .badge-scroll {
+            background: #FF5722;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-no-scroll {
+            background: var(--green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        .nav-maquettes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: #3D3D3D;
+            padding: 15px;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .nav-maquettes button {
+            padding: 8px 16px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 11px;
+        }
+
+        .nav-maquettes button:hover { background: var(--accent-light); transform: scale(1.05); }
+
+        /* Section titles */
+        h2.section-title {
+            color: white;
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 22px;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            border-radius: 15px;
+        }
+
+        .maquettes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+
+        /* Maquette - hauteur fixe iPhone */
+        .maquette {
+            width: 375px;
+            height: 812px; /* iPhone X/11/12/13 height */
+            background: var(--bg-color);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .maquette-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            flex-shrink: 0;
+        }
+
+        .maquette-title {
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        .scroll-indicator {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        .scroll-indicator.scroll { background: #FF5722; color: white; }
+        .scroll-indicator.no-scroll { background: var(--green); color: white; }
+
+        .maquette-content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .maquette-content.no-scroll-content {
+            overflow-y: hidden;
+        }
+
+        /* ========== COMMON STYLES ========== */
+        .page-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            font-size: 11px;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb span { color: var(--accent); font-weight: 600; }
+
+        .separator {
+            height: 2px;
+            background: var(--accent-light);
+            margin: 12px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            width: 100%;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--green), #A5D66B);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        /* Navigation bar bottom */
+        .nav-bottom {
+            display: flex;
+            background: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 0 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 5px 0;
+            color: var(--text-light);
+            font-size: 9px;
+        }
+
+        .nav-item.active { color: var(--accent); }
+        .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
+
+        /* Category grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .category-tile {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .category-tile-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 6px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .category-tile-name { font-weight: 700; color: var(--text-dark); font-size: 12px; margin-bottom: 2px; }
+        .category-tile-count { font-size: 9px; color: var(--text-light); background: var(--yellow-light); padding: 2px 6px; border-radius: 8px; display: inline-block; }
+
+        /* Type cards */
+        .type-card {
+            background: white;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .type-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .type-info { flex: 1; }
+        .type-name { font-weight: 700; font-size: 13px; color: var(--text-dark); margin-bottom: 2px; }
+        .type-desc { font-size: 10px; color: var(--text-light); }
+        .type-arrow { font-size: 16px; color: var(--accent); }
+
+        /* Subcat items */
+        .subcat-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .subcat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .subcat-name { flex: 1; font-weight: 600; color: var(--text-dark); font-size: 13px; }
+        .subcat-count { background: var(--yellow); color: var(--text-dark); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; margin-right: 6px; }
+
+        /* Meat list */
+        .meat-list-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .meat-thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .meat-info { flex: 1; }
+        .meat-name { font-weight: 600; color: var(--text-dark); font-size: 12px; }
+        .meat-tags { display: flex; gap: 4px; margin-top: 2px; }
+        .meat-tag { font-size: 8px; padding: 2px 6px; border-radius: 6px; background: var(--yellow-light); color: var(--text-dark); }
+
+        /* Input styles */
+        .input-group { margin-bottom: 10px; }
+        .input-label { font-size: 11px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; display: block; }
+
+        .input-field {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .input-field input { border: none; flex: 1; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; background: transparent; }
+        .input-icon { color: var(--accent); margin-right: 8px; font-size: 14px; }
+
+        /* Doneness */
+        .doneness-options { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+
+        .doneness-btn {
+            padding: 6px 10px;
+            border: 2px solid var(--accent-light);
+            border-radius: 10px;
+            background: white;
+            font-size: 10px;
+            color: var(--text-dark);
+        }
+
+        .doneness-btn.selected { background: var(--accent); border-color: var(--accent); color: white; }
+        .doneness-btn small { display: block; font-size: 8px; color: var(--text-light); }
+        .doneness-btn.selected small { color: rgba(255,255,255,0.8); }
+
+        /* Slider */
+        .slider-container { background: white; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .slider-value { font-weight: 700; color: var(--accent); background: var(--yellow); padding: 2px 6px; border-radius: 6px; font-size: 11px; }
+        .slider { width: 100%; height: 5px; border-radius: 3px; background: var(--surface); -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 4px; font-size: 8px; color: var(--text-light); }
+
+        /* Timer */
+        .timer-circle-container { display: flex; justify-content: center; margin: 15px 0; }
+
+        .timer-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(249, 112, 102, 0.4);
+        }
+
+        .timer-time { font-size: 40px; font-weight: 700; color: white; }
+        .timer-label { color: rgba(255,255,255,0.8); font-size: 10px; }
+
+        .timer-controls { display: flex; justify-content: center; gap: 15px; margin-top: 12px; }
+
+        .timer-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .timer-btn.pause { background: var(--surface); color: var(--accent); }
+        .timer-btn.stop { background: var(--accent); color: white; }
+
+        /* Result */
+        .result-header {
+            background: var(--green);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: -15px -15px 12px -15px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .result-title { font-size: 18px; font-weight: 900; text-transform: uppercase; }
+        .result-subtitle { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+
+        .result-stat { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--surface); }
+        .result-stat-value { font-size: 22px; font-weight: 700; color: var(--text-dark); min-width: 70px; }
+        .result-stat-label { font-size: 11px; color: var(--text-light); }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 18px; }
+        .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--green); }
+
+        .timeline-item { position: relative; margin-bottom: 14px; }
+        .timeline-item::before { content: ''; position: absolute; left: -15px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+        .timeline-title { font-weight: 700; color: var(--text-dark); margin-bottom: 2px; font-size: 12px; }
+        .timeline-content { font-size: 10px; color: var(--text-light); line-height: 1.4; }
+
+        .cooking-methods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; }
+        .method-item { background: white; border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 9px; }
+        .method-icon { font-size: 14px; margin-bottom: 2px; }
+
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+        .search-bar input { border: none; flex: 1; font-family: 'Poppins', sans-serif; font-size: 12px; outline: none; margin-left: 8px; }
+
+        /* History item */
+        .history-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .history-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .history-info { flex: 1; }
+        .history-title { font-weight: 600; color: var(--text-dark); font-size: 13px; }
+        .history-date { font-size: 10px; color: var(--text-light); }
+        .history-badge { background: var(--green); color: white; padding: 3px 8px; border-radius: 8px; font-size: 9px; font-weight: 600; }
+
+        /* Settings item */
+        .settings-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .settings-icon { font-size: 18px; margin-right: 10px; }
+        .settings-label { flex: 1; font-weight: 500; color: var(--text-dark); font-size: 13px; }
+        .settings-arrow { color: var(--text-light); font-size: 12px; }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--green);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+        }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 30px 15px; }
+        .empty-icon { font-size: 50px; margin-bottom: 12px; }
+        .empty-title { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .empty-text { font-size: 12px; color: var(--text-light); margin-bottom: 15px; }
+
+        /* Quick actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+
+        .quick-action {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        .quick-action-icon { font-size: 28px; margin-bottom: 6px; }
+        .quick-action-label { font-weight: 600; font-size: 11px; color: var(--text-dark); }
+
+        /* Onboarding */
+        .onboarding-image {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            margin-bottom: 20px;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 15px 0;
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-light); }
+        .dot.active { background: var(--accent); width: 20px; border-radius: 4px; }
+
+        /* Recipe card */
+        .recipe-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .recipe-image {
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .recipe-content { padding: 10px; }
+        .recipe-title { font-weight: 700; font-size: 13px; color: var(--text-dark); margin-bottom: 3px; }
+        .recipe-meta { font-size: 10px; color: var(--text-light); }
+
+        /* Detail sections for encyclopedia */
+        .detail-section {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .detail-section-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-text {
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .characteristic-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .characteristic-item {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .characteristic-label { font-size: 9px; color: var(--text-light); }
+        .characteristic-value { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+        .tip-list {
+            list-style: none;
+        }
+
+        .tip-list li {
+            font-size: 10px;
+            color: var(--text-light);
+            padding: 4px 0;
+            border-bottom: 1px solid var(--surface);
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .tip-list li::before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .sauce-item {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+        }
+
+        .sauce-name { font-weight: 600; font-size: 11px; color: var(--text-dark); }
+        .sauce-desc { font-size: 9px; color: var(--text-light); }
+
+        /* Section hidden */
+        .section-hidden { display: none !important; }
+
+        /* Scroll indicator animation */
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .scroll-indicator.scroll {
+            animation: scrollPulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="main-title">ANALYSE DU SCROLLING - Cookmaster</h1>
+
+<div class="legend">
+    <div class="legend-item">
+        <span class="badge-no-scroll">PAS DE SCROLL</span>
+        <span>Contenu tient dans l'écran</span>
+    </div>
+    <div class="legend-item">
+        <span class="badge-scroll">SCROLL NECESSAIRE</span>
+        <span>Contenu dépasse l'écran</span>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav-maquettes">
+    <button onclick="showSection('all')">Tout afficher</button>
+    <button onclick="showSection('no-scroll')">Sans scroll</button>
+    <button onclick="showSection('scroll')">Avec scroll</button>
+</nav>
+
+<!-- ==================== ECRANS SANS SCROLL ==================== -->
+<h2 class="section-title" style="background: var(--green);">ECRANS SANS SCROLL (8 écrans)</h2>
+
+<div class="maquettes-container" id="no-scroll-screens">
+
+    <!-- SPLASH -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Splash Screen</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="font-size: 70px; margin-bottom: 15px;">🥩</div>
+            <h1 style="font-size: 38px; font-weight: 900; color: var(--accent);">COOKMASTER</h1>
+            <p style="color: var(--text-light); margin-top: 8px; font-size: 13px;">La cuisson parfaite, simplement.</p>
+            <div style="margin-top: 30px;">
+                <div style="width: 35px; height: 35px; border: 3px solid var(--accent); border-top-color: transparent; border-radius: 50%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING 1 -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Onboarding 1/3</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="text-align: center;">
+            <div class="onboarding-image">🧮</div>
+            <h2 style="font-size: 20px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px;">Calculez le temps parfait</h2>
+            <p style="color: var(--text-light); font-size: 12px; line-height: 1.5;">Entrez le type de viande, le poids et le niveau de cuisson souhaité.</p>
+            <div class="onboarding-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <button class="btn-primary" style="margin-top: 15px;">Suivant</button>
+            <p style="margin-top: 12px; color: var(--text-light); font-size: 11px;">Passer</p>
+        </div>
+    </div>
+
+    <!-- ONBOARDING 2 -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Onboarding 2/3</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="text-align: center;">
+            <div class="onboarding-image">⏱️</div>
+            <h2 style="font-size: 20px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px;">Timer intelligent</h2>
+            <p style="color: var(--text-light); font-size: 12px; line-height: 1.5;">Lancez le minuteur et recevez une notification quand c'est prêt.</p>
+            <div class="onboarding-dots">
+                <div class="dot"></div>
+                <div class="dot active"></div>
+                <div class="dot"></div>
+            </div>
+            <button class="btn-primary" style="margin-top: 15px;">Suivant</button>
+        </div>
+    </div>
+
+    <!-- ONBOARDING 3 -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Onboarding 3/3</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="text-align: center;">
+            <div class="onboarding-image">📚</div>
+            <h2 style="font-size: 20px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px;">Encyclopédie complète</h2>
+            <p style="color: var(--text-light); font-size: 12px; line-height: 1.5;">Découvrez tous les morceaux et les meilleures méthodes de cuisson.</p>
+            <div class="onboarding-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot active"></div>
+            </div>
+            <button class="btn-green" style="margin-top: 15px;">Commencer</button>
+        </div>
+    </div>
+
+    <!-- TIMER ACCUEIL -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Timer - Accueil</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="text-align: center;">
+            <h1 class="page-title">QUICK TIMER</h1>
+            <p class="page-subtitle">Lancez un minuteur rapide</p>
+
+            <div style="margin: 25px 0;">
+                <div style="font-size: 50px; font-weight: 900; color: var(--accent);">00:00</div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
+                <button style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 18px; font-weight: 700; color: var(--accent);">+1</button>
+                <button style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 18px; font-weight: 700; color: var(--accent);">+5</button>
+                <button style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--accent); background: white; font-size: 18px; font-weight: 700; color: var(--accent);">+10</button>
+            </div>
+
+            <div class="input-field" style="margin-bottom: 15px;">
+                <span class="input-icon">⏱️</span>
+                <input type="text" placeholder="Ou entrez les minutes...">
+            </div>
+
+            <button class="btn-primary">Démarrer</button>
+            <div class="separator"></div>
+            <button class="btn-secondary">Utiliser le calculateur</button>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item active"><div class="nav-item-icon">⏱️</div>Timer</div>
+            <div class="nav-item"><div class="nav-item-icon">📚</div>Explorer</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- TIMER EN COURS -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Timer - En cours</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content">
+            <h1 class="page-title">CÔTE DE BOEUF</h1>
+            <p class="page-subtitle">Saignant • 1.2 kg</p>
+
+            <div class="timer-circle-container">
+                <div class="timer-circle">
+                    <div class="timer-time">15:30</div>
+                    <div class="timer-label">en cours...</div>
+                </div>
+            </div>
+
+            <div class="timer-controls">
+                <div style="text-align: center;"><button class="timer-btn pause">⏸</button><div style="font-size: 9px; color: var(--text-light); margin-top: 3px;">Pause</div></div>
+                <div style="text-align: center;"><button class="timer-btn stop">⏹</button><div style="font-size: 9px; color: var(--text-light); margin-top: 3px;">Stop</div></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-around; text-align: center;">
+                    <div><div style="font-size: 18px; font-weight: 700; color: var(--accent);">52°C</div><div style="font-size: 9px; color: var(--text-light);">Cible</div></div>
+                    <div><div style="font-size: 18px; font-weight: 700; color: var(--text-dark);">1.2 kg</div><div style="font-size: 9px; color: var(--text-light);">Poids</div></div>
+                    <div><div style="font-size: 18px; font-weight: 700; color: var(--green);">Poêle</div><div style="font-size: 9px; color: var(--text-light);">Méthode</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIMER TERMINE -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title" style="background: var(--green);">Timer - Terminé</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content" style="padding-top: 0;">
+            <div style="background: var(--green); padding: 30px 15px; margin: 0 -15px 12px; text-align: center; border-radius: 0 0 20px 20px;">
+                <div style="font-size: 45px; margin-bottom: 8px;">🎉</div>
+                <div style="font-size: 24px; font-weight: 900; color: white;">C'EST PRÊT!</div>
+                <div style="color: rgba(255,255,255,0.9); margin-top: 4px; font-size: 12px;">Côte de boeuf • Saignant</div>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-dark);">Temps de repos</div>
+                <div style="font-size: 38px; font-weight: 900; color: var(--accent); margin: 6px 0;">5 min</div>
+                <div style="font-size: 10px; color: var(--text-light);">Améliore la tendreté</div>
+            </div>
+
+            <div class="card">
+                <div style="font-weight: 700; margin-bottom: 5px; font-size: 12px;">💡 Conseil</div>
+                <div style="font-size: 11px; color: var(--text-light);">Couvrez légèrement d'aluminium pendant le repos.</div>
+            </div>
+
+            <button class="btn-green">Bon appétit!</button>
+        </div>
+    </div>
+
+    <!-- HISTORIQUE VIDE -->
+    <div class="maquette" data-scroll="no">
+        <div class="maquette-header">
+            <span class="maquette-title">Historique - Vide</span>
+            <span class="scroll-indicator no-scroll">PAS DE SCROLL</span>
+        </div>
+        <div class="maquette-content no-scroll-content">
+            <h1 class="page-title">HISTORIQUE</h1>
+
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">Aucune cuisson</div>
+                <div class="empty-text">Vous n'avez pas encore utilisé le calculateur.</div>
+                <button class="btn-primary">Calculer une cuisson</button>
+            </div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item active"><div class="nav-item-icon">📋</div>Historique</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== ECRANS AVEC SCROLL ==================== -->
+<h2 class="section-title" style="background: #FF5722;">ECRANS AVEC SCROLL (18 écrans)</h2>
+
+<div class="maquettes-container" id="scroll-screens">
+
+    <!-- ACCUEIL -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Accueil Principal</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h1 style="font-size: 24px; font-weight: 900; color: var(--accent);">COOKMASTER</h1>
+                <p style="color: var(--text-light); font-size: 11px;">Bienvenue, Chef !</p>
+            </div>
+
+            <div class="quick-actions">
+                <div class="quick-action"><div class="quick-action-icon">🧮</div><div class="quick-action-label">Calculateur</div></div>
+                <div class="quick-action"><div class="quick-action-icon">⏱️</div><div class="quick-action-label">Quick Timer</div></div>
+                <div class="quick-action"><div class="quick-action-icon">📚</div><div class="quick-action-label">Encyclopédie</div></div>
+                <div class="quick-action"><div class="quick-action-icon">🍳</div><div class="quick-action-label">Recettes</div></div>
+            </div>
+
+            <div class="separator"></div>
+            <h3 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">📋 Dernières cuissons</h3>
+
+            <div class="history-item">
+                <div class="history-icon">🥩</div>
+                <div class="history-info"><div class="history-title">Entrecôte - Saignant</div><div class="history-date">Aujourd'hui, 12:30</div></div>
+                <div class="history-badge">Réussie</div>
+            </div>
+            <div class="history-item">
+                <div class="history-icon">🍗</div>
+                <div class="history-info"><div class="history-title">Poulet - Bien cuit</div><div class="history-date">Hier, 19:45</div></div>
+                <div class="history-badge">Réussie</div>
+            </div>
+            <div class="history-item">
+                <div class="history-icon">🥩</div>
+                <div class="history-info"><div class="history-title">Côte de boeuf</div><div class="history-date">15 déc, 13:00</div></div>
+                <div class="history-badge">Réussie</div>
+            </div>
+
+            <button class="btn-secondary" style="margin-top: 10px;">Voir tout l'historique</button>
+
+            <div class="separator"></div>
+            <h3 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">⭐ Favoris</h3>
+
+            <div class="meat-list-item">
+                <div class="meat-thumb">🥩</div>
+                <div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div>
+            </div>
+            <div class="meat-list-item">
+                <div class="meat-thumb">🥩</div>
+                <div class="meat-info"><div class="meat-name">Filet de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div>
+            </div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item active"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item"><div class="nav-item-icon">📚</div>Explorer</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- CALC 1/5 - VIANDE -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Calc 1/5 - Viande</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">CALCULATEUR</h1>
+            <p class="page-subtitle">Choisissez votre type de viande</p>
+
+            <div class="category-grid">
+                <div class="category-tile">
+                    <div class="category-tile-icon">🥩</div>
+                    <div class="category-tile-name">Boeuf</div>
+                    <div class="category-tile-count">45 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🍖</div>
+                    <div class="category-tile-name">Veau</div>
+                    <div class="category-tile-count">28 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🥓</div>
+                    <div class="category-tile-name">Porc</div>
+                    <div class="category-tile-count">35 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🍗</div>
+                    <div class="category-tile-name">Volaille</div>
+                    <div class="category-tile-count">22 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🐑</div>
+                    <div class="category-tile-name">Agneau</div>
+                    <div class="category-tile-count">18 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🦆</div>
+                    <div class="category-tile-name">Canard</div>
+                    <div class="category-tile-count">12 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🦌</div>
+                    <div class="category-tile-name">Gibier</div>
+                    <div class="category-tile-count">15 morceaux</div>
+                </div>
+                <div class="category-tile">
+                    <div class="category-tile-icon">🐰</div>
+                    <div class="category-tile-name">Lapin</div>
+                    <div class="category-tile-count">8 morceaux</div>
+                </div>
+            </div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px; font-weight: 600;">Sélectionnez une catégorie</div>
+    </div>
+
+    <!-- CALC 2/5 - TYPE -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Calc 2/5 - Type</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">BOEUF</h1>
+            <p class="page-subtitle">Choisissez le type de morceau</p>
+            <div class="breadcrumb"><span>🥩 Boeuf</span></div>
+
+            <div class="type-card">
+                <div class="type-icon">⭐</div>
+                <div class="type-info"><div class="type-name">Morceaux Classiques</div><div class="type-desc">Entrecôte, faux-filet, bavette, rumsteck...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+            <div class="type-card">
+                <div class="type-icon">👨‍🍳</div>
+                <div class="type-info"><div class="type-name">Pièces du Boucher</div><div class="type-desc">Onglet, hampe, araignée, merlan...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+            <div class="type-card">
+                <div class="type-icon">🍲</div>
+                <div class="type-info"><div class="type-name">Morceaux à Mijoter</div><div class="type-desc">Paleron, gîte, joue, plat de côtes...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+            <div class="type-card">
+                <div class="type-icon">🔥</div>
+                <div class="type-info"><div class="type-name">Pièces à Rôtir</div><div class="type-desc">Côte de boeuf, filet, brisket...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+            <div class="type-card">
+                <div class="type-icon">🫀</div>
+                <div class="type-info"><div class="type-name">Abats</div><div class="type-desc">Foie, rognons, ris de veau, langue...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+            <div class="type-card">
+                <div class="type-icon">🍔</div>
+                <div class="type-info"><div class="type-name">Viande Hachée</div><div class="type-desc">Steak haché, tartare, boulettes...</div></div>
+                <span class="type-arrow">›</span>
+            </div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px;">‹ Retour</div>
+    </div>
+
+    <!-- CALC 3/5 - SOUS-CAT -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Calc 3/5 - Sous-cat</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">CLASSIQUES</h1>
+            <p class="page-subtitle">Sous-catégories</p>
+            <div class="breadcrumb"><span>🥩 Boeuf</span> › <span>Classiques</span></div>
+
+            <div class="subcat-item"><div class="subcat-icon">🏆</div><span class="subcat-name">Morceaux Nobles</span><span class="subcat-count">8</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">🔥</div><span class="subcat-name">À Griller</span><span class="subcat-count">12</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">🍳</div><span class="subcat-name">À Poêler</span><span class="subcat-count">10</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">🥘</div><span class="subcat-name">À Rôtir</span><span class="subcat-count">7</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">🍖</div><span class="subcat-name">Côtes</span><span class="subcat-count">5</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">🥩</div><span class="subcat-name">Steaks</span><span class="subcat-count">6</span><span style="color: var(--accent);">›</span></div>
+            <div class="subcat-item"><div class="subcat-icon">📦</div><span class="subcat-name">Autres</span><span class="subcat-count">4</span><span style="color: var(--accent);">›</span></div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px;">‹ Retour</div>
+    </div>
+
+    <!-- CALC 4/5 - MORCEAUX (beaucoup de contenu!) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Calc 4/5 - Morceaux</span>
+            <span class="scroll-indicator scroll">SCROLL ++</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">NOBLES</h1>
+            <p class="page-subtitle">Sélectionnez un morceau</p>
+            <div class="breadcrumb"><span>🥩</span> › <span>Classiques</span> › <span>Nobles</span></div>
+
+            <div class="search-bar"><span>🔍</span><input type="text" placeholder="Rechercher..."></div>
+
+            <!-- 8 morceaux réels -->
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Filet de boeuf</div><div class="meat-tags"><span class="meat-tag">Tendre</span><span class="meat-tag">Premium</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Persillé</span><span class="meat-tag">Savoureux</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Côte de boeuf</div><div class="meat-tags"><span class="meat-tag">Festif</span><span class="meat-tag">À l'os</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Faux-filet</div><div class="meat-tags"><span class="meat-tag">Juteux</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Rumsteck</div><div class="meat-tags"><span class="meat-tag">Maigre</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Tournedos</div><div class="meat-tags"><span class="meat-tag">Tendre</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Chateaubriand</div><div class="meat-tags"><span class="meat-tag">Premium</span></div></div><span style="color: var(--accent);">›</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">T-Bone</div><div class="meat-tags"><span class="meat-tag">À l'os</span></div></div><span style="color: var(--accent);">›</span></div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px;">‹ Retour</div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG SIMPLE (Entrecôte - Poêle) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Config SIMPLE - Poêle</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; background: var(--accent); color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Simple</div>
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid var(--accent); padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🥩</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Entrecôte</div><div style="font-size: 9px; color: var(--text-light);">Boeuf › Classiques › Nobles</div></div>
+                <span style="color: var(--accent); font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids (g) *</label>
+                <div class="input-field"><span class="input-icon">⚖️</span><input type="text" placeholder="ex: 300"></div>
+            </div>
+
+            <!-- Cuisson souhaitée (viande rouge) -->
+            <div class="input-group">
+                <label class="input-label">Cuisson souhaitée</label>
+                <div class="doneness-options">
+                    <button class="doneness-btn">Bleu<small>48°C</small></button>
+                    <button class="doneness-btn selected">Saignant<small>52°C</small></button>
+                    <button class="doneness-btn">À point<small>58°C</small></button>
+                    <button class="doneness-btn">Bien cuit<small>65°C</small></button>
+                </div>
+            </div>
+
+            <!-- Méthode de cuisson -->
+            <div class="input-group">
+                <label class="input-label">Méthode de cuisson</label>
+                <div class="input-field" style="justify-content: space-between;">
+                    <span>🍳 Poêle</span>
+                    <span style="color: var(--text-light);">▼</span>
+                </div>
+            </div>
+
+            <!-- TEMPÉRATURE DYNAMIQUE - POÊLE -->
+            <div class="input-group">
+                <label class="input-label">🔥 Intensité du feu</label>
+                <div style="display: flex; gap: 6px;">
+                    <button class="doneness-btn" style="flex: 1;">Doux</button>
+                    <button class="doneness-btn" style="flex: 1;">Moyen</button>
+                    <button class="doneness-btn selected" style="flex: 1;">Vif</button>
+                    <button class="doneness-btn" style="flex: 1;">Très vif</button>
+                </div>
+            </div>
+
+            <!-- Température initiale viande -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale viande</span><span class="slider-value">4°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <div class="card" style="background: var(--yellow-light);">
+                <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">💡 Conseil</div>
+                <div style="font-size: 10px; color: var(--text-light);">Pour l'entrecôte, privilégiez un feu vif pour saisir la viande.</div>
+            </div>
+
+            <button class="btn-primary">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG SIMPLE (Rôti - Four) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Config SIMPLE - Four</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; background: var(--accent); color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Simple</div>
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid var(--accent); padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🥩</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Côte de boeuf</div><div style="font-size: 9px; color: var(--text-light);">Boeuf › Rôtir › Côtes</div></div>
+                <span style="color: var(--accent); font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids (g) *</label>
+                <div class="input-field"><span class="input-icon">⚖️</span><input type="text" value="1200"></div>
+            </div>
+
+            <!-- Cuisson souhaitée -->
+            <div class="input-group">
+                <label class="input-label">Cuisson souhaitée</label>
+                <div class="doneness-options">
+                    <button class="doneness-btn">Bleu<small>48°C</small></button>
+                    <button class="doneness-btn selected">Saignant<small>52°C</small></button>
+                    <button class="doneness-btn">À point<small>58°C</small></button>
+                    <button class="doneness-btn">Bien cuit<small>65°C</small></button>
+                </div>
+            </div>
+
+            <!-- Méthode de cuisson -->
+            <div class="input-group">
+                <label class="input-label">Méthode de cuisson</label>
+                <div class="input-field" style="justify-content: space-between;">
+                    <span>🔥 Four</span>
+                    <span style="color: var(--text-light);">▼</span>
+                </div>
+            </div>
+
+            <!-- TEMPÉRATURE DYNAMIQUE - FOUR (Double affichage) -->
+            <div class="input-group">
+                <label class="input-label">🌡️ Température du four</label>
+                <div class="slider-container" style="margin-bottom: 0;">
+                    <div class="slider-header">
+                        <span style="font-size: 11px; color: var(--text-light);">Thermostat</span>
+                        <span class="slider-value">Th. 6 = 180°C</span>
+                    </div>
+                    <input type="range" class="slider" min="1" max="10" value="6">
+                    <div class="slider-labels"><span>Th.1 (30°)</span><span>Th.6 (180°)</span><span>Th.10 (300°)</span></div>
+                </div>
+            </div>
+
+            <!-- Température initiale viande -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale viande</span><span class="slider-value">4°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <div class="card" style="background: var(--yellow-light);">
+                <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">💡 Conseil</div>
+                <div style="font-size: 10px; color: var(--text-light);">Pour la côte de boeuf, préchauffez le four et saisissez d'abord à la poêle.</div>
+            </div>
+
+            <button class="btn-primary">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG SIMPLE (Poulet - pas de cuisson) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Config SIMPLE - Volaille</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; background: var(--accent); color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Simple</div>
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid var(--accent); padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🍗</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Poulet entier</div><div style="font-size: 9px; color: var(--text-light);">Volaille › Poulet › Entier</div></div>
+                <span style="color: var(--accent); font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids (g) *</label>
+                <div class="input-field"><span class="input-icon">⚖️</span><input type="text" value="1500"></div>
+            </div>
+
+            <!-- PAS DE CUISSON SOUHAITÉE pour volaille -->
+            <div class="card" style="background: var(--surface); border: 1px dashed var(--accent);">
+                <div style="font-size: 11px; color: var(--text-dark); text-align: center;">
+                    <span style="font-size: 16px;">🍗</span><br>
+                    <strong>Volaille = Toujours bien cuite</strong><br>
+                    <span style="font-size: 10px; color: var(--text-light);">Température cible : 74°C à cœur</span>
+                </div>
+            </div>
+
+            <!-- Méthode de cuisson -->
+            <div class="input-group">
+                <label class="input-label">Méthode de cuisson</label>
+                <div class="input-field" style="justify-content: space-between;">
+                    <span>🔥 Four</span>
+                    <span style="color: var(--text-light);">▼</span>
+                </div>
+            </div>
+
+            <!-- TEMPÉRATURE FOUR -->
+            <div class="input-group">
+                <label class="input-label">🌡️ Température du four</label>
+                <div class="slider-container" style="margin-bottom: 0;">
+                    <div class="slider-header">
+                        <span style="font-size: 11px; color: var(--text-light);">Thermostat</span>
+                        <span class="slider-value">Th. 7 = 210°C</span>
+                    </div>
+                    <input type="range" class="slider" min="1" max="10" value="7">
+                    <div class="slider-labels"><span>Th.1</span><span>Th.7</span><span>Th.10</span></div>
+                </div>
+            </div>
+
+            <!-- Température initiale viande -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale</span><span class="slider-value">4°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <button class="btn-primary">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG AVANCÉ (Gigot - avec os) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title" style="background: #9C27B0;">Config AVANCÉ - Gigot</span>
+            <span class="scroll-indicator scroll">SCROLL ++</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Simple</div>
+                <div style="flex: 1; background: #9C27B0; color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid #9C27B0; padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: #9C27B0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🐑</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Gigot d'agneau</div><div style="font-size: 9px; color: var(--text-light);">Agneau › Rôtir › Gigot</div></div>
+                <span style="color: #9C27B0; font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids (g) *</label>
+                <div class="input-field"><span class="input-icon">⚖️</span><input type="text" value="2500"></div>
+            </div>
+
+            <!-- Cuisson souhaitée -->
+            <div class="input-group">
+                <label class="input-label">Cuisson souhaitée</label>
+                <div class="doneness-options">
+                    <button class="doneness-btn">Rosé<small>54°C</small></button>
+                    <button class="doneness-btn selected">À point<small>60°C</small></button>
+                    <button class="doneness-btn">Bien cuit<small>68°C</small></button>
+                </div>
+            </div>
+
+            <!-- Méthode + Température -->
+            <div style="display: flex; gap: 8px;">
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Méthode</label>
+                    <div class="input-field" style="justify-content: space-between; padding: 8px;">
+                        <span style="font-size: 12px;">🔥 Four</span>
+                        <span style="color: var(--text-light);">▼</span>
+                    </div>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Température</label>
+                    <div class="input-field" style="padding: 8px;">
+                        <input type="text" value="180" style="width: 40px; text-align: center;"><span style="color: var(--text-light); font-size: 12px;">°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMÈTRE CONDITIONNEL : AVEC OS ? -->
+            <div class="input-group">
+                <label class="input-label">🦴 Avec os ?</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="doneness-btn selected" style="flex: 1;">Avec os</button>
+                    <button class="doneness-btn" style="flex: 1;">Désossé</button>
+                </div>
+                <div style="font-size: 9px; color: var(--text-light); margin-top: 4px;">L'os ralentit la conduction de chaleur (+10-15% temps)</div>
+            </div>
+
+            <!-- Épaisseur -->
+            <div class="input-group">
+                <label class="input-label">Épaisseur moyenne (cm)</label>
+                <div class="input-field"><span class="input-icon">📏</span><input type="text" placeholder="ex: 8"></div>
+            </div>
+
+            <!-- Température initiale -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale</span><span class="slider-value">4°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <!-- Options avancées -->
+            <div style="background: #F3E5F5; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                <div style="font-weight: 700; font-size: 11px; color: #9C27B0; margin-bottom: 8px;">⚙️ Options avancées</div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 11px;">Altitude (m)</span>
+                    <input type="text" value="0" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 11px; text-align: center;">
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 11px;">Humidité (%)</span>
+                    <input type="text" value="50" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 11px; text-align: center;">
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 11px;">Inclure temps de repos</span>
+                    <div style="width: 40px; height: 22px; background: var(--green); border-radius: 11px; position: relative;">
+                        <div style="width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="background: linear-gradient(135deg, #9C27B0, #BA68C8);">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG AVANCÉ (Filet - bardé) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title" style="background: #9C27B0;">Config AVANCÉ - Filet</span>
+            <span class="scroll-indicator scroll">SCROLL ++</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Simple</div>
+                <div style="flex: 1; background: #9C27B0; color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid #9C27B0; padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: #9C27B0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🥩</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Filet de boeuf</div><div style="font-size: 9px; color: var(--text-light);">Boeuf › Nobles › Filet</div></div>
+                <span style="color: #9C27B0; font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids + Épaisseur -->
+            <div style="display: flex; gap: 8px;">
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Poids (g) *</label>
+                    <div class="input-field" style="padding: 8px;"><input type="text" value="400" style="width: 100%;"></div>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Épaisseur (cm)</label>
+                    <div class="input-field" style="padding: 8px;"><input type="text" value="5" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Cuisson souhaitée -->
+            <div class="input-group">
+                <label class="input-label">Cuisson souhaitée</label>
+                <div class="doneness-options">
+                    <button class="doneness-btn">Bleu<small>48°C</small></button>
+                    <button class="doneness-btn selected">Saignant<small>52°C</small></button>
+                    <button class="doneness-btn">À point<small>58°C</small></button>
+                    <button class="doneness-btn">Bien cuit<small>65°C</small></button>
+                </div>
+            </div>
+
+            <!-- Méthode + Température -->
+            <div style="display: flex; gap: 8px;">
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Méthode</label>
+                    <div class="input-field" style="justify-content: space-between; padding: 8px;">
+                        <span style="font-size: 12px;">🍳 Poêle</span>
+                        <span style="color: var(--text-light);">▼</span>
+                    </div>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Intensité</label>
+                    <div class="input-field" style="justify-content: space-between; padding: 8px;">
+                        <span style="font-size: 12px;">Vif</span>
+                        <span style="color: var(--text-light);">▼</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMÈTRE CONDITIONNEL : BARDÉ ? -->
+            <div class="input-group">
+                <label class="input-label">🥓 Bardé (enrobé de lard) ?</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="doneness-btn" style="flex: 1;">Non bardé</button>
+                    <button class="doneness-btn selected" style="flex: 1;">Bardé</button>
+                </div>
+                <div style="font-size: 9px; color: var(--text-light); margin-top: 4px;">Le bardage protège et ajoute du gras aux morceaux maigres</div>
+            </div>
+
+            <!-- PARAMÈTRE CONDITIONNEL : FORME -->
+            <div class="input-group">
+                <label class="input-label">📐 Forme du morceau</label>
+                <div style="display: flex; gap: 6px;">
+                    <button class="doneness-btn selected" style="flex: 1; font-size: 10px;">Cylindrique</button>
+                    <button class="doneness-btn" style="flex: 1; font-size: 10px;">Plat</button>
+                    <button class="doneness-btn" style="flex: 1; font-size: 10px;">Irrégulier</button>
+                </div>
+            </div>
+
+            <!-- Température initiale -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale</span><span class="slider-value">20°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="20">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <!-- Matériel -->
+            <div class="input-group">
+                <label class="input-label">🍳 Type de poêle</label>
+                <div style="display: flex; gap: 6px;">
+                    <button class="doneness-btn selected" style="flex: 1; font-size: 10px;">Fonte</button>
+                    <button class="doneness-btn" style="flex: 1; font-size: 10px;">Inox</button>
+                    <button class="doneness-btn" style="flex: 1; font-size: 10px;">Céramique</button>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="background: linear-gradient(135deg, #9C27B0, #BA68C8);">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- CALC 5/5 - CONFIG AVANCÉ (Cuisses poulet - os + peau) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title" style="background: #9C27B0;">Config AVANCÉ - Cuisses</span>
+            <span class="scroll-indicator scroll">SCROLL ++</span>
+        </div>
+        <div class="maquette-content">
+            <!-- Toggle Simple/Avancé -->
+            <div style="display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 12px;">
+                <div style="flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 11px;">Simple</div>
+                <div style="flex: 1; background: #9C27B0; color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">Avancé</div>
+            </div>
+
+            <!-- Morceau sélectionné -->
+            <div style="display: flex; align-items: center; background: var(--surface); border: 2px solid #9C27B0; padding: 8px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="width: 36px; height: 36px; background: #9C27B0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px;">🍗</div>
+                <div style="flex: 1;"><div style="font-weight: 700; font-size: 13px;">Cuisses de poulet</div><div style="font-size: 9px; color: var(--text-light);">Volaille › Poulet › Cuisses</div></div>
+                <span style="color: #9C27B0; font-size: 16px;">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids total (g) *</label>
+                <div class="input-field"><span class="input-icon">⚖️</span><input type="text" value="800"></div>
+            </div>
+
+            <!-- PAS DE CUISSON pour volaille -->
+            <div class="card" style="background: var(--surface); border: 1px dashed var(--accent);">
+                <div style="font-size: 11px; color: var(--text-dark); text-align: center;">
+                    🍗 <strong>Volaille = Toujours bien cuite</strong> (74°C)
+                </div>
+            </div>
+
+            <!-- Méthode + Température -->
+            <div style="display: flex; gap: 8px;">
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Méthode</label>
+                    <div class="input-field" style="justify-content: space-between; padding: 8px;">
+                        <span style="font-size: 12px;">🔥 Four</span>
+                        <span style="color: var(--text-light);">▼</span>
+                    </div>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label class="input-label">Température</label>
+                    <div class="input-field" style="padding: 8px;">
+                        <input type="text" value="200" style="width: 40px; text-align: center;"><span style="color: var(--text-light); font-size: 12px;">°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMÈTRE CONDITIONNEL : AVEC OS ? -->
+            <div class="input-group">
+                <label class="input-label">🦴 Avec os ?</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="doneness-btn selected" style="flex: 1;">Avec os</button>
+                    <button class="doneness-btn" style="flex: 1;">Désossées</button>
+                </div>
+            </div>
+
+            <!-- PARAMÈTRE CONDITIONNEL : PEAU ? -->
+            <div class="input-group">
+                <label class="input-label">🍗 Avec peau ?</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="doneness-btn selected" style="flex: 1;">Avec peau</button>
+                    <button class="doneness-btn" style="flex: 1;">Sans peau</button>
+                </div>
+                <div style="font-size: 9px; color: var(--text-light); margin-top: 4px;">La peau protège et garde la viande juteuse</div>
+            </div>
+
+            <!-- Température initiale -->
+            <div class="slider-container">
+                <div class="slider-header"><span class="input-label">Température initiale</span><span class="slider-value">4°C</span></div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels"><span>Congelé</span><span>Frigo</span><span>Ambiante</span></div>
+            </div>
+
+            <!-- Options avancées -->
+            <div style="background: #F3E5F5; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                <div style="font-weight: 700; font-size: 11px; color: #9C27B0; margin-bottom: 8px;">⚙️ Options avancées</div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 11px;">Inclure temps de repos</span>
+                    <div style="width: 40px; height: 22px; background: var(--green); border-radius: 11px; position: relative;">
+                        <div style="width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="background: linear-gradient(135deg, #9C27B0, #BA68C8);">🔥 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- ENCY 5/5 - DETAIL (beaucoup de contenu!) -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Ency - Détail Morceau</span>
+            <span class="scroll-indicator scroll">SCROLL +++</span>
+        </div>
+        <div class="maquette-content">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <div style="font-size: 10px; color: var(--text-light);">Détails</div>
+                <h1 style="font-size: 24px; font-weight: 900; color: var(--accent); font-style: italic;">Entrecôte</h1>
+                <div style="display: inline-block; background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 9px;">Boeuf › Classiques › Nobles</div>
+            </div>
+
+            <!-- Caractéristiques -->
+            <div class="detail-section">
+                <div class="detail-section-title">📊 Caractéristiques</div>
+                <div class="characteristic-grid">
+                    <div class="characteristic-item"><div class="characteristic-label">Tendreté</div><div class="characteristic-value">8/10</div></div>
+                    <div class="characteristic-item"><div class="characteristic-label">Saveur</div><div class="characteristic-value">9/10</div></div>
+                    <div class="characteristic-item"><div class="characteristic-label">Persillage</div><div class="characteristic-value">8/10</div></div>
+                    <div class="characteristic-item"><div class="characteristic-label">Prix</div><div class="characteristic-value">€€€</div></div>
+                </div>
+            </div>
+
+            <!-- Anatomie -->
+            <div class="detail-section">
+                <div class="detail-section-title">🔬 Anatomie</div>
+                <div class="detail-text">Prélevée dans le train de côtes (6ème à 12ème côte), l'entrecôte contient le muscle longissimus dorsi. Le persillage généreux provient de la graisse intramusculaire qui fond à la cuisson.</div>
+            </div>
+
+            <!-- Méthodes de cuisson -->
+            <div class="detail-section">
+                <div class="detail-section-title">🔥 Modes de cuisson</div>
+                <div class="cooking-methods">
+                    <div class="method-item"><div class="method-icon">🍳</div>Poêle</div>
+                    <div class="method-item"><div class="method-icon">🔥</div>Grill</div>
+                    <div class="method-item"><div class="method-icon">♨️</div>Plancha</div>
+                    <div class="method-item"><div class="method-icon">🍖</div>BBQ</div>
+                </div>
+            </div>
+
+            <!-- Températures -->
+            <div class="detail-section">
+                <div class="detail-section-title">🌡️ Températures à coeur</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <span class="meat-tag" style="padding: 5px 10px;">Bleu: 48°C</span>
+                    <span class="meat-tag" style="padding: 5px 10px;">Saignant: 52°C</span>
+                    <span class="meat-tag" style="padding: 5px 10px;">À point: 58°C</span>
+                    <span class="meat-tag" style="padding: 5px 10px;">Bien cuit: 65°C</span>
+                </div>
+            </div>
+
+            <!-- Techniques -->
+            <div class="detail-section">
+                <div class="detail-section-title">👨‍🍳 Techniques du chef</div>
+                <ul class="tip-list">
+                    <li>Privilégier une épaisseur de 3-4 cm</li>
+                    <li>Saisir sur feu très vif (250°C+)</li>
+                    <li>Arroser avec le gras fondu (basting)</li>
+                    <li>Retirer le nerf central avant cuisson</li>
+                </ul>
+            </div>
+
+            <!-- Sauces -->
+            <div class="detail-section">
+                <div class="detail-section-title">🥄 Sauces recommandées</div>
+                <div class="sauce-item"><div class="sauce-name">Sauce au poivre vert</div><div class="sauce-desc">Poivre vert, cognac, crème</div></div>
+                <div class="sauce-item"><div class="sauce-name">Sauce béarnaise</div><div class="sauce-desc">Estragon, échalotes, beurre</div></div>
+                <div class="sauce-item"><div class="sauce-name">Beurre maître d'hôtel</div><div class="sauce-desc">Beurre, persil, citron</div></div>
+            </div>
+
+            <!-- Vins -->
+            <div class="detail-section">
+                <div class="detail-section-title">🍷 Accords vins</div>
+                <div class="detail-text">Cahors, Madiran, Côte-Rôtie (17-18°C)</div>
+            </div>
+
+            <button class="btn-primary">🧮 Calculer le temps</button>
+        </div>
+    </div>
+
+    <!-- RESULTAT -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title" style="background: var(--green);">Résultat Calcul</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content" style="padding-top: 0;">
+            <div style="height: 80px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 -15px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 40px;">🥩</span></div>
+
+            <div class="result-header">
+                <div class="result-title">CUISSON PARFAITE</div>
+                <div class="result-subtitle">Entrecôte • Saignant • 300g</div>
+            </div>
+
+            <div class="result-stat"><div class="result-stat-value">8 min</div><div class="result-stat-label">Temps total (4 min/face)</div></div>
+            <div class="result-stat"><div class="result-stat-value">52°C</div><div class="result-stat-label">Température à coeur cible</div></div>
+            <div class="result-stat"><div class="result-stat-value">3 min</div><div class="result-stat-label">Temps de repos recommandé</div></div>
+
+            <div class="timeline" style="margin-top: 15px;">
+                <div class="timeline-item"><div class="timeline-title">Étape 1 - Préparation</div><div class="timeline-content">Sortir la viande 30 min avant. Sécher avec papier absorbant.</div></div>
+                <div class="timeline-item"><div class="timeline-title">Étape 2 - Saisir</div><div class="timeline-content">Chauffer la poêle à feu vif. Huiler la viande, pas la poêle.</div></div>
+                <div class="timeline-item"><div class="timeline-title">Étape 3 - Cuire</div><div class="timeline-content">4 min première face, retourner, 4 min seconde face.</div></div>
+                <div class="timeline-item"><div class="timeline-title">Étape 4 - Repos</div><div class="timeline-content">Couvrir légèrement d'aluminium. Attendre 3 min.</div></div>
+            </div>
+
+            <div class="card" style="background: var(--yellow-light);">
+                <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">💡 Astuce pro</div>
+                <div style="font-size: 10px; color: var(--text-light);">La viande continue de cuire pendant le repos (+2-3°C).</div>
+            </div>
+
+            <button class="btn-primary">⏱️ Lancer le timer</button>
+        </div>
+    </div>
+
+    <!-- RECETTES -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Recettes - Liste</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">RECETTES</h1>
+            <p class="page-subtitle">Sauces et accompagnements</p>
+
+            <div class="search-bar"><span>🔍</span><input type="text" placeholder="Rechercher..."></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">🥄 Sauces</h3>
+
+            <div class="recipe-card"><div class="recipe-image">🥄</div><div class="recipe-content"><div class="recipe-title">Sauce Béarnaise</div><div class="recipe-meta">⏱️ 15 min • Facile</div></div></div>
+            <div class="recipe-card"><div class="recipe-image">🥄</div><div class="recipe-content"><div class="recipe-title">Sauce au Poivre</div><div class="recipe-meta">⏱️ 10 min • Facile</div></div></div>
+            <div class="recipe-card"><div class="recipe-image">🥄</div><div class="recipe-content"><div class="recipe-title">Sauce Bordelaise</div><div class="recipe-meta">⏱️ 20 min • Moyen</div></div></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; color: var(--text-dark); margin: 12px 0 8px;">🥗 Accompagnements</h3>
+
+            <div class="recipe-card"><div class="recipe-image">🍟</div><div class="recipe-content"><div class="recipe-title">Frites Maison</div><div class="recipe-meta">⏱️ 30 min • Moyen</div></div></div>
+            <div class="recipe-card"><div class="recipe-image">🥔</div><div class="recipe-content"><div class="recipe-title">Gratin Dauphinois</div><div class="recipe-meta">⏱️ 1h • Facile</div></div></div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item active"><div class="nav-item-icon">🍳</div>Recettes</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- RECETTE DETAIL -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Recette - Détail</span>
+            <span class="scroll-indicator scroll">SCROLL ++</span>
+        </div>
+        <div class="maquette-content" style="padding-top: 0;">
+            <div style="height: 120px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 -15px 12px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 50px;">🥄</span></div>
+
+            <h1 style="font-size: 20px; font-weight: 900; color: var(--text-dark);">Sauce Béarnaise</h1>
+            <div style="display: flex; gap: 8px; margin: 8px 0 12px;">
+                <span class="meat-tag" style="padding: 4px 10px;">⏱️ 15 min</span>
+                <span class="meat-tag" style="padding: 4px 10px;">👨‍🍳 Facile</span>
+                <span class="meat-tag" style="padding: 4px 10px;">🥩 Boeuf</span>
+            </div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Ingrédients</h3>
+            <div class="card" style="font-size: 11px; color: var(--text-light);">
+                • 3 jaunes d'oeufs<br>
+                • 200g de beurre clarifié<br>
+                • 2 échalotes finement ciselées<br>
+                • 2 c.à.s d'estragon frais<br>
+                • 1 c.à.s de cerfeuil<br>
+                • 3 c.à.s de vinaigre de vin blanc<br>
+                • Sel, poivre blanc
+            </div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin: 10px 0 6px;">Préparation</h3>
+            <div class="card" style="font-size: 11px; color: var(--text-light); line-height: 1.6;">
+                <strong>1.</strong> Faire réduire le vinaigre avec les échalotes et l'estragon jusqu'à obtenir 1 c.à.s de liquide.<br><br>
+                <strong>2.</strong> Laisser refroidir, puis ajouter les jaunes d'oeufs. Battre au bain-marie tiède.<br><br>
+                <strong>3.</strong> Incorporer le beurre fondu en filet tout en fouettant vigoureusement.<br><br>
+                <strong>4.</strong> Assaisonner, passer au chinois, ajouter le cerfeuil haché.
+            </div>
+
+            <div class="card" style="background: var(--yellow-light);">
+                <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">💡 Astuce</div>
+                <div style="font-size: 10px; color: var(--text-light);">Si la sauce tourne, ajoutez une cuillère d'eau froide en fouettant.</div>
+            </div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px;">⭐ Ajouter aux favoris</div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Historique</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">HISTORIQUE</h1>
+            <p class="page-subtitle">Vos dernières cuissons</p>
+
+            <div class="history-item"><div class="history-icon">🥩</div><div class="history-info"><div class="history-title">Entrecôte - Saignant</div><div class="history-date">Aujourd'hui, 12:30 • 300g</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🍗</div><div class="history-info"><div class="history-title">Poulet - Bien cuit</div><div class="history-date">Hier, 19:45 • 1.2kg</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🥩</div><div class="history-info"><div class="history-title">Côte de boeuf - À point</div><div class="history-date">15 déc, 13:00 • 800g</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🐑</div><div class="history-info"><div class="history-title">Gigot d'agneau - Rosé</div><div class="history-date">12 déc, 12:00 • 2kg</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🥩</div><div class="history-info"><div class="history-title">Filet de boeuf</div><div class="history-date">10 déc, 20:00 • 400g</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🥓</div><div class="history-info"><div class="history-title">Côtes de porc</div><div class="history-date">8 déc, 19:30 • 600g</div></div><div class="history-badge">Réussie</div></div>
+            <div class="history-item"><div class="history-icon">🦆</div><div class="history-info"><div class="history-title">Magret de canard</div><div class="history-date">5 déc, 20:15 • 350g</div></div><div class="history-badge">Réussie</div></div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item active"><div class="nav-item-icon">📋</div>Historique</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- FAVORIS -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Favoris</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <h1 class="page-title">FAVORIS</h1>
+            <p class="page-subtitle">Vos morceaux préférés</p>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">🥩 Morceaux</h3>
+
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div><span style="color: var(--yellow); font-size: 18px;">⭐</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Côte de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div><span style="color: var(--yellow); font-size: 18px;">⭐</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🍗</div><div class="meat-info"><div class="meat-name">Magret de canard</div><div class="meat-tags"><span class="meat-tag">Canard</span></div></div><span style="color: var(--yellow); font-size: 18px;">⭐</span></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Filet de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div><span style="color: var(--yellow); font-size: 18px;">⭐</span></div>
+
+            <div class="separator"></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">🥄 Recettes favorites</h3>
+
+            <div class="recipe-card"><div class="recipe-image">🥄</div><div class="recipe-content"><div class="recipe-title">Sauce Béarnaise</div><div class="recipe-meta">⏱️ 15 min</div></div></div>
+            <div class="recipe-card"><div class="recipe-image">🥄</div><div class="recipe-content"><div class="recipe-title">Sauce au Poivre</div><div class="recipe-meta">⏱️ 10 min</div></div></div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item active"><div class="nav-item-icon">⭐</div>Favoris</div>
+            <div class="nav-item"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Profil</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">👨‍🍳</div>
+                <h2 style="font-size: 16px; font-weight: 700; color: var(--text-dark);">Chef Amateur</h2>
+                <p style="font-size: 11px; color: var(--text-light);">42 cuissons réalisées</p>
+            </div>
+
+            <div class="card" style="display: flex; justify-content: space-around; text-align: center;">
+                <div><div style="font-size: 20px; font-weight: 700; color: var(--accent);">42</div><div style="font-size: 9px; color: var(--text-light);">Cuissons</div></div>
+                <div><div style="font-size: 20px; font-weight: 700; color: var(--green);">98%</div><div style="font-size: 9px; color: var(--text-light);">Réussite</div></div>
+                <div><div style="font-size: 20px; font-weight: 700; color: var(--yellow);">5</div><div style="font-size: 9px; color: var(--text-light);">Favoris</div></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">⚙️ Paramètres</h3>
+
+            <div class="settings-item"><span class="settings-icon">🔔</span><span class="settings-label">Notifications</span><div class="toggle-switch"></div></div>
+            <div class="settings-item"><span class="settings-icon">🔊</span><span class="settings-label">Sons</span><div class="toggle-switch"></div></div>
+            <div class="settings-item"><span class="settings-icon">📳</span><span class="settings-label">Vibrations</span><div class="toggle-switch"></div></div>
+            <div class="settings-item"><span class="settings-icon">🌡️</span><span class="settings-label">Unité température</span><span class="settings-arrow">°C ›</span></div>
+            <div class="settings-item"><span class="settings-icon">⚖️</span><span class="settings-label">Unité poids</span><span class="settings-arrow">kg ›</span></div>
+            <div class="settings-item"><span class="settings-icon">🎨</span><span class="settings-label">Thème</span><span class="settings-arrow">Clair ›</span></div>
+            <div class="settings-item"><span class="settings-icon">🌍</span><span class="settings-label">Langue</span><span class="settings-arrow">Français ›</span></div>
+            <div class="settings-item"><span class="settings-icon">ℹ️</span><span class="settings-label">À propos</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item"><span class="settings-icon">📧</span><span class="settings-label">Contact</span><span class="settings-arrow">›</span></div>
+        </div>
+        <div class="nav-bottom">
+            <div class="nav-item"><div class="nav-item-icon">🏠</div>Accueil</div>
+            <div class="nav-item"><div class="nav-item-icon">🧮</div>Calculer</div>
+            <div class="nav-item"><div class="nav-item-icon">📚</div>Explorer</div>
+            <div class="nav-item active"><div class="nav-item-icon">👤</div>Profil</div>
+        </div>
+    </div>
+
+    <!-- RECHERCHE -->
+    <div class="maquette" data-scroll="yes">
+        <div class="maquette-header">
+            <span class="maquette-title">Recherche</span>
+            <span class="scroll-indicator scroll">SCROLL</span>
+        </div>
+        <div class="maquette-content">
+            <div class="search-bar" style="margin-bottom: 15px;">
+                <span>🔍</span>
+                <input type="text" placeholder="Rechercher un morceau, une recette...">
+            </div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">🕐 Recherches récentes</h3>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px;">
+                <span class="meat-tag" style="padding: 5px 10px; font-size: 11px;">Entrecôte</span>
+                <span class="meat-tag" style="padding: 5px 10px; font-size: 11px;">Béarnaise</span>
+                <span class="meat-tag" style="padding: 5px 10px; font-size: 11px;">Côte de boeuf</span>
+                <span class="meat-tag" style="padding: 5px 10px; font-size: 11px;">Magret</span>
+            </div>
+
+            <div class="separator"></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">🔥 Populaires</h3>
+
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Entrecôte</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Côte de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div></div>
+            <div class="meat-list-item"><div class="meat-thumb">🍗</div><div class="meat-info"><div class="meat-name">Magret de canard</div><div class="meat-tags"><span class="meat-tag">Canard</span></div></div></div>
+            <div class="meat-list-item"><div class="meat-thumb">🥩</div><div class="meat-info"><div class="meat-name">Filet de boeuf</div><div class="meat-tags"><span class="meat-tag">Boeuf</span></div></div></div>
+            <div class="meat-list-item"><div class="meat-thumb">🐑</div><div class="meat-info"><div class="meat-name">Gigot d'agneau</div><div class="meat-tags"><span class="meat-tag">Agneau</span></div></div></div>
+
+            <div class="separator"></div>
+
+            <h3 style="font-size: 12px; font-weight: 700; margin-bottom: 8px;">📂 Parcourir par catégorie</h3>
+
+            <div class="type-card"><div class="type-icon">🥩</div><div class="type-info"><div class="type-name">Boeuf</div><div class="type-desc">45 morceaux</div></div><span class="type-arrow">›</span></div>
+            <div class="type-card"><div class="type-icon">🍗</div><div class="type-info"><div class="type-name">Volaille</div><div class="type-desc">22 morceaux</div></div><span class="type-arrow">›</span></div>
+        </div>
+        <div style="background: var(--accent); color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; left: 0; right: 0; font-size: 11px;">Tapez pour rechercher</div>
+    </div>
+
+</div>
+
+<!-- RESUME -->
+<h2 class="section-title" style="background: linear-gradient(135deg, #667eea, #764ba2);">📊 RÉSUMÉ</h2>
+
+<div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 25px; color: var(--text-dark);">
+    <h3 style="color: var(--green); margin-bottom: 15px;">✅ ÉCRANS SANS SCROLL (8)</h3>
+    <ul style="list-style: none; margin-bottom: 20px;">
+        <li style="padding: 5px 0;">• Splash Screen</li>
+        <li style="padding: 5px 0;">• Onboarding 1/3</li>
+        <li style="padding: 5px 0;">• Onboarding 2/3</li>
+        <li style="padding: 5px 0;">• Onboarding 3/3</li>
+        <li style="padding: 5px 0;">• Timer - Accueil</li>
+        <li style="padding: 5px 0;">• Timer - En cours</li>
+        <li style="padding: 5px 0;">• Timer - Terminé</li>
+        <li style="padding: 5px 0;">• Historique/Favoris - État vide</li>
+    </ul>
+
+    <h3 style="color: #FF5722; margin-bottom: 15px;">📜 ÉCRANS AVEC SCROLL (18)</h3>
+    <ul style="list-style: none; margin-bottom: 20px;">
+        <li style="padding: 5px 0;">• Accueil Principal <span style="color: var(--text-light); font-size: 12px;">(quick actions + historique + favoris)</span></li>
+        <li style="padding: 5px 0;">• Calculateur 1/5 - Viandes <span style="color: var(--text-light); font-size: 12px;">(8 catégories)</span></li>
+        <li style="padding: 5px 0;">• Calculateur 2/5 - Types <span style="color: var(--text-light); font-size: 12px;">(6 types)</span></li>
+        <li style="padding: 5px 0;">• Calculateur 3/5 - Sous-catégories <span style="color: var(--text-light); font-size: 12px;">(7 sous-cat)</span></li>
+        <li style="padding: 5px 0;">• Calculateur 4/5 - Morceaux <span style="color: var(--text-light); font-size: 12px;">(8+ items + recherche)</span></li>
+        <li style="padding: 5px 0;">• Calculateur 5/5 - Configuration <span style="color: var(--text-light); font-size: 12px;">(nombreux champs)</span></li>
+        <li style="padding: 5px 0;">• Encyclopédie - Détail morceau <span style="color: #FF5722; font-size: 12px; font-weight: 600;">(BEAUCOUP de contenu!)</span></li>
+        <li style="padding: 5px 0;">• Résultat Calcul <span style="color: var(--text-light); font-size: 12px;">(stats + timeline + conseils)</span></li>
+        <li style="padding: 5px 0;">• Recettes - Liste <span style="color: var(--text-light); font-size: 12px;">(recherche + catégories + cards)</span></li>
+        <li style="padding: 5px 0;">• Recette - Détail <span style="color: var(--text-light); font-size: 12px;">(ingrédients + préparation)</span></li>
+        <li style="padding: 5px 0;">• Historique <span style="color: var(--text-light); font-size: 12px;">(7+ items)</span></li>
+        <li style="padding: 5px 0;">• Favoris <span style="color: var(--text-light); font-size: 12px;">(morceaux + recettes)</span></li>
+        <li style="padding: 5px 0;">• Profil/Paramètres <span style="color: var(--text-light); font-size: 12px;">(stats + 9 paramètres)</span></li>
+        <li style="padding: 5px 0;">• Recherche <span style="color: var(--text-light); font-size: 12px;">(récents + populaires + catégories)</span></li>
+    </ul>
+
+    <div style="background: var(--yellow-light); padding: 15px; border-radius: 12px;">
+        <h4 style="margin-bottom: 8px;">💡 Recommandations iOS</h4>
+        <ul style="font-size: 13px; color: var(--text-light); list-style: disc; padding-left: 20px;">
+            <li>Utiliser <code>ScrollView</code> pour tous les écrans avec scroll</li>
+            <li>Pour les listes longues (morceaux, historique), utiliser <code>LazyVStack</code> pour les performances</li>
+            <li>Ajouter un indicateur de scroll subtil sur les écrans avec beaucoup de contenu</li>
+            <li>Le détail encyclopédie nécessite potentiellement des sections collapsibles</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function showSection(type) {
+        const noScrollScreens = document.getElementById('no-scroll-screens');
+        const scrollScreens = document.getElementById('scroll-screens');
+
+        if (type === 'all') {
+            noScrollScreens.style.display = 'flex';
+            scrollScreens.style.display = 'flex';
+        } else if (type === 'no-scroll') {
+            noScrollScreens.style.display = 'flex';
+            scrollScreens.style.display = 'none';
+        } else if (type === 'scroll') {
+            noScrollScreens.style.display = 'none';
+            scrollScreens.style.display = 'flex';
+        }
+    }
+</script>
+
+</body>
+</html>

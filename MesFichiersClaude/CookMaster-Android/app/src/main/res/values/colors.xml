@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="background">#1A1A1A</color>
+    <color name="surface">#2D2D2D</color>
+    <color name="gold">#D4AF37</color>
+    <color name="accent">#FF6B35</color>
+    <color name="secondary">#4ECDC4</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#F5F5F5</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_tertiary">#808080</color>
+
+    <!-- Functional Colors -->
+    <color name="success">#06FFA5</color>
+    <color name="error">#E63946</color>
+    <color name="warning">#FFC857</color>
+    <color name="info">#4ECDC4</color>
+
+    <!-- Temperature Colors -->
+    <color name="temp_blue">#3498DB</color>
+    <color name="temp_rare">#E74C3C</color>
+    <color name="temp_medium">#E67E22</color>
+    <color name="temp_well">#8B4513</color>
+
+    <!-- System Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Launcher Icon -->
+    <color name="ic_launcher_background">#1A1A1A</color>
+</resources>

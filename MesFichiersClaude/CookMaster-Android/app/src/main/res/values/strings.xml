@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CookMaster</string>
+
+    <!-- Notification Channels -->
+    <string name="default_notification_channel_id">cookmaster_general</string>
+    <string name="timer_notification_channel_id">cookmaster_timer</string>
+    <string name="timer_notification_channel_name">Cooking Timer</string>
+    <string name="timer_notification_channel_description">Notifications for cooking timers</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Master Perfect Cooking</string>
+    <string name="onboarding_desc_1">Calculate precise cooking times and temperatures for any meat</string>
+    <string name="onboarding_title_2">40+ Cooking Methods</string>
+    <string name="onboarding_desc_2">From oven to BBQ, sous-vide to grilling</string>
+    <string name="onboarding_title_3">Join the Community</string>
+    <string name="onboarding_desc_3">Share recipes and learn from other chefs</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- Authentication -->
+    <string name="auth_login">Login</string>
+    <string name="auth_register">Sign Up</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_confirm_password">Confirm Password</string>
+    <string name="auth_forgot_password">Forgot Password?</string>
+    <string name="auth_or">OR</string>
+    <string name="auth_google">Continue with Google</string>
+    <string name="auth_use_without_account">Use without account</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_explorer">Explorer</string>
+    <string name="nav_timer">Timer</string>
+    <string name="nav_community">Community</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Calculator -->
+    <string name="calculator_title">Cooking Calculator</string>
+    <string name="calculator_select_meat">Select Meat</string>
+    <string name="calculator_weight">Weight</string>
+    <string name="calculator_cooking_method">Cooking Method</string>
+    <string name="calculator_doneness">Doneness</string>
+    <string name="calculator_calculate">Calculate</string>
+    <string name="calculator_mode_simple">Simple Mode</string>
+    <string name="calculator_mode_advanced">Advanced Mode</string>
+
+    <!-- Results -->
+    <string name="result_cooking_time">Cooking Time</string>
+    <string name="result_core_temp">Core Temperature</string>
+    <string name="result_rest_time">Rest Time</string>
+    <string name="result_total_time">Total Time</string>
+    <string name="result_confidence">Confidence</string>
+    <string name="result_start_timer">Start Timer</string>
+    <string name="result_save">Save</string>
+    <string name="result_share">Share</string>
+
+    <!-- Timer -->
+    <string name="timer_title">Timer</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_resume">Resume</string>
+    <string name="timer_stop">Stop</string>
+    <string name="timer_add_time">Add Time</string>
+    <string name="timer_remaining">Remaining</string>
+    <string name="timer_target_temp">Target Temperature</string>
+
+    <!-- Common -->
+    <string name="common_cancel">Cancel</string>
+    <string name="common_ok">OK</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_search">Search</string>
+    <string name="common_filter">Filter</string>
+    <string name="common_sort">Sort</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_error">An error occurred</string>
+    <string name="common_retry">Retry</string>
+
+    <!-- Units -->
+    <string name="unit_kg">kg</string>
+    <string name="unit_g">g</string>
+    <string name="unit_lbs">lbs</string>
+    <string name="unit_oz">oz</string>
+    <string name="unit_celsius">°C</string>
+    <string name="unit_fahrenheit">°F</string>
+    <string name="unit_min">min</string>
+    <string name="unit_hour">h</string>
+
+    <!-- Doneness Levels -->
+    <string name="doneness_blue">Blue</string>
+    <string name="doneness_rare">Rare</string>
+    <string name="doneness_medium_rare">Medium Rare</string>
+    <string name="doneness_medium">Medium</string>
+    <string name="doneness_medium_well">Medium Well</string>
+    <string name="doneness_well_done">Well Done</string>
+
+    <!-- Meat Categories -->
+    <string name="category_beef">Beef</string>
+    <string name="category_pork">Pork</string>
+    <string name="category_lamb">Lamb</string>
+    <string name="category_veal">Veal</string>
+    <string name="category_poultry">Poultry</string>
+    <string name="category_game">Game</string>
+</resources>

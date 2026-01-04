@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookmaster - Apercu des 9 pages</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #FFF5F5;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #FF6B6B;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .pages-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .page-card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 280px;
+            transition: transform 0.2s;
+        }
+        .page-card:hover {
+            transform: translateY(-5px);
+        }
+        .page-number {
+            background: #FF6B6B;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .page-title {
+            color: #2D3436;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        .thumbnail {
+            width: 100%;
+            height: 350px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+        .btn-edit {
+            display: inline-block;
+            background: #FF6B6B;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .btn-edit:hover {
+            background: #e55a5a;
+        }
+        .style-guide {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0 auto 30px;
+            max-width: 800px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .style-guide h2 {
+            color: #2D3436;
+            margin-top: 0;
+            text-align: center;
+        }
+        .colors {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .color-box {
+            width: 80px;
+            text-align: center;
+        }
+        .color-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            border: 2px solid #ddd;
+        }
+        .color-name {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cookmaster</h1>
+    <p class="subtitle">Apercu des 9 pages de l'application</p>
+
+    <div class="style-guide">
+        <h2>Charte graphique</h2>
+        <div class="colors">
+            <div class="color-box">
+                <div class="color-circle" style="background: #FF6B6B;"></div>
+                <div class="color-name">Corail<br>#FF6B6B</div>
+            </div>
+            <div class="color-box">
+                <div class="color-circle" style="background: #FFD93D;"></div>
+                <div class="color-name">Jaune dore<br>#FFD93D</div>
+            </div>
+            <div class="color-box">
+                <div class="color-circle" style="background: #6BCF7F;"></div>
+                <div class="color-name">Vert<br>#6BCF7F</div>
+            </div>
+            <div class="color-box">
+                <div class="color-circle" style="background: #FFF5F5; border: 2px solid #ddd;"></div>
+                <div class="color-name">Rose clair<br>#FFF5F5</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pages-container">
+        <div class="page-card">
+            <div class="page-number">1</div>
+            <div class="page-title">Accueil</div>
+            <img class="thumbnail" src="https://document-export.canva.com/pZyR8/DAG7f2pZyR8/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251213%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251213T213926Z&X-Amz-Expires=71224&X-Amz-Signature=b07ce8e8c8719953c44a903d8f3f97802c4db9c904ceb162b29d5cfaab1b0df9&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A26%3A30%20GMT" alt="Accueil">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7f2pZyR8/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">2</div>
+            <div class="page-title">Calculateur</div>
+            <img class="thumbnail" src="https://document-export.canva.com/96AtQ/DAG7f796AtQ/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T000227Z&X-Amz-Expires=63265&X-Amz-Signature=6316b144ad7433af90d99f4af903c6696dc01df221798a6283c6de5a6ae527e7&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A36%3A52%20GMT" alt="Calculateur">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7f796AtQ/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">3</div>
+            <div class="page-title">Resultats Calculateur</div>
+            <img class="thumbnail" src="https://document-export.canva.com/9WyQU/DAG7fz9WyQU/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251213%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251213T235416Z&X-Amz-Expires=64058&X-Amz-Signature=808df15ed8bc3c545193a16612e496cdace11ac26b9ea292911867c5d1d31c28&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A41%3A54%20GMT" alt="Resultats">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7fz9WyQU/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">4</div>
+            <div class="page-title">Minuteur</div>
+            <img class="thumbnail" src="https://document-export.canva.com/0jqEY/DAG7f00jqEY/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T101333Z&X-Amz-Expires=27327&X-Amz-Signature=054e438ae224926f0f93b12ed0596eb85489d1feb98cef7081de2f5144ce847b&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A49%3A00%20GMT" alt="Minuteur">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7f00jqEY/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">5</div>
+            <div class="page-title">Minuteur Termine</div>
+            <img class="thumbnail" src="https://document-export.canva.com/LoQjs/DAG7f4LoQjs/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T032641Z&X-Amz-Expires=50320&X-Amz-Signature=906efcf572e54c5e112df51eab83432c5011ba21c3b38a20534a35185ea14ded&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A25%3A21%20GMT" alt="Minuteur Termine">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7f4LoQjs/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">6</div>
+            <div class="page-title">Encyclopedie Categories</div>
+            <img class="thumbnail" src="https://document-export.canva.com/h1zC8/DAG7fwh1zC8/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T051050Z&X-Amz-Expires=44485&X-Amz-Signature=f84a999af5c19b474c7c1642c581c5d1e8d7b45dfc9773f9824407c9123260e7&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A32%3A15%20GMT" alt="Encyclopedie Categories">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7fwh1zC8/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">7</div>
+            <div class="page-title">Encyclopedie Sous-categories</div>
+            <img class="thumbnail" src="https://document-export.canva.com/p8FDM/DAG7fwp8FDM/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251213%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251213T192607Z&X-Amz-Expires=79925&X-Amz-Signature=4b358fbf7fe4f2ca5c7564891987f8fbc39524e688a177d713dc9536dece17d9&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A38%3A12%20GMT" alt="Encyclopedie Sous-categories">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7fwp8FDM/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">8</div>
+            <div class="page-title">Detail Morceau</div>
+            <img class="thumbnail" src="https://document-export.canva.com/C7pOk/DAG7fyC7pOk/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T030512Z&X-Amz-Expires=53072&X-Amz-Signature=a5e7573c7a13b71089ff68a9a2573066076cdcde847cc1501e692e008d250a98&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A49%3A44%20GMT" alt="Detail Morceau">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7fyC7pOk/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+
+        <div class="page-card">
+            <div class="page-number">9</div>
+            <div class="page-title">Parametres</div>
+            <img class="thumbnail" src="https://document-export.canva.com/IShlA/DAG7f_IShlA/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251214T111808Z&X-Amz-Expires=22282&X-Amz-Signature=90c7ce9895a82ea8c69e3450cb5f5de9fa37388a2f65f29b627b780855f1f79e&X-Amz-SignedHeaders=host&response-expires=Sun%2C%2014%20Dec%202025%2017%3A29%3A30%20GMT" alt="Parametres">
+            <a class="btn-edit" href="https://www.canva.com/design/DAG7f_IShlA/edit" target="_blank">Ouvrir dans Canva</a>
+        </div>
+    </div>
+
+</body>
+</html>

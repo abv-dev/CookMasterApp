@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookmaster - Maquettes UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF0F0;
+            --accent: #F97066;
+            --accent-light: #FFB5B5;
+            --text-dark: #2D3436;
+            --text-light: #636E72;
+            --white: #FFFFFF;
+            --green: #4ECDC4;
+            --surface: #FFEAEA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #2D3436;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation des maquettes */
+        .nav-maquettes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: #2D3436;
+            padding: 15px;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .nav-maquettes button {
+            padding: 10px 20px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-maquettes button:hover {
+            background: var(--accent-light);
+            transform: scale(1.05);
+        }
+
+        .nav-maquettes button.active {
+            background: var(--green);
+        }
+
+        /* Container des maquettes */
+        .maquettes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        /* Chaque maquette */
+        .maquette {
+            width: 375px;
+            min-height: 700px;
+            background: var(--bg-color);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .maquette-title {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .maquette-content {
+            padding: 20px;
+            min-height: 650px;
+        }
+
+        /* Styles communs */
+        .page-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .separator {
+            height: 2px;
+            background: var(--accent-light);
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 25px rgba(249, 112, 102, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .img-placeholder {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #FFB5B5, #FFDDD2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .img-round {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D4A574, #8B6914);
+            border: 3px solid var(--accent);
+        }
+
+        .footer-bar {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ========== PAGE CALCULATEUR ========== */
+        .calc-toggle {
+            display: flex;
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .calc-toggle button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 22px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calc-toggle button.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .calc-toggle button:not(.active) {
+            background: transparent;
+            color: var(--text-light);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 15px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-bar input {
+            border: none;
+            flex: 1;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            outline: none;
+            margin-left: 10px;
+        }
+
+        .meat-category {
+            margin-bottom: 20px;
+        }
+
+        .meat-category-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .meat-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .meat-item:hover {
+            background: var(--surface);
+            transform: translateX(5px);
+        }
+
+        .meat-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--surface);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .meat-name {
+            flex: 1;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus-within {
+            border-color: var(--accent);
+        }
+
+        .input-field input {
+            border: none;
+            flex: 1;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-icon {
+            color: var(--accent);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .doneness-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .doneness-btn {
+            padding: 10px 16px;
+            border: 2px solid var(--accent-light);
+            border-radius: 20px;
+            background: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .doneness-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .doneness-btn small {
+            display: block;
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        .doneness-btn.selected small {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .slider-container {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .slider-value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--surface);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(249, 112, 102, 0.4);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* ========== PAGE TIMER ========== */
+        .timer-circle-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .timer-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #FF8A80);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(249, 112, 102, 0.4);
+            position: relative;
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .timer-time {
+            font-size: 56px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .timer-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .timer-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .timer-btn.pause {
+            background: var(--surface);
+            color: var(--accent);
+        }
+
+        .timer-btn.stop {
+            background: var(--accent);
+            color: white;
+        }
+
+        .timer-info {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .timer-meat-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .timer-details {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* ========== PAGE ENCYCLOPEDIE ========== */
+        .category-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .category-card.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .category-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D4A574, #8B6914);
+            border: 4px solid var(--accent);
+            flex-shrink: 0;
+        }
+
+        .category-info {
+            flex: 1;
+            padding: 0 15px;
+        }
+
+        .category-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .category-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        /* ========== PAGE MORCEAU ========== */
+        .morceau-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .morceau-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--green);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--bg-color);
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .cooking-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .method-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .method-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* ========== PAGE RESULTAT ========== */
+        .result-header {
+            background: var(--green);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .result-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .result-stat {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--surface);
+        }
+
+        .result-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            min-width: 100px;
+        }
+
+        .result-stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .result-tip {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .result-tip-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .result-tip-text {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* Single view mode */
+        .maquette.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-maquettes">
+    <button onclick="showAll()">Tout afficher</button>
+    <button onclick="showOnly('calculateur')">Calculateur</button>
+    <button onclick="showOnly('timer')">Timer</button>
+    <button onclick="showOnly('timer-actif')">Timer Actif</button>
+    <button onclick="showOnly('encyclopedie')">Encyclopédie</button>
+    <button onclick="showOnly('morceau')">Morceau</button>
+    <button onclick="showOnly('resultat')">Résultat</button>
+</nav>
+
+<div class="maquettes-container">
+
+    <!-- ========== PAGE CALCULATEUR ========== -->
+    <div class="maquette" id="calculateur">
+        <div class="maquette-title">Page Calculateur (NOUVELLE)</div>
+        <div class="maquette-content">
+            <h1 class="page-title">CALCULATEUR</h1>
+            <p class="page-subtitle">Calculez le temps de cuisson parfait</p>
+
+            <!-- Toggle Simple/Avancé -->
+            <div class="calc-toggle">
+                <button class="active">Simple</button>
+                <button>Avancé</button>
+            </div>
+
+            <!-- Barre de recherche -->
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" placeholder="Rechercher une viande...">
+            </div>
+
+            <!-- Catégories de viandes -->
+            <div class="meat-category">
+                <div class="meat-category-title">Boeuf</div>
+                <div class="meat-item">
+                    <div class="meat-icon">🥩</div>
+                    <span class="meat-name">Entrecôte</span>
+                    <span>›</span>
+                </div>
+                <div class="meat-item">
+                    <div class="meat-icon">🥩</div>
+                    <span class="meat-name">Côte de boeuf</span>
+                    <span>›</span>
+                </div>
+                <div class="meat-item">
+                    <div class="meat-icon">🥩</div>
+                    <span class="meat-name">Filet</span>
+                    <span>›</span>
+                </div>
+            </div>
+
+            <div class="meat-category">
+                <div class="meat-category-title">Volaille</div>
+                <div class="meat-item">
+                    <div class="meat-icon">🍗</div>
+                    <span class="meat-name">Poulet entier</span>
+                    <span>›</span>
+                </div>
+                <div class="meat-item">
+                    <div class="meat-icon">🍗</div>
+                    <span class="meat-name">Cuisses de poulet</span>
+                    <span>›</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="footer-bar">Sélectionnez une viande</div>
+    </div>
+
+    <!-- ========== PAGE CALCULATEUR - Configuration ========== -->
+    <div class="maquette" id="calculateur-config">
+        <div class="maquette-title">Calculateur - Configuration</div>
+        <div class="maquette-content">
+            <h1 class="page-title">CALCULATEUR</h1>
+            <p class="page-subtitle">Configurez votre cuisson</p>
+
+            <!-- Viande sélectionnée -->
+            <div class="card" style="display: flex; align-items: center;">
+                <div class="meat-icon" style="margin-right: 15px;">🥩</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700;">Entrecôte</div>
+                    <div style="font-size: 12px; color: var(--text-light);">Boeuf</div>
+                </div>
+                <span style="color: var(--accent);">✕</span>
+            </div>
+
+            <!-- Poids -->
+            <div class="input-group">
+                <label class="input-label">Poids (g)</label>
+                <div class="input-field">
+                    <span class="input-icon">⚖️</span>
+                    <input type="text" placeholder="ex: 250">
+                </div>
+            </div>
+
+            <!-- Épaisseur -->
+            <div class="input-group">
+                <label class="input-label">Épaisseur (cm) - Optionnel</label>
+                <div class="input-field">
+                    <span class="input-icon">📏</span>
+                    <input type="text" placeholder="ex: 2.5">
+                </div>
+            </div>
+
+            <!-- Niveau de cuisson -->
+            <div class="input-group">
+                <label class="input-label">Niveau de cuisson</label>
+                <div class="doneness-options">
+                    <button class="doneness-btn">
+                        Bleu
+                        <small>48°C</small>
+                    </button>
+                    <button class="doneness-btn selected">
+                        Saignant
+                        <small>52°C</small>
+                    </button>
+                    <button class="doneness-btn">
+                        À point
+                        <small>58°C</small>
+                    </button>
+                    <button class="doneness-btn">
+                        Bien cuit
+                        <small>65°C</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Température initiale -->
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span class="input-label">Température initiale</span>
+                    <span class="slider-value">4°C</span>
+                </div>
+                <input type="range" class="slider" min="-18" max="25" value="4">
+                <div class="slider-labels">
+                    <span>Congelé (-18°C)</span>
+                    <span>Ambiante (25°C)</span>
+                </div>
+            </div>
+
+            <button class="btn-primary">🔥 Calculer le temps de cuisson</button>
+        </div>
+    </div>
+
+    <!-- ========== PAGE TIMER ACCUEIL ========== -->
+    <div class="maquette" id="timer">
+        <div class="maquette-title">Accueil Timer</div>
+        <div class="maquette-content">
+            <h1 class="page-title">COOKMASTER</h1>
+            <p class="page-subtitle">Simplifiez votre expérience de cuisson facilement</p>
+
+            <div class="separator"></div>
+
+            <!-- Timer Preview -->
+            <div class="card" style="display: flex; align-items: center;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; margin-bottom: 5px;">TIMER</div>
+                    <div style="font-size: 12px; color: var(--text-light);">Un timer principal avec une progression circulaire et un affichage central clair.</div>
+                </div>
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #FF8A80); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">15:30</div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- Options -->
+            <div class="card" style="display: flex; align-items: center;">
+                <div style="width: 80px; height: 80px; background: var(--surface); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 15px;">
+                    <span style="font-size: 20px;">⏱️</span>
+                    <span style="font-size: 10px; margin-top: 5px;">Quick Timer</span>
+                    <span style="font-size: 14px; font-weight: 700;">00:00</span>
+                </div>
+                <div>
+                    <div style="font-weight: 700;">OPTIONS</div>
+                    <div style="font-size: 12px; color: var(--text-light);">Deux options pour lancer un timer rapidement, avec une interface intuitive et accessible.</div>
+                </div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- Lancer un timer -->
+            <div class="card" style="display: flex; align-items: center;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 700;">LANCER UN TIMER</div>
+                    <div style="font-size: 12px; color: var(--text-light);">L'option de timer rapide est bien visible, assurant une utilisation aisée sans calcul.</div>
+                </div>
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 24px;">🌡️</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <h2 style="color: var(--accent); font-size: 22px; font-weight: 900;">ALLEZ AU CALCULATEUR</h2>
+                <p style="font-size: 13px; color: var(--text-light);">Transformez votre façon de cuisiner dès aujourd'hui.</p>
+            </div>
+
+        </div>
+        <div class="footer-bar">Lancez votre aventure culinaire maintenant!</div>
+    </div>
+
+    <!-- ========== PAGE TIMER ACTIF ========== -->
+    <div class="maquette" id="timer-actif">
+        <div class="maquette-title">Timer Actif</div>
+        <div class="maquette-content">
+            <h1 class="page-title">COOKMASTER</h1>
+            <p class="page-subtitle">Simplifiez votre expérience de cuisson facilement</p>
+
+            <h2 style="text-align: center; color: var(--accent); margin: 20px 0;">CÔTE DE BOEUF</h2>
+
+            <div class="separator"></div>
+
+            <div class="timer-circle-container">
+                <div class="timer-circle">
+                    <div class="timer-time">15:30</div>
+                    <div class="timer-label">Poppins Bold</div>
+                </div>
+            </div>
+
+            <div class="timer-controls">
+                <div style="text-align: center;">
+                    <button class="timer-btn pause">⏸</button>
+                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">Pause</div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="timer-btn stop">⏹</button>
+                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">Stop</div>
+                </div>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="timer-info">
+                <div class="timer-meat-name">Saignant</div>
+                <div class="timer-details">
+                    température : 🌡️ 52°C à coeur<br>
+                    poids : ⚖️ 1.2 kg
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== PAGE ENCYCLOPEDIE ========== -->
+    <div class="maquette" id="encyclopedie">
+        <div class="maquette-title">Encyclopédie - Accueil</div>
+        <div class="maquette-content">
+            <h1 class="page-title">ENCYCLOPÉDIE</h1>
+            <p class="page-subtitle">Explorez les catégories de viandes disponibles</p>
+
+            <div class="separator"></div>
+
+            <!-- Boeuf -->
+            <div class="category-card">
+                <div style="flex: 1;">
+                    <div class="category-name">BOEUF</div>
+                    <div class="category-desc">Le boeuf est une viande riche en protéines, parfaite pour diverses recettes.</div>
+                </div>
+                <div class="category-img"></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- Veau -->
+            <div class="category-card reverse">
+                <div style="flex: 1;">
+                    <div class="category-name">VEAU</div>
+                    <div class="category-desc">Le veau offre une texture délicate et un goût subtil, idéal pour des plats raffinés.</div>
+                </div>
+                <div class="category-img"></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- Agneau -->
+            <div class="category-card">
+                <div style="flex: 1;">
+                    <div class="category-name">AGNEAU</div>
+                    <div class="category-desc">L'agneau, avec sa saveur unique, est excellent pour des recettes traditionnelles et festives.</div>
+                </div>
+                <div class="category-img"></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- Porc -->
+            <div class="category-card reverse">
+                <div style="flex: 1;">
+                    <div class="category-name">PORC</div>
+                    <div class="category-desc">Le porc est polyvalent et savoureux, adapté à de nombreuses préparations culinaires.</div>
+                </div>
+                <div class="category-img"></div>
+            </div>
+
+        </div>
+        <div class="footer-bar">Explorez toutes les catégories de viandes!</div>
+    </div>
+
+    <!-- ========== PAGE MORCEAU ========== -->
+    <div class="maquette" id="morceau">
+        <div class="maquette-title">Détail Morceau</div>
+        <div class="maquette-content">
+            <div class="morceau-header">
+                <div style="font-size: 14px; color: var(--text-light);">Détails</div>
+                <h1 style="font-size: 36px; font-weight: 900; color: var(--accent); font-style: italic;">Morceau</h1>
+                <div class="morceau-badge">Informations sur l'entrecôte et cuisson</div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-title">Caractéristiques de l'entrecôte</div>
+                    <div class="timeline-content">L'entrecôte est une viande tendre et savoureuse, parfaite pour les amateurs de boeuf.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Modes de cuisson</div>
+                    <div class="timeline-content">Différentes méthodes pour préparer votre viande</div>
+                    <div class="cooking-methods">
+                        <div class="method-item">
+                            <div class="method-icon">🍳</div>
+                            Poêle
+                        </div>
+                        <div class="method-item">
+                            <div class="method-icon">🔥</div>
+                            Grill
+                        </div>
+                        <div class="method-item">
+                            <div class="method-icon">♨️</div>
+                            Plancha
+                        </div>
+                        <div class="method-item">
+                            <div class="method-icon">🍖</div>
+                            Barbecue
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Accompagnements suggérés</div>
+                    <div class="timeline-content">Options pour accompagner votre entrecôte savoureuse</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Températures recommandées</div>
+                    <div class="timeline-content">Guide des températures pour une cuisson parfaite</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 20px;">CALCULER LE TEMPS DE CUISSON</button>
+
+        </div>
+        <div class="footer-bar" style="background: var(--green);">Notes</div>
+    </div>
+
+    <!-- ========== PAGE RESULTAT ========== -->
+    <div class="maquette" id="resultat">
+        <div class="maquette-title">Résultat Calculateur</div>
+        <div class="maquette-content" style="padding-top: 0;">
+
+            <!-- Image placeholder -->
+            <div style="height: 150px; background: linear-gradient(135deg, #D4A574, #8B6914); margin: 0 -20px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 60px;">🥩</span>
+            </div>
+
+            <div class="result-header">
+                <div class="result-title">CUISSON RÉUSSIE</div>
+                <div class="result-subtitle">Des conseils pour savourer votre entrecôte parfaite</div>
+            </div>
+
+            <div class="result-tip">
+                <div class="result-tip-title">Importance du temps de repos</div>
+                <div class="result-tip-text">Laisser reposer la viande améliore la tendreté et les saveurs.</div>
+            </div>
+
+            <div class="result-stat">
+                <div class="result-stat-value">55°C</div>
+                <div class="result-stat-label">Température idéale pour une viande à point.</div>
+            </div>
+
+            <div class="result-stat">
+                <div class="result-stat-value">5 min</div>
+                <div class="result-stat-label">Temps de repos recommandé avant de servir.</div>
+            </div>
+
+            <div style="background: var(--surface); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: center;">
+                <p style="font-size: 13px; color: var(--text-light);">Profitez de votre repas avec plaisir et satisfaction !</p>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 20px;">🍽️ Lancer le timer</button>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function showAll() {
+        document.querySelectorAll('.maquette').forEach(m => m.classList.remove('hidden'));
+    }
+
+    function showOnly(id) {
+        document.querySelectorAll('.maquette').forEach(m => {
+            if (m.id === id || m.id === id + '-config') {
+                m.classList.remove('hidden');
+            } else {
+                m.classList.add('hidden');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

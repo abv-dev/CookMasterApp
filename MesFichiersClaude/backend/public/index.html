@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CookMaster - Calcul de Cuisson Parfait</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash" class="splash-screen">
+        <div class="splash-content">
+            <div class="logo">🥩</div>
+            <h1>CookMaster</h1>
+            <p>Votre assistant de cuisson intelligent</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Home Screen -->
+        <div id="home" class="screen active">
+            <header class="app-header">
+                <div class="logo-small">🥩</div>
+                <h1>CookMaster</h1>
+            </header>
+
+            <div class="content">
+                <div class="welcome-card">
+                    <h2>Bonjour, Chef! 👨‍🍳</h2>
+                    <p>Prêt à cuisiner quelque chose de délicieux?</p>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="loadCalculator(); navigate('calculator');">
+                        <span class="icon">🍳</span>
+                        <span class="label">Cooking Helper</span>
+                        <span class="sublabel">Assistant cuisson</span>
+                    </button>
+                    <button class="action-btn" onclick="navigate('timer')">
+                        <span class="icon">⏱️</span>
+                        <span class="label">Timer</span>
+                        <span class="sublabel">Minuteur</span>
+                    </button>
+                </div>
+
+                <section class="section">
+                    <h2>Explorez notre catalogue</h2>
+                    <p class="section-desc"><span id="meatCount">...</span> viandes disponibles</p>
+                    <button class="btn-primary" onclick="navigate('explorer')">
+                        🔍 Voir toutes les viandes
+                    </button>
+                </section>
+
+                <section class="tip-section">
+                    <div class="tip-icon">💡</div>
+                    <div>
+                        <h3>Conseil pratique</h3>
+                        <p id="tipOfDay"></p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Explorer Screen -->
+        <div id="explorer" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('home')">←</button>
+                <h1>Explorer les Viandes</h1>
+            </header>
+
+            <div class="content">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Rechercher une viande...">
+                </div>
+
+                <div class="filter-tabs" id="filterTabs"></div>
+
+                <div id="meatsList" class="meats-list"></div>
+            </div>
+        </div>
+
+        <!-- Meat Cuts List Screen -->
+        <div id="meatCuts" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('explorer')">←</button>
+                <h1 id="meatCutsName"></h1>
+            </header>
+
+            <div class="content" id="meatCutsContent"></div>
+        </div>
+
+        <!-- Cut Detail Screen -->
+        <div id="cutDetail" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigateBack()">←</button>
+                <h1 id="cutDetailName"></h1>
+            </header>
+
+            <div class="content" id="cutDetailContent"></div>
+        </div>
+
+        <!-- Cooking Helper Screen -->
+        <div id="calculator" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigateBack()">←</button>
+                <h1>Cooking Helper</h1>
+            </header>
+
+            <div class="content">
+                <form id="calcForm" class="calc-form">
+                    <!-- Form fields will be populated by JS -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Summary Screen -->
+        <div id="resultsSummary" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('calculator')">←</button>
+                <h1>Résultats</h1>
+            </header>
+
+            <div class="content" id="resultsSummaryContent"></div>
+        </div>
+
+        <!-- Results Details Screen -->
+        <div id="resultsDetails" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('resultsSummary')">←</button>
+                <h1>Détails Complets</h1>
+            </header>
+
+            <div class="content" id="resultsDetailsContent"></div>
+        </div>
+
+        <!-- Timer Screen -->
+        <div id="timer" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('home')">←</button>
+                <h1>Minuteurs</h1>
+            </header>
+
+            <div class="content" id="timerContent"></div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen">
+            <header class="screen-header">
+                <button class="btn-back" onclick="navigate('home')">←</button>
+                <h1>Profil</h1>
+            </header>
+
+            <div class="content" id="profileContent"></div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="navigate('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Accueil</span>
+            </button>
+            <button class="nav-btn" onclick="navigate('explorer')">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Explorer</span>
+            </button>
+            <button class="nav-btn" onclick="navigate('timer')">
+                <span class="nav-icon">⏱️</span>
+                <span class="nav-label">Timer</span>
+            </button>
+            <button class="nav-btn" onclick="navigate('profile')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profil</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app-main.js"></script>
+</body>
+</html>
