@@ -10,7 +10,7 @@ function Layout({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Main content */}
-      <main className="flex-1 pb-20 overflow-y-auto">
+      <main className="flex-1 pb-24 overflow-y-auto">
         {children}
       </main>
 

@@ -17,8 +17,8 @@ function NavBar() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-accent-light shadow-lg z-50">
-      <div className="max-w-[430px] mx-auto flex justify-around items-center py-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-accent-light shadow-lg z-50 pb-safe">
+      <div className="max-w-[430px] mx-auto flex justify-around items-center py-2 pb-1">
         {navItems.map((item) => (
           <NavLink
             key={item.path}

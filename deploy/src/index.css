@@ -55,6 +55,13 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  /* Support for iOS safe area */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Safe area utilities for iOS */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
 }
 
 /* Mobile-first container */
