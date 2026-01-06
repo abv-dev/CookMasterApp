@@ -305,7 +305,12 @@ function Calculator() {
     const boneFactor = withBone ? meatFactors.boneFactor : 1.0
 
     // Facteur bardage (utilise le facteur spécifique - très important pour le gibier)
-    const bardingFactor = isBarded ? meatFactors.bardingFactor : 1.0
+    // Prend en compte soit l'ancien state isBarded soit le nouveau specificAnswers.barded
+    const isBardedFinal = isBarded || specificAnswers.barded
+    const bardingFactor = isBardedFinal ? meatFactors.bardingFactor : 1.0
+
+    // Facteur marinade (la viande marinée cuit plus vite - 10% plus rapide)
+    const marinatedFactor = specificAnswers.marinated ? 0.90 : 1.0
 
     // Facteur peau (pour la volaille - la peau protège et accélère)
     const skinFactor = (selectedMeatId === 'volaille' && withSkin) ? (meatFactors.skinFactor || 1.0) : 1.0
@@ -335,7 +340,7 @@ function Calculator() {
     const specificFactor = calculateSpecificFactors(selectedCutId, specificAnswers)
 
     // Calcul final avec tous les facteurs spécifiques
-    let totalSeconds = baseTime * weightFactor * thicknessFactor * tempFactor * boneFactor * bardingFactor * skinFactor * intensityFactor * thermostatFactor * specificFactor
+    let totalSeconds = baseTime * weightFactor * thicknessFactor * tempFactor * boneFactor * bardingFactor * marinatedFactor * skinFactor * intensityFactor * thermostatFactor * specificFactor
 
     // Arrondir à 15 secondes près
     totalSeconds = Math.round(totalSeconds / 15) * 15
@@ -596,6 +601,116 @@ function Calculator() {
             <button onClick={() => setStep(3)} className="text-accent text-xl">
               ✕
             </button>
+          </div>
+
+          {/* Quick Cooking Options - Always Visible */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Mariné */}
+            <button
+              onClick={() => setSpecificAnswers(prev => ({ ...prev, marinated: !prev.marinated }))}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                specificAnswers.marinated
+                  ? 'border-accent bg-accent-light'
+                  : 'border-gray-200 bg-white'
+              }`}
+            >
+              <div className="text-2xl mb-1">🫒</div>
+              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Marinated' : 'Mariné'}</div>
+              <div className={`text-xs mt-1 font-bold ${specificAnswers.marinated ? 'text-accent' : 'text-text-light'}`}>
+                {specificAnswers.marinated ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+              </div>
+            </button>
+
+            {/* Bardé */}
+            <button
+              onClick={() => setSpecificAnswers(prev => ({ ...prev, barded: !prev.barded }))}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                specificAnswers.barded
+                  ? 'border-accent bg-accent-light'
+                  : 'border-gray-200 bg-white'
+              }`}
+            >
+              <div className="text-2xl mb-1">🥓</div>
+              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Barded' : 'Bardé'}</div>
+              <div className={`text-xs mt-1 font-bold ${specificAnswers.barded ? 'text-accent' : 'text-text-light'}`}>
+                {specificAnswers.barded ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+              </div>
+            </button>
+
+            {/* Avec Os */}
+            <button
+              onClick={() => setWithBone(!withBone)}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                withBone
+                  ? 'border-accent bg-accent-light'
+                  : 'border-gray-200 bg-white'
+              }`}
+            >
+              <div className="text-2xl mb-1">🦴</div>
+              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'With Bone' : 'Avec Os'}</div>
+              <div className={`text-xs mt-1 font-bold ${withBone ? 'text-accent' : 'text-text-light'}`}>
+                {withBone ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+              </div>
+            </button>
+
+            {/* Sonde thermique */}
+            <button
+              onClick={() => setSpecificAnswers(prev => ({ ...prev, probe: !prev.probe }))}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                specificAnswers.probe
+                  ? 'border-green bg-green-50'
+                  : 'border-gray-200 bg-white'
+              }`}
+              style={specificAnswers.probe ? { borderColor: '#27AE60', backgroundColor: '#27AE6015' } : {}}
+            >
+              <div className="text-2xl mb-1">🌡️</div>
+              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Meat Probe' : 'Sonde'}</div>
+              <div className={`text-xs mt-1 font-bold`} style={{ color: specificAnswers.probe ? '#27AE60' : '#A0A0A0' }}>
+                {specificAnswers.probe ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+              </div>
+            </button>
+          </div>
+
+          {/* Thickness Slider */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-text-dark flex items-center gap-2">
+                📏 {lang === 'en' ? 'Thickness' : 'Épaisseur'}
+              </label>
+              <span className="text-lg font-bold text-accent">
+                {thickness || (isImperial ? '1' : '2.5')} {isImperial ? 'in' : 'cm'}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={isImperial ? 0.5 : 1}
+              max={isImperial ? 4 : 10}
+              step={isImperial ? 0.25 : 0.5}
+              value={thickness || (isImperial ? 1 : 2.5)}
+              onChange={(e) => setThickness(e.target.value)}
+              className="w-full accent-accent"
+            />
+            <div className="flex justify-between text-xs text-text-light mt-1">
+              <span>{isImperial ? '0.5 in' : '1 cm'}</span>
+              <span>{isImperial ? '2 in' : '5 cm'}</span>
+              <span>{isImperial ? '4 in' : '10 cm'}</span>
+            </div>
+            {/* Quick presets */}
+            <div className="flex justify-center gap-2 mt-2">
+              {(isImperial ? [0.5, 1, 1.5, 2, 3] : [1.5, 2.5, 3.5, 5, 7]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setThickness(t.toString())}
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    parseFloat(thickness) === t
+                      ? 'bg-accent text-white'
+                      : 'bg-gray-100 text-text-dark'
+                  }`}
+                >
+                  {t}{isImperial ? '"' : 'cm'}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Weight Input */}
