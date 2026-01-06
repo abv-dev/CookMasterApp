@@ -20,6 +20,16 @@ export const meatCategories = {
       temperaturage: "Sortir 30-60 minutes avant cuisson pour atteindre 18-20°C",
       assaisonnement: "Saler juste avant ou après cuisson, poivrer après",
       sechage: "Sécher soigneusement avec papier absorbant"
+    },
+    // Facteurs de cuisson spécifiques au boeuf
+    cookingFactors: {
+      boneFactor: 1.15,          // Os moyennement épais, bonne conduction
+      bardingFactor: 1.08,       // Déjà bien persillé, peu d'effet du bardage
+      thicknessExponent: 1.5,    // Densité standard
+      weightExponent: 0.85,      // Cuisson non-linéaire standard
+      frozenTempFactor: 1.30,    // Temps supplémentaire si congelé
+      fridgeTempFactor: 1.10,    // Temps supplémentaire si frigo
+      baseThicknessRef: 2.5      // Épaisseur de référence en cm
     }
   },
 
@@ -41,6 +51,16 @@ export const meatCategories = {
       temperaturage: "Sortir 30 minutes avant cuisson",
       assaisonnement: "Sel, poivre, herbes (thym, romarin, sauge), ail",
       securite: "Température minimum 63°C à cœur (recommandé 68-70°C)"
+    },
+    // Facteurs de cuisson spécifiques au porc
+    cookingFactors: {
+      boneFactor: 1.18,          // Os denses mais petits
+      bardingFactor: 1.05,       // Chair déjà grasse, peu d'effet
+      thicknessExponent: 1.4,    // Chair moins dense que boeuf
+      weightExponent: 0.82,      // Cuisson plus rapide
+      frozenTempFactor: 1.35,    // Plus sensible au froid
+      fridgeTempFactor: 1.12,
+      baseThicknessRef: 2.0      // Morceaux généralement plus fins
     }
   },
 
@@ -62,6 +82,16 @@ export const meatCategories = {
       temperaturage: "Sortir 30-45 minutes avant cuisson",
       assaisonnement: "Ail, romarin, thym, moutarde, anchois",
       marinade: "Optionnelle : huile d'olive, citron, herbes"
+    },
+    // Facteurs de cuisson spécifiques à l'agneau
+    cookingFactors: {
+      boneFactor: 1.20,          // Os fins mais nombreux (carré, souris)
+      bardingFactor: 1.12,       // Moins gras que boeuf, bardage utile
+      thicknessExponent: 1.6,    // Chair dense et fine
+      weightExponent: 0.88,      // Pièces souvent petites
+      frozenTempFactor: 1.28,
+      fridgeTempFactor: 1.08,
+      baseThicknessRef: 2.0      // Morceaux généralement plus fins
     }
   },
 
@@ -83,6 +113,16 @@ export const meatCategories = {
       temperaturage: "Sortir 20-30 minutes avant cuisson",
       assaisonnement: "Légèrement : sel, citron, sauge, estragon",
       cuisson: "Ne pas surcuire : le veau devient sec rapidement"
+    },
+    // Facteurs de cuisson spécifiques au veau
+    cookingFactors: {
+      boneFactor: 1.12,          // Os jeunes, moins denses
+      bardingFactor: 1.10,       // Viande maigre, bardage recommandé
+      thicknessExponent: 1.4,    // Chair tendre et fine
+      weightExponent: 0.80,      // Cuisson rapide
+      frozenTempFactor: 1.25,
+      fridgeTempFactor: 1.08,
+      baseThicknessRef: 1.5      // Escalopes fines
     }
   },
 
@@ -104,6 +144,17 @@ export const meatCategories = {
       temperaturage: "Sortir 30 minutes avant cuisson",
       assaisonnement: "Sel, poivre, herbes de Provence, thym, romarin, ail, citron",
       securite: "CRUCIAL : Température minimum 74°C à cœur pour éliminer salmonelles"
+    },
+    // Facteurs de cuisson spécifiques à la volaille
+    cookingFactors: {
+      boneFactor: 1.25,          // Os creux mais volumineux
+      bardingFactor: 1.15,       // Chair maigre, bardage très utile
+      skinFactor: 0.92,          // Peau protège et accélère (graisse sous-cutanée)
+      thicknessExponent: 1.3,    // Chair moins dense
+      weightExponent: 0.75,      // Pièces volumineuses mais creuses
+      frozenTempFactor: 1.40,    // Très sensible au froid
+      fridgeTempFactor: 1.15,
+      baseThicknessRef: 3.0      // Cuisses épaisses
     }
   },
 
@@ -125,6 +176,17 @@ export const meatCategories = {
       temperaturage: "Sortir 1h avant cuisson",
       marinade: "Quasi-obligatoire : vin rouge, genièvre, thym, laurier 12-48h",
       bardage: "ESSENTIEL car très maigre : barder de lard pour éviter dessèchement"
+    },
+    // Facteurs de cuisson spécifiques au gibier
+    cookingFactors: {
+      boneFactor: 1.22,          // Os denses d'animaux sauvages
+      bardingFactor: 1.25,       // TRÈS maigre, le bardage fait une énorme différence
+      thicknessExponent: 1.7,    // Chair très dense et ferme
+      weightExponent: 0.90,      // Nécessite cuisson plus uniforme
+      frozenTempFactor: 1.35,
+      fridgeTempFactor: 1.12,
+      baseThicknessRef: 3.0,     // Pièces souvent épaisses
+      marinadeFactor: 0.90       // La marinade attendrit et accélère légèrement
     }
   }
 };

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { meatCategories, donenessLevels, cookingMethods, intensityLevels } from '../data/meatData'
 import { cutsData } from '../data/cutsData'
+import { cutSpecificQuestions, calculateSpecificFactors, getEffectiveDiffusivity, heatTransferCoeffs } from '../data/thermalProfiles'
 import { saveToHistory } from '../services/storageService'
 import { settingsService } from '../services/settingsService'
 import { unitConversion } from '../utils/unitConversion'
@@ -87,7 +88,12 @@ function Calculator() {
     sec: 'sec',
     commonTemps: lang === 'en' ? 'Common temperatures' : 'Températures courantes',
     presetTemps: lang === 'en' ? 'Preset temperatures' : 'Températures prédéfinies',
-    preciseSurfaceTemp: lang === 'en' ? '🌡️ Precise surface temperature' : '🌡️ Température de surface précise'
+    preciseSurfaceTemp: lang === 'en' ? '🌡️ Precise surface temperature' : '🌡️ Température de surface précise',
+    specificQuestions: lang === 'en' ? '🎯 Specific options for this cut' : '🎯 Options spécifiques à ce morceau',
+    yes: lang === 'en' ? 'Yes' : 'Oui',
+    no: lang === 'en' ? 'No' : 'Non',
+    precisionMode: lang === 'en' ? '🔬 Precision mode' : '🔬 Mode précision',
+    precisionModeDesc: lang === 'en' ? 'Answer these questions for a more accurate calculation' : 'Répondez à ces questions pour un calcul plus précis'
   }
 
   // Helper pour obtenir le texte traduit
@@ -116,6 +122,7 @@ function Calculator() {
   const [withSkin, setWithSkin] = useState(true)
   const [isBarded, setIsBarded] = useState(false)
   const [calculationResult, setCalculationResult] = useState(null)
+  const [specificAnswers, setSpecificAnswers] = useState({}) // Réponses aux questions spécifiques par morceau
 
   // Effet pour pré-remplir depuis l'encyclopédie
   useEffect(() => {
@@ -168,6 +175,12 @@ function Calculator() {
   // Méthode de cuisson sélectionnée
   const selectedMethodData = cookingMethods.find(m => m.id === method)
 
+  // Questions spécifiques au morceau sélectionné
+  const cutQuestions = useMemo(() => {
+    if (!selectedCutId) return null
+    return cutSpecificQuestions[selectedCutId] || null
+  }, [selectedCutId])
+
   // Méthodes de cuisson disponibles pour ce morceau
   const availableMethods = useMemo(() => {
     if (!selectedCut?.cuissons) return cookingMethods
@@ -206,6 +219,18 @@ function Calculator() {
       const donenessType = cut.donenessType || 'viande_rouge'
       const defaultDoneness = donenessLevels[donenessType]?.[1]?.id || 'saignant'
       setDoneness(defaultDoneness)
+
+      // Initialiser les réponses spécifiques avec les valeurs par défaut
+      const cutQs = cutSpecificQuestions[cutId]
+      if (cutQs?.questions) {
+        const defaultAnswers = {}
+        cutQs.questions.forEach(q => {
+          defaultAnswers[q.id] = q.default
+        })
+        setSpecificAnswers(defaultAnswers)
+      } else {
+        setSpecificAnswers({})
+      }
     }
   }
 
@@ -236,11 +261,23 @@ function Calculator() {
     }
     if (isNaN(weightG) || weightG <= 0) return null
 
+    // Récupérer les facteurs de cuisson spécifiques à ce type de viande
+    const meatFactors = selectedMeat?.cookingFactors || {
+      boneFactor: 1.15,
+      bardingFactor: 1.10,
+      thicknessExponent: 1.5,
+      weightExponent: 0.85,
+      frozenTempFactor: 1.30,
+      fridgeTempFactor: 1.10,
+      baseThicknessRef: 2.5,
+      skinFactor: 1.0
+    }
+
     // Temps de base par 100g (en secondes)
     const baseTime = selectedCut.temps_base_100g?.[doneness] || 120
 
-    // Facteur de poids (non linéaire - les grosses pièces cuisent plus lentement par gramme)
-    const weightFactor = Math.pow(weightG / 100, 0.85)
+    // Facteur de poids (non linéaire - utilise l'exposant spécifique à la viande)
+    const weightFactor = Math.pow(weightG / 100, meatFactors.weightExponent)
 
     // Facteur d'épaisseur (si renseigné)
     let thicknessFactor = 1
@@ -250,26 +287,28 @@ function Calculator() {
       if (isImperial) {
         thicknessCm = thicknessCm * 2.54 // 1 inch = 2.54 cm
       }
-      // L'épaisseur a un impact quadratique (la chaleur doit traverser)
-      thicknessFactor = Math.pow(thicknessCm / 2.5, 1.5)
+      // L'épaisseur utilise l'exposant et la référence spécifiques à la viande
+      thicknessFactor = Math.pow(thicknessCm / meatFactors.baseThicknessRef, meatFactors.thicknessExponent)
     }
 
-    // Facteur de température initiale
-    // Plus la viande est froide, plus elle met de temps
+    // Facteur de température initiale (utilise les facteurs spécifiques)
     let tempFactor = 1
-    if (initialTemp < 4) {
-      tempFactor = 1.3 // Congelé ou très froid
+    if (initialTemp < 0) {
+      tempFactor = meatFactors.frozenTempFactor // Congelé
     } else if (initialTemp < 15) {
-      tempFactor = 1.1 // Sortie du frigo
+      tempFactor = meatFactors.fridgeTempFactor // Sortie du frigo
     } else {
       tempFactor = 1.0 // Température ambiante
     }
 
-    // Facteur avec os (+15% de temps)
-    const boneFactor = withBone ? 1.15 : 1.0
+    // Facteur avec os (utilise le facteur spécifique à la viande)
+    const boneFactor = withBone ? meatFactors.boneFactor : 1.0
 
-    // Facteur bardage (protection = cuisson légèrement plus longue +10%)
-    const bardingFactor = isBarded ? 1.1 : 1.0
+    // Facteur bardage (utilise le facteur spécifique - très important pour le gibier)
+    const bardingFactor = isBarded ? meatFactors.bardingFactor : 1.0
+
+    // Facteur peau (pour la volaille - la peau protège et accélère)
+    const skinFactor = (selectedMeatId === 'volaille' && withSkin) ? (meatFactors.skinFactor || 1.0) : 1.0
 
     // Facteur intensité (feu vif = plus rapide)
     let intensityFactor = 1
@@ -292,14 +331,27 @@ function Calculator() {
       thermostatFactor = 180 / ovenTemp // Référence à 180°C
     }
 
-    // Calcul final
-    let totalSeconds = baseTime * weightFactor * thicknessFactor * tempFactor * boneFactor * bardingFactor * intensityFactor * thermostatFactor
+    // Facteur spécifique au morceau (questions détaillées)
+    const specificFactor = calculateSpecificFactors(selectedCutId, specificAnswers)
+
+    // Calcul final avec tous les facteurs spécifiques
+    let totalSeconds = baseTime * weightFactor * thicknessFactor * tempFactor * boneFactor * bardingFactor * skinFactor * intensityFactor * thermostatFactor * specificFactor
 
     // Arrondir à 15 secondes près
     totalSeconds = Math.round(totalSeconds / 15) * 15
 
-    // Temps de repos recommandé (environ 1/3 du temps de cuisson, min 2 min)
-    const restSeconds = Math.max(120, Math.round(totalSeconds / 3 / 30) * 30)
+    // Temps de repos recommandé (varie selon la viande)
+    // Gibier et boeuf : repos plus long pour redistribuer les jus
+    // Volaille : repos court, risque de refroidissement
+    let restRatio = 0.33 // 1/3 par défaut
+    if (selectedMeatId === 'gibier' || selectedMeatId === 'boeuf') {
+      restRatio = 0.40 // 40% pour viandes denses
+    } else if (selectedMeatId === 'volaille') {
+      restRatio = 0.25 // 25% pour volaille
+    } else if (selectedMeatId === 'veau') {
+      restRatio = 0.30 // 30% pour veau
+    }
+    const restSeconds = Math.max(120, Math.round(totalSeconds * restRatio / 30) * 30)
 
     // Températures cibles
     const donenessData = availableDoneness.find(d => d.id === doneness)
@@ -1140,6 +1192,84 @@ function Calculator() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Cut-Specific Questions - Mode Précision */}
+          {cutQuestions && cutQuestions.questions && cutQuestions.questions.length > 0 && (
+            <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: '#3498DB15', border: '1px solid #3498DB50' }}>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-sm" style={{ color: '#3498DB' }}>{t.specificQuestions}</h3>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#3498DB', color: 'white' }}>
+                  {cutQuestions.questions.length}
+                </span>
+              </div>
+              <p className="text-xs text-text-light">{t.precisionModeDesc}</p>
+
+              <div className="space-y-3">
+                {cutQuestions.questions.map((q) => (
+                  <div key={q.id}>
+                    <label className="block text-xs text-text-dark mb-1 font-medium">
+                      {lang === 'en' && q.question_en ? q.question_en : q.question}
+                    </label>
+
+                    {/* Boolean question */}
+                    {q.type === 'boolean' && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: true }))}
+                          className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            specificAnswers[q.id] === true
+                              ? 'text-white'
+                              : 'bg-white text-text-dark border border-gray-200'
+                          }`}
+                          style={specificAnswers[q.id] === true ? { backgroundColor: '#3498DB' } : {}}
+                        >
+                          {t.yes}
+                        </button>
+                        <button
+                          onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: false }))}
+                          className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            specificAnswers[q.id] === false
+                              ? 'text-white'
+                              : 'bg-white text-text-dark border border-gray-200'
+                          }`}
+                          style={specificAnswers[q.id] === false ? { backgroundColor: '#3498DB' } : {}}
+                        >
+                          {t.no}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Select question */}
+                    {q.type === 'select' && (
+                      <div className="flex flex-wrap gap-2">
+                        {q.options.map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: opt.value }))}
+                            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                              specificAnswers[q.id] === opt.value
+                                ? 'text-white'
+                                : 'bg-white text-text-dark border border-gray-200'
+                            }`}
+                            style={specificAnswers[q.id] === opt.value ? { backgroundColor: '#3498DB' } : {}}
+                          >
+                            {lang === 'en' && opt.label_en ? opt.label_en : opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tip if available */}
+                    {q.tip && (
+                      <p className="text-xs mt-1" style={{ color: '#3498DB' }}>
+                        💡 {lang === 'en' && q.tip_en ? q.tip_en : q.tip}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
