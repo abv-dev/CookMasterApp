@@ -23,11 +23,8 @@ function Home() {
     subtitle: lang === 'en' ? 'Master the cooking of your meats' : 'Maîtrisez la cuisson de vos viandes',
     meats: lang === 'en' ? 'meats' : 'viandes',
     cuts: lang === 'en' ? 'cuts' : 'morceaux',
-    quickActions: lang === 'en' ? 'Quick actions' : 'Actions rapides',
     calculator: lang === 'en' ? 'Calculator' : 'Calculateur',
     calculatorDesc: lang === 'en' ? 'Perfect cooking time' : 'Temps de cuisson parfait',
-    timer: lang === 'en' ? 'Timer' : 'Minuteur',
-    timerDesc: lang === 'en' ? 'Never miss again' : 'Ne ratez plus jamais',
     encyclopedia: lang === 'en' ? 'Encyclopedia' : 'Encyclopédie',
     encyclopediaDesc: lang === 'en' ? 'All about meats' : 'Tout sur les viandes',
     recentHistory: lang === 'en' ? 'Recent history' : 'Historique récent',
@@ -133,13 +130,7 @@ function Home() {
       description: texts.calculatorDesc,
       path: '/calculator',
       color: '#F97066',
-    },
-    {
-      icon: '⏱️',
-      title: texts.timer,
-      description: texts.timerDesc,
-      path: '/timer',
-      color: '#FFD93D',
+      gradient: 'linear-gradient(135deg, #F97066, #FF8A80)',
     },
     {
       icon: '📚',
@@ -147,6 +138,7 @@ function Home() {
       description: texts.encyclopediaDesc,
       path: '/encyclopedia',
       color: '#8BC34A',
+      gradient: 'linear-gradient(135deg, #8BC34A, #AED581)',
     },
   ]
 
@@ -227,28 +219,26 @@ function Home() {
         </div>
       </header>
 
-      {/* Quick Actions */}
+      {/* Main Features - Calculator & Encyclopedia */}
       <section className="mb-6">
-        <h2 className="text-lg font-bold text-text-dark mb-3">{texts.quickActions}</h2>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {features.map((feature) => (
             <Link
               key={feature.path}
               to={feature.path}
-              className="card flex flex-col items-center py-4 hover:shadow-md transition-shadow active:scale-98"
+              className="relative overflow-hidden rounded-2xl p-5 hover:shadow-lg transition-all active:scale-98"
+              style={{ background: feature.gradient }}
             >
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-2"
-                style={{ backgroundColor: feature.color + '20' }}
-              >
+              <div className="text-4xl mb-3">{feature.icon}</div>
+              <h3 className="font-bold text-lg text-white mb-1">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-white/80">
+                {feature.description}
+              </p>
+              <div className="absolute -bottom-4 -right-4 text-7xl opacity-20">
                 {feature.icon}
               </div>
-              <span className="font-semibold text-sm text-text-dark">
-                {feature.title}
-              </span>
-              <span className="text-xs text-text-light text-center mt-1">
-                {feature.description}
-              </span>
             </Link>
           ))}
         </div>
