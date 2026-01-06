@@ -1,0 +1,56 @@
+{
+  "name": "CookMaster - Maîtrisez la Cuisson",
+  "short_name": "CookMaster",
+  "description": "Application de calcul et maîtrise de la cuisson des viandes. Calculateur intelligent, minuteur avec alarmes, encyclopédie complète.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#F97066",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Calculateur",
+      "short_name": "Calcul",
+      "description": "Calculer le temps de cuisson",
+      "url": "/calculator",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Minuteur",
+      "short_name": "Timer",
+      "description": "Lancer le minuteur",
+      "url": "/timer",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Encyclopédie",
+      "short_name": "Encyclo",
+      "description": "Explorer les viandes",
+      "url": "/encyclopedia",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
