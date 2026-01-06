@@ -105,7 +105,7 @@ function Calculator() {
     return obj[field] || ''
   }
 
-  const [step, setStep] = useState(1) // 1: meat, 2: subcategory, 3: cut, 4: config
+  const [step, setStep] = useState(1) // 1: meat, 2: subcategory, 3: cut, 4: options, 5: config, 6: results
   const [isAdvanced, setIsAdvanced] = useState(false)
   const [selectedMeatId, setSelectedMeatId] = useState(null)
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null)
@@ -246,6 +246,8 @@ function Calculator() {
       setStep(3)
     } else if (step === 5) {
       setStep(4)
+    } else if (step === 6) {
+      setStep(5)
       setCalculationResult(null)
     }
   }
@@ -377,7 +379,7 @@ function Calculator() {
     const result = calculateCookingTime()
     if (result) {
       setCalculationResult(result)
-      setStep(5)
+      setStep(6)
     }
   }
 
@@ -454,7 +456,7 @@ function Calculator() {
 
       {/* Progress indicator */}
       <div className="flex gap-1 mb-6">
-        {[1, 2, 3, 4, 5].map((s) => (
+        {[1, 2, 3, 4, 5, 6].map((s) => (
           <div
             key={s}
             className={`h-1 flex-1 rounded-full transition-all ${
@@ -560,29 +562,9 @@ function Calculator() {
         </section>
       )}
 
-      {/* Step 4: Configuration */}
+      {/* Step 4: Cooking Options */}
       {step === 4 && selectedCut && (
         <section className="space-y-4">
-          {/* Mode Toggle */}
-          <div className="flex bg-surface rounded-xl p-1">
-            <button
-              onClick={() => setIsAdvanced(false)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                !isAdvanced ? 'bg-accent text-white' : 'text-text-light'
-              }`}
-            >
-              {t.simple}
-            </button>
-            <button
-              onClick={() => setIsAdvanced(true)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                isAdvanced ? 'bg-purple text-white' : 'text-text-light'
-              }`}
-            >
-              {t.advanced}
-            </button>
-          </div>
-
           {/* Selected Cut Card */}
           <div
             className="card flex items-center gap-3 border-2"
@@ -598,12 +580,13 @@ function Calculator() {
               <h3 className="font-bold text-text-dark">{getText(selectedCut, 'name')}</h3>
               <p className="text-xs text-text-light">{getText(selectedMeat, 'name')} • {getText(selectedSubcategory, 'name')}</p>
             </div>
-            <button onClick={() => setStep(3)} className="text-accent text-xl">
-              ✕
-            </button>
           </div>
 
-          {/* Quick Cooking Options - Always Visible */}
+          <h2 className="text-lg font-semibold text-text-dark">
+            {lang === 'en' ? '🍖 Preparation Options' : '🍖 Options de préparation'}
+          </h2>
+
+          {/* Quick Cooking Options */}
           <div className="grid grid-cols-2 gap-3">
             {/* Mariné */}
             <button
@@ -711,6 +694,60 @@ function Calculator() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Continue Button */}
+          <button
+            onClick={() => setStep(5)}
+            className="btn-primary flex items-center justify-center gap-2"
+          >
+            <span>{lang === 'en' ? 'Continue' : 'Continuer'}</span>
+            <span>→</span>
+          </button>
+        </section>
+      )}
+
+      {/* Step 5: Configuration */}
+      {step === 5 && selectedCut && (
+        <section className="space-y-4">
+          {/* Mode Toggle */}
+          <div className="flex bg-surface rounded-xl p-1">
+            <button
+              onClick={() => setIsAdvanced(false)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                !isAdvanced ? 'bg-accent text-white' : 'text-text-light'
+              }`}
+            >
+              {t.simple}
+            </button>
+            <button
+              onClick={() => setIsAdvanced(true)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                isAdvanced ? 'bg-purple text-white' : 'text-text-light'
+              }`}
+            >
+              {t.advanced}
+            </button>
+          </div>
+
+          {/* Selected Cut Card */}
+          <div
+            className="card flex items-center gap-3 border-2"
+            style={{ borderColor: selectedMeat.color }}
+          >
+            <div
+              className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+              style={{ backgroundColor: selectedMeat.color }}
+            >
+              {selectedCut.icon || selectedMeat.icon}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-text-dark">{getText(selectedCut, 'name')}</h3>
+              <p className="text-xs text-text-light">{getText(selectedMeat, 'name')} • {getText(selectedSubcategory, 'name')}</p>
+            </div>
+            <button onClick={() => setStep(4)} className="text-accent text-xl">
+              ✕
+            </button>
           </div>
 
           {/* Weight Input */}
@@ -1417,8 +1454,8 @@ function Calculator() {
         </section>
       )}
 
-      {/* Step 5: Results */}
-      {step === 5 && calculationResult && (
+      {/* Step 6: Results */}
+      {step === 6 && calculationResult && (
         <section className="space-y-4">
           {/* Result Card */}
           <div className="card text-center py-6 border-2 border-green">
@@ -1514,7 +1551,7 @@ function Calculator() {
 
             <button
               onClick={() => {
-                setStep(4)
+                setStep(5)
                 setCalculationResult(null)
               }}
               className="w-full py-3 text-accent font-semibold"
