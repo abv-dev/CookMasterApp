@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { settingsService } from '../services/settingsService'
 import { storageService } from '../services/storageService'
 
@@ -29,6 +31,8 @@ const donenessLabels = {
 }
 
 function Settings() {
+  const navigate = useNavigate()
+  const { user, isAuthenticated, logout, loading: authLoading, syncing, syncFromCloud } = useAuth()
   const [settings, setSettings] = useState(settingsService.getSettings())
   const [showConfirmClear, setShowConfirmClear] = useState(false)
 
@@ -234,6 +238,68 @@ function Settings() {
         </div>
       </section>
 
+      {/* Account Section */}
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold text-text-light uppercase mb-3">
+          {effectiveLang === 'en' ? 'Account' : 'Compte'}
+        </h2>
+        <div className="card">
+          {authLoading ? (
+            <div className="py-4 text-center text-text-light">
+              {effectiveLang === 'en' ? 'Loading...' : 'Chargement...'}
+            </div>
+          ) : isAuthenticated && user ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center text-white text-xl font-bold">
+                  {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-text-dark">{user.name || user.email}</p>
+                  <p className="text-sm text-text-light">{user.email}</p>
+                </div>
+                <span className={`text-sm font-medium ${syncing ? 'text-accent' : 'text-green'}`}>
+                  {syncing
+                    ? (effectiveLang === 'en' ? '↻ Syncing...' : '↻ Sync...')
+                    : (effectiveLang === 'en' ? '✓ Synced' : '✓ Synchronisé')
+                  }
+                </span>
+              </div>
+              <button
+                onClick={syncFromCloud}
+                disabled={syncing}
+                className="w-full py-3 bg-accent text-white rounded-xl font-medium mb-2 disabled:opacity-50"
+              >
+                {syncing
+                  ? (effectiveLang === 'en' ? 'Syncing...' : 'Synchronisation...')
+                  : (effectiveLang === 'en' ? '↻ Sync now' : '↻ Synchroniser')
+                }
+              </button>
+              <button
+                onClick={logout}
+                className="w-full py-3 bg-surface text-text-dark rounded-xl font-medium"
+              >
+                {effectiveLang === 'en' ? 'Log out' : 'Se déconnecter'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-text-light text-sm">
+                {effectiveLang === 'en'
+                  ? 'Sign in to sync your data across devices'
+                  : 'Connectez-vous pour synchroniser vos données sur tous vos appareils'}
+              </p>
+              <button
+                onClick={() => navigate('/auth')}
+                className="w-full py-3 bg-accent text-white rounded-xl font-semibold"
+              >
+                {effectiveLang === 'en' ? 'Sign in / Sign up' : 'Se connecter / S\'inscrire'}
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* About Section */}
       <section className="mb-6">
         <h2 className="text-sm font-semibold text-text-light uppercase mb-3">
@@ -250,6 +316,12 @@ function Settings() {
             </span>
             <span className="text-text-light">Cookmaster Team</span>
           </div>
+          <a
+            href="mailto:contact@cook-master.app"
+            className="block w-full text-left py-2 text-accent font-medium"
+          >
+            📧 contact@cook-master.app
+          </a>
           <button className="w-full text-left py-2 text-accent font-medium">
             {effectiveLang === 'en' ? 'Privacy policy' : 'Politique de confidentialité'} →
           </button>

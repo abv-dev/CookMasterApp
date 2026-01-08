@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { LanguageProvider } from './contexts/LanguageContext'
+import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 
 // Lazy load des pages pour optimiser le bundle
@@ -11,6 +12,7 @@ const Encyclopedia = lazy(() => import('./pages/Encyclopedia'))
 const Settings = lazy(() => import('./pages/Settings'))
 const History = lazy(() => import('./pages/History'))
 const Favorites = lazy(() => import('./pages/Favorites'))
+const Auth = lazy(() => import('./pages/Auth'))
 
 // Composant de chargement
 function LoadingSpinner() {
@@ -26,23 +28,30 @@ function LoadingSpinner() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <Router>
-        <Layout>
+    <AuthProvider>
+      <LanguageProvider>
+        <Router>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/calculator" element={<Calculator />} />
-              <Route path="/timer" element={<Timer />} />
-              <Route path="/encyclopedia/*" element={<Encyclopedia />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/*" element={
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/calculator" element={<Calculator />} />
+                    <Route path="/timer" element={<Timer />} />
+                    <Route path="/encyclopedia/*" element={<Encyclopedia />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/history" element={<History />} />
+                    <Route path="/favorites" element={<Favorites />} />
+                  </Routes>
+                </Layout>
+              } />
             </Routes>
           </Suspense>
-        </Layout>
-      </Router>
-    </LanguageProvider>
+        </Router>
+      </LanguageProvider>
+    </AuthProvider>
   )
 }
 

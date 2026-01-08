@@ -67,6 +67,45 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Recommandé pour éviter le dessèchement',
         tip_en: 'Recommended to prevent drying'
+      },
+      {
+        id: 'butter_basting',
+        question: 'Arroser de beurre en fin de cuisson ?',
+        question_en: 'Butter baste at the end?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple'], tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Arroser de beurre = croûte dorée et saveur',
+        tip_en: 'Butter basting = golden crust and flavor'
+      },
+      {
+        id: 'flip_count',
+        question: 'Nombre de retournements ?',
+        question_en: 'Number of flips?',
+        type: 'select',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        options: [
+          { value: 'once', label: 'Une seule fois', label_en: 'Once only', factor: 1.0 },
+          { value: 'multiple', label: 'Plusieurs fois', label_en: 'Multiple times', factor: 0.95 }
+        ],
+        default: 'once',
+        tip: 'Retourner une fois = meilleure croûte',
+        tip_en: 'Flip once = better crust'
+      },
+      {
+        id: 'sv_target_temp',
+        question: 'Température cible sous-vide ?',
+        question_en: 'Target sous-vide temp?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '52°C (saignant)', label_en: '126°F (rare)', factor: 1.0 },
+          { value: 'medium_rare', label: '55°C (rosé)', label_en: '131°F (medium-rare)', factor: 1.0 },
+          { value: 'medium', label: '58°C (à point)', label_en: '136°F (medium)', factor: 1.0 }
+        ],
+        default: 'medium_rare'
       }
     ],
     thermalProfile: {
@@ -97,10 +136,48 @@ export const cutSpecificQuestions = {
         type: 'select',
         options: [
           { value: 'present', label: 'Présente', label_en: 'Present', factor: 1.0 },
-          { value: 'scored', label: 'Incisée', label_en: 'Scored', factor: 0.97 },
+          { value: 'scored', label: 'Incisée (pour éviter de gondoler)', label_en: 'Scored (to prevent curling)', factor: 0.97 },
           { value: 'removed', label: 'Retirée', label_en: 'Removed', factor: 0.95 }
         ],
-        default: 'present'
+        default: 'present',
+        tip: 'Inciser la bande de gras tous les 2cm empêche le steak de gondoler',
+        tip_en: 'Score fat strip every inch to prevent curling'
+      },
+      {
+        id: 'sear_fat_first',
+        question: 'Saisir le gras en premier ?',
+        question_en: 'Sear fat edge first?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Debout sur le gras 1-2 min = gras croustillant',
+        tip_en: 'Standing on fat 1-2 min = crispy fat'
+      },
+      {
+        id: 'rest_covered',
+        question: 'Repos couvert ?',
+        question_en: 'Rest covered?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct', 'reverse_sear'] },
+        default: false,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Couvert = moins de croûte, non couvert = croûte préservée',
+        tip_en: 'Covered = softer crust, uncovered = crisp crust'
+      },
+      {
+        id: 'bbq_zone',
+        question: 'Zone de cuisson BBQ ?',
+        question_en: 'BBQ cooking zone?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        options: [
+          { value: 'direct', label: 'Directe (sur les braises)', label_en: 'Direct (over coals)', factor: 0.9 },
+          { value: 'indirect', label: 'Indirecte puis saisie', label_en: 'Indirect then sear', factor: 1.1 }
+        ],
+        default: 'direct'
       }
     ],
     thermalProfile: {
@@ -117,27 +194,17 @@ export const cutSpecificQuestions = {
     questions: [
       {
         id: 'bone_orientation',
-        question: 'Position de l\'os ?',
-        question_en: 'Bone position?',
+        question: 'Position de l\'os pendant la cuisson ?',
+        question_en: 'Bone position during cooking?',
         type: 'select',
         options: [
           { value: 'lateral', label: 'Os sur le côté', label_en: 'Bone on side', factor: 1.0 },
-          { value: 'dessous', label: 'Os en dessous', label_en: 'Bone underneath', factor: 1.08 },
+          { value: 'dessous', label: 'Os en dessous (protège)', label_en: 'Bone underneath (protects)', factor: 1.08 },
           { value: 'dessus', label: 'Os au-dessus', label_en: 'Bone on top', factor: 0.95 }
         ],
-        default: 'lateral'
-      },
-      {
-        id: 'cooking_method',
-        question: 'Méthode de cuisson ?',
-        question_en: 'Cooking method?',
-        type: 'select',
-        options: [
-          { value: 'sear_then_oven', label: 'Saisir puis four', label_en: 'Sear then oven', factor: 1.0 },
-          { value: 'reverse_sear', label: 'Reverse sear', label_en: 'Reverse sear', factor: 1.05 },
-          { value: 'direct', label: 'Tout au grill/BBQ', label_en: 'All grill/BBQ', factor: 0.9 }
-        ],
-        default: 'sear_then_oven'
+        default: 'lateral',
+        tip: 'Os en dessous = cuisson plus douce côté os',
+        tip_en: 'Bone underneath = gentler cooking on bone side'
       },
       {
         id: 'fat_cap',
@@ -150,6 +217,44 @@ export const cutSpecificQuestions = {
           { value: 'trimmed', label: 'Parée (< 5mm)', label_en: 'Trimmed', factor: 0.95 }
         ],
         default: 'medium'
+      },
+      {
+        id: 'bbq_lid',
+        question: 'Couvercle du BBQ ?',
+        question_en: 'BBQ lid?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        options: [
+          { value: 'closed', label: 'Fermé (convection)', label_en: 'Closed (convection)', factor: 0.85 },
+          { value: 'open', label: 'Ouvert (saisie directe)', label_en: 'Open (direct sear)', factor: 1.0 }
+        ],
+        default: 'closed',
+        tip: 'Fermé = cuisson plus uniforme pour pièces épaisses',
+        tip_en: 'Closed = more even cooking for thick cuts'
+      },
+      {
+        id: 'sear_first',
+        question: 'Saisir la viande avant le four ?',
+        question_en: 'Sear meat before oven?',
+        type: 'boolean',
+        showWhen: { techniques: ['basse_temperature'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.05,
+        tip: 'Saisir avant = croûte + jus caramélisés',
+        tip_en: 'Searing first = crust + caramelized juices'
+      },
+      {
+        id: 'convection',
+        question: 'Mode convection (chaleur tournante) ?',
+        question_en: 'Convection mode (fan)?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: 'Convection = cuisson 10% plus rapide',
+        tip_en: 'Convection = 10% faster cooking'
       }
     ],
     thermalProfile: {
@@ -184,6 +289,33 @@ export const cutSpecificQuestions = {
           { value: 'thick', label: 'Épaisse (> 3cm)', label_en: 'Thick', factor: 1.25 }
         ],
         default: 'standard'
+      },
+      {
+        id: 'pan_material',
+        question: 'Type de poêle ?',
+        question_en: 'Pan type?',
+        type: 'select',
+        showWhen: { techniques: ['saisie_simple'], tools: ['poele'] },
+        options: [
+          { value: 'cast_iron', label: 'Fonte', label_en: 'Cast iron', factor: 0.95 },
+          { value: 'stainless', label: 'Inox', label_en: 'Stainless steel', factor: 1.0 },
+          { value: 'nonstick', label: 'Anti-adhésive', label_en: 'Non-stick', factor: 1.05 }
+        ],
+        default: 'cast_iron',
+        tip: 'La fonte retient mieux la chaleur pour une belle croûte',
+        tip_en: 'Cast iron retains heat better for a good crust'
+      },
+      {
+        id: 'grill_marks',
+        question: 'Marques de grill croisées ?',
+        question_en: 'Cross-hatch grill marks?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct'] },
+        default: false,
+        factorYes: 1.05,
+        factorNo: 1.0,
+        tip: 'Tourner 45° à mi-cuisson par face',
+        tip_en: 'Rotate 45° halfway through each side'
       }
     ],
     thermalProfile: {
@@ -213,8 +345,32 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 0.95,
         factorNo: 1.0,
-        tip: 'La marinade attendrit les fibres',
-        tip_en: 'Marinade tenderizes fibers'
+        tip: 'La marinade attendrit les fibres longues',
+        tip_en: 'Marinade tenderizes long fibers'
+      },
+      {
+        id: 'high_heat',
+        question: 'Feu très vif ?',
+        question_en: 'Very high heat?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: 'La bavette se saisit toujours à feu vif',
+        tip_en: 'Flank steak must be seared on high heat'
+      },
+      {
+        id: 'rest_before_slice',
+        question: 'Repos avant tranchage ?',
+        question_en: 'Rest before slicing?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Repos 5 min puis trancher contre les fibres',
+        tip_en: 'Rest 5 min then slice against the grain'
       }
     ],
     thermalProfile: {
@@ -249,6 +405,18 @@ export const cutSpecificQuestions = {
           { value: 'thick', label: 'Épaisse', label_en: 'Thick', factor: 1.15 }
         ],
         default: 'standard'
+      },
+      {
+        id: 'quick_sear',
+        question: 'Saisie rapide feu vif ?',
+        question_en: 'Quick high-heat sear?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: true,
+        factorYes: 0.85,
+        factorNo: 1.0,
+        tip: 'L\'onglet se mange saignant, saisie rapide obligatoire',
+        tip_en: 'Onglet must be rare, quick sear required'
       }
     ],
     thermalProfile: {
@@ -282,6 +450,18 @@ export const cutSpecificQuestions = {
           { value: 'strips', label: 'En lanières (fajitas)', label_en: 'Strips (fajitas)', factor: 0.7 }
         ],
         default: 'whole'
+      },
+      {
+        id: 'wok_style',
+        question: 'Cuisson façon wok ?',
+        question_en: 'Wok-style cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['wok'] },
+        default: true,
+        factorYes: 0.6,
+        factorNo: 1.0,
+        tip: 'Lanières fines, feu très vif, cuisson ultra-rapide',
+        tip_en: 'Thin strips, very high heat, ultra-fast cooking'
       }
     ],
     thermalProfile: {
@@ -314,6 +494,31 @@ export const cutSpecificQuestions = {
           { value: 'matured', label: 'Maturé (21+ jours)', label_en: 'Aged (21+ days)', factor: 0.95 }
         ],
         default: 'standard'
+      },
+      {
+        id: 'roast_sear',
+        question: 'Saisir le rôti avant cuisson ?',
+        question_en: 'Sear roast before cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['basse_temperature', 'rotissoire'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.05,
+        tip: 'Saisir développe les arômes',
+        tip_en: 'Searing develops flavors'
+      },
+      {
+        id: 'skewer_size',
+        question: 'Taille des cubes pour brochettes ?',
+        question_en: 'Cube size for skewers?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct'] },
+        options: [
+          { value: 'small', label: 'Petits (2cm)', label_en: 'Small (1in)', factor: 0.7 },
+          { value: 'medium', label: 'Moyens (3cm)', label_en: 'Medium (1.5in)', factor: 1.0 },
+          { value: 'large', label: 'Gros (4cm)', label_en: 'Large (2in)', factor: 1.2 }
+        ],
+        default: 'medium'
       }
     ],
     thermalProfile: {
@@ -325,28 +530,56 @@ export const cutSpecificQuestions = {
   paleron: {
     questions: [
       {
-        id: 'cooking_style',
-        question: 'Style de cuisson ?',
-        question_en: 'Cooking style?',
+        id: 'piece_size',
+        question: 'Taille du morceau ?',
+        question_en: 'Piece size?',
         type: 'select',
         options: [
-          { value: 'braise', label: 'Braisé classique', label_en: 'Classic braise', factor: 1.0 },
-          { value: 'slow', label: 'Cuisson très lente (8h+)', label_en: 'Very slow (8h+)', factor: 1.5 },
-          { value: 'pressure', label: 'Cocotte-minute', label_en: 'Pressure cooker', factor: 0.4 }
+          { value: 'small', label: 'Petit (< 500g)', label_en: 'Small (< 1lb)', factor: 0.8 },
+          { value: 'medium', label: 'Moyen (500g-1kg)', label_en: 'Medium (1-2lb)', factor: 1.0 },
+          { value: 'large', label: 'Gros (> 1kg)', label_en: 'Large (> 2lb)', factor: 1.25 }
         ],
-        default: 'braise'
+        default: 'medium'
       },
       {
         id: 'liquid_level',
         question: 'Niveau de liquide ?',
         question_en: 'Liquid level?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
           { value: 'covered', label: 'Recouvert', label_en: 'Covered', factor: 0.9 },
           { value: 'half', label: 'À mi-hauteur', label_en: 'Half', factor: 1.0 },
           { value: 'minimal', label: 'Fond seulement', label_en: 'Minimal', factor: 1.15 }
         ],
-        default: 'half'
+        default: 'half',
+        tip: 'Plus de liquide = cuisson plus douce et moelleuse',
+        tip_en: 'More liquid = gentler, more tender result'
+      },
+      {
+        id: 'seared_first',
+        question: 'Viande saisie avant de braiser ?',
+        question_en: 'Meat seared before braising?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.05,
+        tip: 'Saisir = saveurs Maillard + meilleure texture',
+        tip_en: 'Searing = Maillard flavors + better texture'
+      },
+      {
+        id: 'sv_duration',
+        question: 'Durée sous-vide prévue ?',
+        question_en: 'Planned sous-vide duration?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'short', label: '12-24h (ferme)', label_en: '12-24h (firm)', factor: 0.7 },
+          { value: 'medium', label: '24-48h (fondant)', label_en: '24-48h (tender)', factor: 1.0 },
+          { value: 'long', label: '48-72h (effiloché)', label_en: '48-72h (shreddable)', factor: 1.3 }
+        ],
+        default: 'medium'
       }
     ],
     thermalProfile: {
@@ -361,23 +594,49 @@ export const cutSpecificQuestions = {
       {
         id: 'trimmed',
         question: 'Parée (gras/nerfs retirés) ?',
-        question_en: 'Trimmed?',
+        question_en: 'Trimmed (fat/sinew removed)?',
         type: 'boolean',
         default: true,
         factorYes: 1.0,
-        factorNo: 1.1
+        factorNo: 1.1,
+        tip: 'La joue parée cuit plus uniformément',
+        tip_en: 'Trimmed cheek cooks more evenly'
       },
       {
-        id: 'cooking_method',
-        question: 'Méthode ?',
-        question_en: 'Method?',
+        id: 'wine_base',
+        question: 'Base de cuisson au vin ?',
+        question_en: 'Wine-based cooking liquid?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 0.95,
+        factorNo: 1.0,
+        tip: 'Le vin attendrit et parfume la viande',
+        tip_en: 'Wine tenderizes and flavors the meat'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'low', label: '60°C (très tendre)', label_en: '140°F (very tender)', factor: 1.3 },
+          { value: 'medium', label: '68°C (effiloché)', label_en: '154°F (shreddable)', factor: 1.0 },
+          { value: 'high', label: '77°C (traditionnel)', label_en: '170°F (traditional)', factor: 0.8 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'quantity',
+        question: 'Nombre de joues ?',
+        question_en: 'Number of cheeks?',
         type: 'select',
         options: [
-          { value: 'braise_wine', label: 'Braisée au vin', label_en: 'Braised in wine', factor: 1.0 },
-          { value: 'sous_vide', label: 'Sous-vide longue durée', label_en: 'Long sous-vide', factor: 1.2 },
-          { value: 'pressure', label: 'Cocotte-minute', label_en: 'Pressure cooker', factor: 0.35 }
+          { value: 'few', label: '2-4 joues', label_en: '2-4 cheeks', factor: 1.0 },
+          { value: 'many', label: '6+ joues', label_en: '6+ cheeks', factor: 1.1 }
         ],
-        default: 'braise_wine'
+        default: 'few'
       }
     ],
     thermalProfile: {
@@ -399,7 +658,9 @@ export const cutSpecificQuestions = {
           { value: 'medium', label: 'Moyens (4-5cm)', label_en: 'Medium (1.5-2in)', factor: 1.0 },
           { value: 'large', label: 'Gros (6cm+)', label_en: 'Large (2.5in+)', factor: 1.2 }
         ],
-        default: 'medium'
+        default: 'medium',
+        tip: 'Cubes réguliers = cuisson uniforme',
+        tip_en: 'Even cubes = uniform cooking'
       },
       {
         id: 'seared',
@@ -409,20 +670,36 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.0,
         factorNo: 1.1,
-        tip: 'Saisir développe les saveurs (Maillard)',
-        tip_en: 'Searing develops flavors (Maillard)'
+        tip: 'Saisir développe les saveurs (réaction de Maillard)',
+        tip_en: 'Searing develops flavors (Maillard reaction)'
       },
       {
-        id: 'cooking_vessel',
-        question: 'Récipient ?',
-        question_en: 'Cooking vessel?',
+        id: 'lid_type',
+        question: 'Couvercle pendant la cuisson ?',
+        question_en: 'Lid during cooking?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'dutch_oven', label: 'Cocotte fonte', label_en: 'Dutch oven', factor: 1.0 },
-          { value: 'slow_cooker', label: 'Mijoteuse électrique', label_en: 'Slow cooker', factor: 1.15 },
-          { value: 'pressure', label: 'Cocotte-minute', label_en: 'Pressure cooker', factor: 0.4 }
+          { value: 'tight', label: 'Bien fermé', label_en: 'Tightly sealed', factor: 0.95 },
+          { value: 'loose', label: 'Entrouvert', label_en: 'Slightly open', factor: 1.05 }
         ],
-        default: 'dutch_oven'
+        default: 'tight',
+        tip: 'Couvercle fermé = moins d\'évaporation',
+        tip_en: 'Sealed lid = less evaporation'
+      },
+      {
+        id: 'oven_or_stove',
+        question: 'Cuisson au four ou sur feu ?',
+        question_en: 'Oven or stovetop?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'oven', label: 'Au four (150°C)', label_en: 'Oven (300°F)', factor: 1.0 },
+          { value: 'stove', label: 'Sur feu doux', label_en: 'Low stovetop', factor: 1.1 }
+        ],
+        default: 'oven',
+        tip: 'Le four offre une chaleur plus uniforme',
+        tip_en: 'Oven provides more even heat'
       }
     ],
     thermalProfile: {
@@ -446,16 +723,42 @@ export const cutSpecificQuestions = {
         tip_en: 'Soak 2h to remove blood'
       },
       {
-        id: 'cooking_style',
-        question: 'Style de cuisson ?',
-        question_en: 'Cooking style?',
+        id: 'piece_count',
+        question: 'Nombre de tronçons ?',
+        question_en: 'Number of pieces?',
         type: 'select',
         options: [
-          { value: 'braise', label: 'Braisée', label_en: 'Braised', factor: 1.0 },
-          { value: 'pot_au_feu', label: 'Pot-au-feu', label_en: 'Pot-au-feu', factor: 1.1 },
-          { value: 'pressure', label: 'Cocotte-minute', label_en: 'Pressure cooker', factor: 0.4 }
+          { value: 'few', label: '3-4 tronçons', label_en: '3-4 pieces', factor: 1.0 },
+          { value: 'many', label: '6+ tronçons', label_en: '6+ pieces', factor: 1.1 }
         ],
-        default: 'braise'
+        default: 'few'
+      },
+      {
+        id: 'liquid_type',
+        question: 'Base de liquide ?',
+        question_en: 'Liquid base?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 0.95 },
+          { value: 'stock', label: 'Bouillon', label_en: 'Stock', factor: 1.0 },
+          { value: 'water', label: 'Eau (pot-au-feu)', label_en: 'Water (pot-au-feu)', factor: 1.05 }
+        ],
+        default: 'wine',
+        tip: 'Le vin aide à attendrir la viande',
+        tip_en: 'Wine helps tenderize the meat'
+      },
+      {
+        id: 'seared_first',
+        question: 'Tronçons saisis avant ?',
+        question_en: 'Pieces seared first?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.05,
+        tip: 'Saisir = plus de saveur, meilleure texture',
+        tip_en: 'Searing = more flavor, better texture'
       }
     ],
     thermalProfile: {
@@ -564,9 +867,50 @@ export const cutSpecificQuestions = {
         question: 'Saisi d\'abord ?',
         question_en: 'Seared first?',
         type: 'boolean',
+        showWhen: { NOT_techniques: ['sous_vide'] },
         default: true,
         factorYes: 1.0,
         factorNo: 0.95
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'low', label: '58°C (rosé)', label_en: '136°F (medium-rare)', factor: 1.0 },
+          { value: 'medium', label: '62°C (à point)', label_en: '144°F (medium)', factor: 1.1 },
+          { value: 'high', label: '68°C (bien cuit)', label_en: '154°F (well done)', factor: 1.2 }
+        ],
+        default: 'medium',
+        tip: 'Le porc doit atteindre 63°C minimum pour la sécurité',
+        tip_en: 'Pork must reach 145°F for safety'
+      },
+      {
+        id: 'sv_finish',
+        question: 'Finition après sous-vide ?',
+        question_en: 'Finish after sous-vide?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'sear', label: 'Saisie poêle', label_en: 'Pan sear', factor: 1.0 },
+          { value: 'torch', label: 'Chalumeau', label_en: 'Torch', factor: 0.98 },
+          { value: 'none', label: 'Aucune', label_en: 'None', factor: 0.95 }
+        ],
+        default: 'sear'
+      },
+      {
+        id: 'oven_convection',
+        question: 'Mode four ?',
+        question_en: 'Oven mode?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'convection', label: 'Chaleur tournante', label_en: 'Convection', factor: 0.9 },
+          { value: 'static', label: 'Statique', label_en: 'Static', factor: 1.0 }
+        ],
+        default: 'convection'
       }
     ],
     thermalProfile: {
@@ -588,16 +932,56 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style de cuisson ?',
-        question_en: 'Cooking style?',
+        id: 'bbq_smoke',
+        question: 'Fumage ?',
+        question_en: 'Smoking?',
         type: 'select',
+        showWhen: { techniques: ['bbq_low_slow'] },
         options: [
-          { value: 'roast', label: 'Rôtie', label_en: 'Roasted', factor: 1.0 },
-          { value: 'braise', label: 'Braisée', label_en: 'Braised', factor: 1.2 },
-          { value: 'pulled', label: 'Effilochée (pulled)', label_en: 'Pulled', factor: 1.5 }
+          { value: 'heavy', label: 'Intense (hickory/mesquite)', label_en: 'Heavy (hickory/mesquite)', factor: 1.1 },
+          { value: 'medium', label: 'Moyen (chêne/pommier)', label_en: 'Medium (oak/apple)', factor: 1.0 },
+          { value: 'light', label: 'Léger', label_en: 'Light', factor: 0.95 }
         ],
-        default: 'roast'
+        default: 'medium',
+        tip: 'Pulled pork traditionnel = 8-12h de fumage',
+        tip_en: 'Traditional pulled pork = 8-12h smoking'
+      },
+      {
+        id: 'bbq_wrap',
+        question: 'Emballage mi-cuisson (Texas crutch) ?',
+        question_en: 'Mid-cook wrap (Texas crutch)?',
+        type: 'boolean',
+        showWhen: { techniques: ['bbq_low_slow'] },
+        default: false,
+        factorYes: 0.75,
+        factorNo: 1.0,
+        tip: 'Accélère la cuisson mais ramollit la croûte',
+        tip_en: 'Speeds up cooking but softens bark'
+      },
+      {
+        id: 'slow_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'beer', label: 'Bière', label_en: 'Beer', factor: 1.0 },
+          { value: 'cider', label: 'Cidre', label_en: 'Cider', factor: 1.0 },
+          { value: 'stock', label: 'Bouillon', label_en: 'Stock', factor: 0.95 }
+        ],
+        default: 'beer'
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: 'Haute (200°C) - rôti', label_en: 'High (400°F) - roast', factor: 0.8 },
+          { value: 'low', label: 'Basse (140°C) - effiloché', label_en: 'Low (285°F) - pulled', factor: 1.5 }
+        ],
+        default: 'high'
       }
     ],
     thermalProfile: {
@@ -630,6 +1014,31 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'La saumure garde la viande juteuse',
         tip_en: 'Brining keeps meat juicy'
+      },
+      {
+        id: 'grill_zone',
+        question: 'Zone de cuisson ?',
+        question_en: 'Cooking zone?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        options: [
+          { value: 'direct', label: 'Directe (saisie)', label_en: 'Direct (sear)', factor: 0.9 },
+          { value: 'indirect', label: 'Indirecte (pour épaisse)', label_en: 'Indirect (for thick)', factor: 1.2 },
+          { value: 'reverse', label: 'Indirect puis direct', label_en: 'Indirect then direct', factor: 1.15 }
+        ],
+        default: 'direct'
+      },
+      {
+        id: 'pan_butter',
+        question: 'Beurrer en fin ?',
+        question_en: 'Butter baste?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.05,
+        factorNo: 1.0,
+        tip: 'Le beurre noisette apporte saveur et moelleux',
+        tip_en: 'Brown butter adds flavor and moisture'
       }
     ],
     thermalProfile: {
@@ -670,6 +1079,30 @@ export const cutSpecificQuestions = {
           { value: 'thick', label: 'Épaisse (> 3cm)', label_en: 'Thick', factor: 1.35 }
         ],
         default: 'standard'
+      },
+      {
+        id: 'plancha_oil',
+        question: 'Huile sur viande ou plancha ?',
+        question_en: 'Oil on meat or plancha?',
+        type: 'select',
+        showWhen: { tools: ['plancha'] },
+        options: [
+          { value: 'meat', label: 'Huiler la viande', label_en: 'Oil the meat', factor: 1.0 },
+          { value: 'surface', label: 'Huiler la plancha', label_en: 'Oil the plancha', factor: 0.95 }
+        ],
+        default: 'meat'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temp?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'medium', label: '60°C (juteux)', label_en: '140°F (juicy)', factor: 1.0 },
+          { value: 'safe', label: '63°C (sûr)', label_en: '145°F (safe)', factor: 1.1 }
+        ],
+        default: 'safe'
       }
     ],
     thermalProfile: {
@@ -711,6 +1144,43 @@ export const cutSpecificQuestions = {
           { value: 'trimmed', label: 'Paré', label_en: 'Trimmed', factor: 0.9 }
         ],
         default: 'fat_only'
+      },
+      {
+        id: 'oven_mode',
+        question: 'Mode de cuisson four ?',
+        question_en: 'Oven cooking mode?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'convection', label: 'Chaleur tournante', label_en: 'Convection', factor: 0.88 },
+          { value: 'static', label: 'Statique traditionnel', label_en: 'Static traditional', factor: 1.0 },
+          { value: 'steam', label: 'Vapeur (si dispo)', label_en: 'Steam (if available)', factor: 0.92 }
+        ],
+        default: 'convection'
+      },
+      {
+        id: 'seared_first',
+        question: 'Saisi d\'abord ?',
+        question_en: 'Seared first?',
+        type: 'boolean',
+        showWhen: { techniques: ['basse_temperature'] },
+        default: false,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'En basse température, saisir en fin est souvent préférable',
+        tip_en: 'In low-temp cooking, searing at the end is often preferred'
+      },
+      {
+        id: 'rotisserie',
+        question: 'Rôtissoire tournante ?',
+        question_en: 'Rotisserie?',
+        type: 'boolean',
+        showWhen: { techniques: ['rotissoire'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: 'La rotation assure une cuisson uniforme',
+        tip_en: 'Rotation ensures even cooking'
       }
     ],
     thermalProfile: {
@@ -733,27 +1203,67 @@ export const cutSpecificQuestions = {
         tip_en: 'Remove back membrane for tenderness'
       },
       {
-        id: 'cooking_style',
-        question: 'Style de cuisson ?',
-        question_en: 'Cooking style?',
-        type: 'select',
-        options: [
-          { value: 'bbq_low_slow', label: 'BBQ low & slow', label_en: 'BBQ low & slow', factor: 1.0 },
-          { value: 'oven_braise', label: 'Four braisé', label_en: 'Oven braised', factor: 0.85 },
-          { value: 'grilled', label: 'Grillé direct', label_en: 'Direct grilled', factor: 0.6 }
-        ],
-        default: 'bbq_low_slow'
-      },
-      {
         id: 'wrapped',
         question: 'Emballé (Texas crutch) ?',
         question_en: 'Wrapped (Texas crutch)?',
         type: 'boolean',
+        showWhen: { techniques: ['bbq_low_slow'] },
         default: false,
         factorYes: 0.75,
         factorNo: 1.0,
         tip: 'L\'emballage accélère la cuisson mais ramollit la croûte',
         tip_en: 'Wrapping speeds up but softens bark'
+      },
+      {
+        id: 'bbq_wood',
+        question: 'Type de bois de fumage ?',
+        question_en: 'Smoking wood type?',
+        type: 'select',
+        showWhen: { techniques: ['bbq_low_slow'] },
+        options: [
+          { value: 'hickory', label: 'Hickory (classique)', label_en: 'Hickory (classic)', factor: 1.0 },
+          { value: 'apple', label: 'Pommier (doux)', label_en: 'Apple (mild)', factor: 0.95 },
+          { value: 'cherry', label: 'Cerisier (fruité)', label_en: 'Cherry (fruity)', factor: 0.95 },
+          { value: 'mesquite', label: 'Mesquite (intense)', label_en: 'Mesquite (intense)', factor: 1.05 }
+        ],
+        default: 'hickory'
+      },
+      {
+        id: 'bbq_spray',
+        question: 'Spritz pendant cuisson ?',
+        question_en: 'Spritz during cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['bbq_low_slow'] },
+        default: true,
+        factorYes: 1.05,
+        factorNo: 1.0,
+        tip: 'Vinaigre de cidre/jus de pomme toutes les heures',
+        tip_en: 'Apple cider vinegar/juice every hour'
+      },
+      {
+        id: 'oven_covered',
+        question: 'Couvert pendant cuisson ?',
+        question_en: 'Covered during cooking?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'covered', label: 'Couvert (plus tendre)', label_en: 'Covered (more tender)', factor: 0.85 },
+          { value: 'uncovered', label: 'Découvert (plus croustillant)', label_en: 'Uncovered (crispier)', factor: 1.0 },
+          { value: 'both', label: 'Couvert puis découvert', label_en: 'Covered then uncovered', factor: 0.92 }
+        ],
+        default: 'both'
+      },
+      {
+        id: 'direct_sear',
+        question: 'Saisie finale directe ?',
+        question_en: 'Final direct sear?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: 'Attention à ne pas brûler le glaçage',
+        tip_en: 'Be careful not to burn the glaze'
       }
     ],
     thermalProfile: {
@@ -775,16 +1285,53 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'skin_scored',
+        question: 'Couenne incisée ?',
+        question_en: 'Skin scored?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 0.95,
+        factorNo: 1.0,
+        tip: 'Inciser en losanges pour une couenne croustillante',
+        tip_en: 'Score in diamonds for crispy skin'
+      },
+      {
+        id: 'initial_high_heat',
+        question: 'Démarrage haute température ?',
+        question_en: 'Start at high heat?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: '220°C pendant 30min puis baisser',
+        tip_en: '425°F for 30min then reduce'
+      },
+      {
+        id: 'slow_liquid',
+        question: 'Type de liquide ?',
+        question_en: 'Liquid type?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'roast_crispy', label: 'Rôtie (couenne croustillante)', label_en: 'Roasted (crispy)', factor: 1.0 },
-          { value: 'braise', label: 'Braisée', label_en: 'Braised', factor: 1.3 },
-          { value: 'confit', label: 'Confite', label_en: 'Confit', factor: 1.5 }
+          { value: 'stock', label: 'Bouillon', label_en: 'Stock', factor: 1.0 },
+          { value: 'beer', label: 'Bière', label_en: 'Beer', factor: 0.95 },
+          { value: 'cider', label: 'Cidre', label_en: 'Cider', factor: 0.95 }
         ],
-        default: 'roast_crispy'
+        default: 'stock'
+      },
+      {
+        id: 'bbq_rub',
+        question: 'Assaisonnement sec (rub) ?',
+        question_en: 'Dry rub?',
+        type: 'boolean',
+        showWhen: { techniques: ['bbq_low_slow'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Appliquer la veille pour meilleure pénétration',
+        tip_en: 'Apply night before for better penetration'
       }
     ],
     thermalProfile: {
@@ -800,27 +1347,52 @@ export const cutSpecificQuestions = {
   jarret: {
     questions: [
       {
-        id: 'cooking_vessel',
-        question: 'Récipient ?',
-        question_en: 'Vessel?',
-        type: 'select',
-        options: [
-          { value: 'dutch_oven', label: 'Cocotte', label_en: 'Dutch oven', factor: 1.0 },
-          { value: 'pressure', label: 'Cocotte-minute', label_en: 'Pressure cooker', factor: 0.4 },
-          { value: 'slow_cooker', label: 'Mijoteuse', label_en: 'Slow cooker', factor: 1.3 }
-        ],
-        default: 'dutch_oven'
-      },
-      {
         id: 'liquid_level',
         question: 'Niveau de liquide ?',
         question_en: 'Liquid level?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
           { value: 'covered', label: 'Recouvert', label_en: 'Covered', factor: 0.9 },
           { value: 'half', label: 'À mi-hauteur', label_en: 'Half', factor: 1.0 }
         ],
         default: 'half'
+      },
+      {
+        id: 'seared_first',
+        question: 'Saisi avant braisage ?',
+        question_en: 'Seared before braising?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Saisir développe les saveurs (Maillard)',
+        tip_en: 'Searing develops flavors (Maillard)'
+      },
+      {
+        id: 'pressure_release',
+        question: 'Type de dépressurisation ?',
+        question_en: 'Pressure release type?',
+        type: 'select',
+        showWhen: { tools: ['autocuiseur'] },
+        options: [
+          { value: 'natural', label: 'Naturelle (plus tendre)', label_en: 'Natural (more tender)', factor: 1.1 },
+          { value: 'quick', label: 'Rapide', label_en: 'Quick', factor: 1.0 }
+        ],
+        default: 'natural'
+      },
+      {
+        id: 'slow_cooker_setting',
+        question: 'Réglage mijoteuse ?',
+        question_en: 'Slow cooker setting?',
+        type: 'select',
+        showWhen: { tools: ['mijoteuse'] },
+        options: [
+          { value: 'low', label: 'Bas (8-10h)', label_en: 'Low (8-10h)', factor: 1.3 },
+          { value: 'high', label: 'Haut (4-6h)', label_en: 'High (4-6h)', factor: 0.8 }
+        ],
+        default: 'low'
       }
     ],
     thermalProfile: {
@@ -859,16 +1431,43 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'covered',
-        question: 'Couvert pendant la cuisson ?',
-        question_en: 'Covered?',
+        id: 'oven_initial',
+        question: 'Température initiale four ?',
+        question_en: 'Initial oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'open', label: 'Non couvert (rôti)', label_en: 'Uncovered', factor: 1.0 },
-          { value: 'partial', label: 'Couvert en début', label_en: 'Partial', factor: 0.92 },
-          { value: 'full', label: 'Couvert (braisé)', label_en: 'Covered', factor: 0.85 }
+          { value: 'high_then_low', label: 'Haute puis basse (240°C → 160°C)', label_en: 'High then low', factor: 0.95 },
+          { value: 'constant', label: 'Constante (180°C)', label_en: 'Constant (350°F)', factor: 1.0 },
+          { value: 'low_slow', label: 'Basse constante (140°C)', label_en: 'Low constant', factor: 1.4 }
         ],
-        default: 'open'
+        default: 'high_then_low',
+        tip: 'Haute température initiale pour croûte dorée',
+        tip_en: 'High initial temp for golden crust'
+      },
+      {
+        id: 'bbq_method',
+        question: 'Méthode BBQ ?',
+        question_en: 'BBQ method?',
+        type: 'select',
+        showWhen: { techniques: ['bbq_low_slow', 'grill_direct'] },
+        options: [
+          { value: 'indirect', label: 'Indirect (recommandé)', label_en: 'Indirect (recommended)', factor: 1.0 },
+          { value: 'spit', label: 'À la broche', label_en: 'On spit', factor: 0.9 }
+        ],
+        default: 'indirect'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '54°C (rosé)', label_en: '129°F (rare)', factor: 1.0 },
+          { value: 'medium', label: '58°C (à point)', label_en: '136°F (medium)', factor: 1.1 }
+        ],
+        default: 'rare'
       }
     ],
     thermalProfile: {
@@ -885,6 +1484,7 @@ export const cutSpecificQuestions = {
         question: 'Quantité de liquide ?',
         question_en: 'Liquid amount?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
           { value: 'partial', label: 'À mi-hauteur', label_en: 'Half-covered', factor: 1.0 },
           { value: 'full', label: 'Recouverte', label_en: 'Fully covered', factor: 0.90 },
@@ -897,12 +1497,38 @@ export const cutSpecificQuestions = {
         question: 'Couvercle ?',
         question_en: 'Lid?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
           { value: 'sealed', label: 'Hermétique', label_en: 'Sealed', factor: 0.85 },
           { value: 'partial', label: 'Entrouvert', label_en: 'Partial', factor: 1.0 },
           { value: 'open', label: 'Sans couvercle', label_en: 'No lid', factor: 1.20 }
         ],
         default: 'sealed'
+      },
+      {
+        id: 'seared_first',
+        question: 'Saisie avant braisage ?',
+        question_en: 'Seared before braising?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Saisir à feu vif pour colorer',
+        tip_en: 'Sear on high heat to brown'
+      },
+      {
+        id: 'sv_time',
+        question: 'Durée sous-vide ?',
+        question_en: 'Sous-vide duration?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'short', label: '12h (ferme)', label_en: '12h (firm)', factor: 0.8 },
+          { value: 'medium', label: '24h (tendre)', label_en: '24h (tender)', factor: 1.0 },
+          { value: 'long', label: '48h (effiloché)', label_en: '48h (fall-apart)', factor: 1.2 }
+        ],
+        default: 'medium'
       }
     ],
     thermalProfile: {
@@ -946,6 +1572,40 @@ export const cutSpecificQuestions = {
           { value: 'removed', label: 'Retirée', label_en: 'Removed', factor: 0.92 }
         ],
         default: 'scored'
+      },
+      {
+        id: 'sear_first',
+        question: 'Saisir avant four ?',
+        question_en: 'Sear before oven?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Saisir côté gras en premier',
+        tip_en: 'Sear fat side first'
+      },
+      {
+        id: 'rest_time',
+        question: 'Temps de repos ?',
+        question_en: 'Rest time?',
+        type: 'select',
+        showWhen: { techniques: ['saisie_simple', 'reverse_sear'] },
+        options: [
+          { value: 'short', label: '5 min', label_en: '5 min', factor: 1.0 },
+          { value: 'medium', label: '10 min (recommandé)', label_en: '10 min (recommended)', factor: 1.0 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'grill_indirect',
+        question: 'Finition directe ?',
+        question_en: 'Direct finish?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        default: true,
+        factorYes: 0.95,
+        factorNo: 1.0
       }
     ],
     thermalProfile: {
@@ -1005,6 +1665,28 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 0.95,
         factorNo: 1.0
+      },
+      {
+        id: 'high_heat',
+        question: 'Feu très vif ?',
+        question_en: 'Very high heat?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple'], tools: ['poele', 'plancha', 'grill'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0,
+        tip: 'L\'agneau supporte le feu vif - saisir rapidement',
+        tip_en: 'Lamb handles high heat - sear quickly'
+      },
+      {
+        id: 'rest_covered',
+        question: 'Repos couvert ?',
+        question_en: 'Rest covered?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: false,
+        factorYes: 1.05,
+        factorNo: 1.0
       }
     ],
     thermalProfile: {
@@ -1026,16 +1708,39 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'seared_first',
+        question: 'Morceaux saisis avant ?',
+        question_en: 'Pieces seared first?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95
+      },
+      {
+        id: 'liquid_base',
+        question: 'Base de liquide ?',
+        question_en: 'Liquid base?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'braise', label: 'Braisé', label_en: 'Braised', factor: 1.0 },
-          { value: 'tagine', label: 'Tajine', label_en: 'Tagine', factor: 1.1 },
-          { value: 'curry', label: 'Curry', label_en: 'Curry', factor: 1.0 }
+          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 0.95 },
+          { value: 'stock', label: 'Bouillon', label_en: 'Stock', factor: 1.0 },
+          { value: 'tomato', label: 'Base tomate', label_en: 'Tomato base', factor: 1.0 }
         ],
-        default: 'braise'
+        default: 'stock'
+      },
+      {
+        id: 'spices',
+        question: 'Épices orientales ?',
+        question_en: 'Oriental spices?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: false,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Cumin, coriandre, cannelle pour tajine/curry',
+        tip_en: 'Cumin, coriander, cinnamon for tagine/curry'
       }
     ],
     thermalProfile: {
@@ -1060,16 +1765,43 @@ export const cutSpecificQuestions = {
         default: 'bone_in'
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'oven_temp',
+        question: 'Température four ?',
+        question_en: 'Oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'roast', label: 'Rôtie', label_en: 'Roasted', factor: 1.0 },
-          { value: 'slow_roast', label: 'Rôtie lentement (7h)', label_en: 'Slow roast (7h)', factor: 2.0 },
-          { value: 'braise', label: 'Braisée', label_en: 'Braised', factor: 1.3 }
+          { value: 'high', label: 'Haute (200°C) - rôti classique', label_en: 'High (400°F) - classic roast', factor: 0.8 },
+          { value: 'medium', label: 'Moyenne (160°C)', label_en: 'Medium (320°F)', factor: 1.0 },
+          { value: 'low', label: 'Basse (120°C) - effilochée', label_en: 'Low (250°F) - pull-apart', factor: 2.0 }
         ],
-        default: 'roast'
+        default: 'medium'
+      },
+      {
+        id: 'covered',
+        question: 'Couvert pendant cuisson ?',
+        question_en: 'Covered during cooking?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente', 'basse_temperature'] },
+        options: [
+          { value: 'sealed', label: 'Couvert hermétique', label_en: 'Sealed', factor: 0.85 },
+          { value: 'partial', label: 'Couvert puis découvert', label_en: 'Covered then uncovered', factor: 0.95 },
+          { value: 'open', label: 'Découvert', label_en: 'Uncovered', factor: 1.1 }
+        ],
+        default: 'partial'
+      },
+      {
+        id: 'liquid_amount',
+        question: 'Quantité de liquide ?',
+        question_en: 'Liquid amount?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'none', label: 'Sans (rôti sec)', label_en: 'None (dry roast)', factor: 1.0 },
+          { value: 'minimal', label: 'Fond de sauce', label_en: 'Sauce base', factor: 0.95 },
+          { value: 'braising', label: 'Mi-hauteur (braisé)', label_en: 'Half-height (braised)', factor: 0.9 }
+        ],
+        default: 'minimal'
       }
     ],
     thermalProfile: {
@@ -1100,6 +1832,30 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 1.1,
         factorNo: 1.0
+      },
+      {
+        id: 'pan_butter',
+        question: 'Beurrer en fin ?',
+        question_en: 'Butter baste at end?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.0,
+        tip: 'Arroser de beurre noisette pour le goût',
+        tip_en: 'Baste with brown butter for flavor'
+      },
+      {
+        id: 'high_heat',
+        question: 'Feu très vif ?',
+        question_en: 'Very high heat?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple'] },
+        default: true,
+        factorYes: 0.85,
+        factorNo: 1.0,
+        tip: 'Saisie rapide 1-2 min par face',
+        tip_en: 'Quick sear 1-2 min per side'
       }
     ],
     thermalProfile: {
@@ -1121,6 +1877,30 @@ export const cutSpecificQuestions = {
           { value: 'crown', label: 'En couronne', label_en: 'Crown', factor: 1.1 }
         ],
         default: 'whole'
+      },
+      {
+        id: 'oven_convection',
+        question: 'Mode four ?',
+        question_en: 'Oven mode?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'convection', label: 'Chaleur tournante', label_en: 'Convection', factor: 0.9 },
+          { value: 'static', label: 'Statique', label_en: 'Static', factor: 1.0 }
+        ],
+        default: 'static'
+      },
+      {
+        id: 'sear_first',
+        question: 'Saisir avant four ?',
+        question_en: 'Sear before oven?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Saisir sur toutes les faces à feu vif',
+        tip_en: 'Sear on all sides on high heat'
       }
     ],
     thermalProfile: {
@@ -1198,6 +1978,31 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 0.85,
         factorNo: 1.0
+      },
+      {
+        id: 'pan_fat',
+        question: 'Matière grasse ?',
+        question_en: 'Cooking fat?',
+        type: 'select',
+        showWhen: { tools: ['poele'] },
+        options: [
+          { value: 'butter_clarified', label: 'Beurre clarifié', label_en: 'Clarified butter', factor: 1.0 },
+          { value: 'butter_oil', label: 'Beurre + huile', label_en: 'Butter + oil', factor: 1.0 },
+          { value: 'oil', label: 'Huile seule', label_en: 'Oil only', factor: 0.95 }
+        ],
+        default: 'butter_clarified',
+        tip: 'Le beurre clarifié supporte la haute température',
+        tip_en: 'Clarified butter handles high heat'
+      },
+      {
+        id: 'sauce_pan',
+        question: 'Déglacer la poêle ?',
+        question_en: 'Deglaze pan?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.0
       }
     ],
     thermalProfile: {
@@ -1230,6 +2035,43 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Le veau est maigre - le bardage évite le dessèchement',
         tip_en: 'Veal is lean - barding prevents drying'
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: 'Haute (200°C)', label_en: 'High (400°F)', factor: 0.85 },
+          { value: 'medium', label: 'Moyenne (160°C)', label_en: 'Medium (320°F)', factor: 1.0 },
+          { value: 'low', label: 'Basse température (80°C)', label_en: 'Low temp (175°F)', factor: 1.8 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'tender', label: '58°C (tendre)', label_en: '136°F (tender)', factor: 1.0 },
+          { value: 'medium', label: '62°C (à point)', label_en: '144°F (medium)', factor: 1.1 }
+        ],
+        default: 'tender'
+      },
+      {
+        id: 'arrosage',
+        question: 'Arroser pendant cuisson ?',
+        question_en: 'Baste during cooking?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Le veau a besoin d\'arrosage régulier',
+        tip_en: 'Veal needs regular basting'
       }
     ],
     thermalProfile: {
@@ -1250,15 +2092,41 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'seared_first',
+        question: 'Saisi avant braisage ?',
+        question_en: 'Seared before braising?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95
+      },
+      {
+        id: 'liquid_type',
+        question: 'Type de liquide ?',
+        question_en: 'Liquid type?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'braise', label: 'Braisé', label_en: 'Braised', factor: 1.0 },
-          { value: 'grilled', label: 'Grillé', label_en: 'Grilled', factor: 0.7 }
+          { value: 'wine_white', label: 'Vin blanc', label_en: 'White wine', factor: 0.95 },
+          { value: 'stock', label: 'Fond de veau', label_en: 'Veal stock', factor: 1.0 },
+          { value: 'tomato', label: 'Base tomate', label_en: 'Tomato base', factor: 1.0 }
         ],
-        default: 'braise'
+        default: 'stock'
+      },
+      {
+        id: 'grill_zone',
+        question: 'Zone de grill ?',
+        question_en: 'Grill zone?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct'] },
+        options: [
+          { value: 'direct', label: 'Directe (croustillant)', label_en: 'Direct (crispy)', factor: 0.8 },
+          { value: 'indirect_then_direct', label: 'Indirect puis direct', label_en: 'Indirect then direct', factor: 1.0 }
+        ],
+        default: 'indirect_then_direct',
+        tip: 'Le tendron est gras - attention aux flambées',
+        tip_en: 'Tendron is fatty - watch for flare-ups'
       }
     ],
     thermalProfile: {
@@ -1291,16 +2159,41 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Cuisson ?',
-        question_en: 'Cooking?',
+        id: 'pan_butter',
+        question: 'Cuisson au beurre ?',
+        question_en: 'Butter cooking?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Beurre noisette classique pour les ris',
+        tip_en: 'Brown butter is classic for sweetbreads'
+      },
+      {
+        id: 'flour_coating',
+        question: 'Fariner avant cuisson ?',
+        question_en: 'Flour before cooking?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.05,
+        factorNo: 1.0,
+        tip: 'La farine aide à dorer',
+        tip_en: 'Flour helps browning'
+      },
+      {
+        id: 'braise_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
         type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'pan_fried', label: 'Poêlé', label_en: 'Pan-fried', factor: 1.0 },
-          { value: 'breaded', label: 'Pané', label_en: 'Breaded', factor: 1.1 },
-          { value: 'braise', label: 'Braisé', label_en: 'Braised', factor: 1.4 }
+          { value: 'cream', label: 'Crème', label_en: 'Cream', factor: 1.0 },
+          { value: 'wine', label: 'Vin blanc', label_en: 'White wine', factor: 0.95 },
+          { value: 'stock', label: 'Fond de veau', label_en: 'Veal stock', factor: 1.0 }
         ],
-        default: 'pan_fried'
+        default: 'cream'
       }
     ],
     thermalProfile: {
@@ -1357,6 +2250,41 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Crapaudine = cuisson 30% plus rapide et plus uniforme',
         tip_en: 'Spatchcock = 30% faster and more even'
+      },
+      {
+        id: 'oven_method',
+        question: 'Méthode four ?',
+        question_en: 'Oven method?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high_constant', label: 'Haute constante (200°C)', label_en: 'High constant (400°F)', factor: 0.85 },
+          { value: 'high_then_low', label: 'Haute puis basse', label_en: 'High then low', factor: 0.95 },
+          { value: 'low_slow', label: 'Basse température', label_en: 'Low temperature', factor: 1.4 }
+        ],
+        default: 'high_constant'
+      },
+      {
+        id: 'bbq_indirect',
+        question: 'Cuisson indirecte ?',
+        question_en: 'Indirect cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['bbq_low_slow', 'grill_direct'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.8,
+        tip: 'Toujours indirect pour poulet entier',
+        tip_en: 'Always indirect for whole chicken'
+      },
+      {
+        id: 'rotisserie',
+        question: 'À la broche ?',
+        question_en: 'Rotisserie?',
+        type: 'boolean',
+        showWhen: { techniques: ['rotissoire'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.0
       }
     ],
     thermalProfile: {
@@ -1398,6 +2326,45 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 0.75,
         factorNo: 1.0
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'juicy', label: '60°C (très juteux)', label_en: '140°F (very juicy)', factor: 1.0 },
+          { value: 'safe', label: '63°C (sûr)', label_en: '145°F (safe)', factor: 1.1 },
+          { value: 'traditional', label: '74°C (traditionnel)', label_en: '165°F (traditional)', factor: 1.3 }
+        ],
+        default: 'safe',
+        tip: 'À 60°C, pasteuriser plus longtemps',
+        tip_en: 'At 140°F, pasteurize longer'
+      },
+      {
+        id: 'pan_skin_down',
+        question: 'Commencer côté peau ?',
+        question_en: 'Start skin side down?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95,
+        tip: 'Peau croustillante = commencer côté peau à froid',
+        tip_en: 'Crispy skin = start skin side on cold pan'
+      },
+      {
+        id: 'brine',
+        question: 'Saumuré avant ?',
+        question_en: 'Brined before?',
+        type: 'boolean',
+        showWhen: { techniques: ['saisie_simple', 'grill_direct'] },
+        default: false,
+        factorYes: 0.95,
+        factorNo: 1.0,
+        tip: 'Saumure = blanc plus juteux',
+        tip_en: 'Brining = juicier breast'
       }
     ],
     thermalProfile: {
@@ -1439,6 +2406,33 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 0.85,
         factorNo: 1.0
+      },
+      {
+        id: 'bbq_zone',
+        question: 'Zone BBQ ?',
+        question_en: 'BBQ zone?',
+        type: 'select',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        options: [
+          { value: 'indirect', label: 'Indirecte (moins risqué)', label_en: 'Indirect (less risky)', factor: 1.1 },
+          { value: 'direct_low', label: 'Directe feu doux', label_en: 'Direct low heat', factor: 1.0 },
+          { value: 'combo', label: 'Indirect puis direct', label_en: 'Indirect then direct', factor: 1.05 }
+        ],
+        default: 'combo',
+        tip: 'La peau peut brûler en direct - surveiller',
+        tip_en: 'Skin can burn on direct - watch carefully'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'low', label: '65°C (tendre)', label_en: '149°F (tender)', factor: 1.0 },
+          { value: 'high', label: '74°C (effiloché)', label_en: '165°F (shreddable)', factor: 1.2 }
+        ],
+        default: 'low'
       }
     ],
     thermalProfile: {
@@ -1463,16 +2457,40 @@ export const cutSpecificQuestions = {
         default: 'whole'
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'oven_temp',
+        question: 'Température four ?',
+        question_en: 'Oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'fried', label: 'Frites', label_en: 'Fried', factor: 1.0 },
-          { value: 'baked', label: 'Four', label_en: 'Baked', factor: 1.2 },
-          { value: 'grilled', label: 'Grillées', label_en: 'Grilled', factor: 0.9 }
+          { value: 'high', label: 'Haute (220°C) - croustillant', label_en: 'High (425°F) - crispy', factor: 0.85 },
+          { value: 'medium', label: 'Moyenne (180°C)', label_en: 'Medium (350°F)', factor: 1.0 }
         ],
-        default: 'baked'
+        default: 'high'
+      },
+      {
+        id: 'bbq_direct',
+        question: 'Cuisson directe ?',
+        question_en: 'Direct heat?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.1,
+        tip: 'Surveiller les flambées dues au gras',
+        tip_en: 'Watch for flare-ups from fat'
+      },
+      {
+        id: 'sauce_before',
+        question: 'Saucer avant cuisson ?',
+        question_en: 'Sauce before cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct', 'bbq_low_slow'] },
+        default: false,
+        factorYes: 1.1,
+        factorNo: 1.0,
+        tip: 'Les sauces sucrées brûlent - saucer en fin',
+        tip_en: 'Sweet sauces burn - sauce at end'
       }
     ],
     thermalProfile: {
@@ -1500,6 +2518,7 @@ export const cutSpecificQuestions = {
         question: 'Démarrage à froid ?',
         question_en: 'Cold start?',
         type: 'boolean',
+        showWhen: { tools: ['poele'] },
         default: true,
         factorYes: 1.25,
         factorNo: 1.0,
@@ -1511,12 +2530,40 @@ export const cutSpecificQuestions = {
         question: 'Temps côté gras ?',
         question_en: 'Fat side time?',
         type: 'select',
+        showWhen: { techniques: ['saisie_simple'], tools: ['poele', 'plancha'] },
         options: [
           { value: 'court', label: '70% côté gras', label_en: '70% fat side', factor: 1.1 },
           { value: 'moyen', label: '80% côté gras', label_en: '80% fat side', factor: 1.0 },
           { value: 'long', label: '90% côté gras', label_en: '90% fat side', factor: 0.95 }
         ],
         default: 'moyen'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '54°C (saignant)', label_en: '129°F (rare)', factor: 0.95 },
+          { value: 'medium_rare', label: '57°C (rosé)', label_en: '135°F (medium-rare)', factor: 1.0 },
+          { value: 'medium', label: '60°C (à point)', label_en: '140°F (medium)', factor: 1.1 }
+        ],
+        default: 'medium_rare',
+        tip: 'Le magret se déguste rosé',
+        tip_en: 'Duck breast is best medium-rare'
+      },
+      {
+        id: 'grill_direct',
+        question: 'Zone directe au grill ?',
+        question_en: 'Direct heat zone?',
+        type: 'boolean',
+        showWhen: { techniques: ['grill_direct'], tools: ['grill', 'bbq_direct'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.1,
+        tip: 'Attention aux flambées avec le gras de canard',
+        tip_en: 'Watch for flare-ups with duck fat'
       }
     ],
     thermalProfile: {
@@ -1552,6 +2599,30 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Finir au grill ou poêle pour croustillant',
         tip_en: 'Finish under broiler for crispy'
+      },
+      {
+        id: 'oven_crisp',
+        question: 'Croustiller au four ?',
+        question_en: 'Crisp in oven?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.15,
+        factorNo: 1.0,
+        tip: 'Four chaud (200°C) pour croustiller',
+        tip_en: 'Hot oven (400°F) to crisp'
+      },
+      {
+        id: 'pan_finish',
+        question: 'Finir à la poêle ?',
+        question_en: 'Finish in pan?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.1,
+        factorNo: 1.0,
+        tip: 'Côté peau dans la poêle chaude',
+        tip_en: 'Skin-side down in hot pan'
       }
     ],
     thermalProfile: {
@@ -1583,16 +2654,41 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'roast', label: 'Rôti classique', label_en: 'Classic roast', factor: 1.0 },
-          { value: 'slow', label: 'Rôti lent', label_en: 'Slow roast', factor: 1.5 },
-          { value: 'peking', label: 'Style Pékin (séché)', label_en: 'Peking style', factor: 1.3 }
+          { value: 'high', label: '220°C (croustillant)', label_en: '425°F (crispy)', factor: 0.85 },
+          { value: 'medium', label: '180°C (classique)', label_en: '350°F (classic)', factor: 1.0 },
+          { value: 'low', label: '150°C (lent)', label_en: '300°F (slow)', factor: 1.5 }
         ],
-        default: 'roast'
+        default: 'medium'
+      },
+      {
+        id: 'rotisserie',
+        question: 'À la rôtissoire ?',
+        question_en: 'Rotisserie?',
+        type: 'boolean',
+        showWhen: { techniques: ['rotissoire'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1,
+        tip: 'Rotation régulière pour cuisson uniforme',
+        tip_en: 'Even rotation for uniform cooking'
+      },
+      {
+        id: 'bbq_indirect',
+        question: 'Zone indirecte ?',
+        question_en: 'Indirect zone?',
+        type: 'boolean',
+        showWhen: { tools: ['bbq_indirect'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.8,
+        tip: 'Essentiel pour éviter les flambées avec le gras',
+        tip_en: 'Essential to avoid flare-ups with fat'
       }
     ],
     thermalProfile: {
@@ -1633,9 +2729,45 @@ export const cutSpecificQuestions = {
         question: 'Arrosé régulièrement ?',
         question_en: 'Basted regularly?',
         type: 'boolean',
+        showWhen: { tools: ['four'] },
         default: true,
         factorYes: 1.0,
         factorNo: 0.95
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 },
+          { value: 'low', label: '150°C', label_en: '300°F', factor: 1.4 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'rotisserie',
+        question: 'À la rôtissoire ?',
+        question_en: 'Rotisserie?',
+        type: 'boolean',
+        showWhen: { techniques: ['rotissoire'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1,
+        tip: 'Cuisson uniforme avec rotation',
+        tip_en: 'Uniform cooking with rotation'
+      },
+      {
+        id: 'bbq_indirect',
+        question: 'Zone indirecte ?',
+        question_en: 'Indirect zone?',
+        type: 'boolean',
+        showWhen: { tools: ['bbq_indirect'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.85
       }
     ],
     thermalProfile: {
@@ -1666,6 +2798,28 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.05,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '200°C', label_en: '400°F', factor: 0.9 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'rotisserie',
+        question: 'À la rôtissoire ?',
+        question_en: 'Rotisserie?',
+        type: 'boolean',
+        showWhen: { techniques: ['rotissoire'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1
       }
     ],
     thermalProfile: {
@@ -1694,6 +2848,45 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.0,
         factorNo: 0.95
+      },
+      {
+        id: 'pan_sear',
+        question: 'Saisir la peau ?',
+        question_en: 'Sear the skin?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.1,
+        factorNo: 1.0,
+        tip: 'Côté peau en premier pour croustillant',
+        tip_en: 'Skin-side first for crispy'
+      },
+      {
+        id: 'bbq_zone',
+        question: 'Zone de cuisson ?',
+        question_en: 'Cooking zone?',
+        type: 'select',
+        showWhen: { tools: ['grill', 'bbq_direct', 'bbq_indirect'] },
+        options: [
+          { value: 'direct', label: 'Directe', label_en: 'Direct', factor: 0.85 },
+          { value: 'indirect', label: 'Indirecte', label_en: 'Indirect', factor: 1.2 },
+          { value: 'both', label: 'Les deux', label_en: 'Both', factor: 1.0 }
+        ],
+        default: 'both',
+        tip: 'Finir en indirect pour cuisson à coeur',
+        tip_en: 'Finish indirect for even cooking'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'tender', label: '65°C (tendre)', label_en: '149°F (tender)', factor: 1.0 },
+          { value: 'fall_off', label: '74°C (effiloché)', label_en: '165°F (fall-off)', factor: 1.3 }
+        ],
+        default: 'tender'
       }
     ],
     thermalProfile: {
@@ -1739,6 +2932,45 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.05,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C (saisir)', label_en: '425°F (sear)', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 },
+          { value: 'low', label: '130°C (lent)', label_en: '265°F (slow)', factor: 1.5 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '52°C (saignant)', label_en: '126°F (rare)', factor: 0.95 },
+          { value: 'medium_rare', label: '55°C (rosé)', label_en: '131°F (medium-rare)', factor: 1.0 }
+        ],
+        default: 'medium_rare',
+        tip: 'Le cerf se déguste rosé maximum',
+        tip_en: 'Venison is best medium-rare max'
+      },
+      {
+        id: 'pan_sear',
+        question: 'Saisir à la poêle ?',
+        question_en: 'Pan sear?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1,
+        tip: 'Saisir rapidement à feu vif',
+        tip_en: 'Sear quickly over high heat'
       }
     ],
     thermalProfile: {
@@ -1778,6 +3010,31 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.2,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high_start', label: '220°C puis 160°C', label_en: '425°F then 325°F', factor: 1.0 },
+          { value: 'medium', label: '180°C constant', label_en: '350°F constant', factor: 1.1 },
+          { value: 'low', label: '140°C (lent)', label_en: '285°F (slow)', factor: 1.6 }
+        ],
+        default: 'high_start',
+        tip: 'Démarrer chaud pour croûter, puis baisser',
+        tip_en: 'Start hot to crust, then lower'
+      },
+      {
+        id: 'basted',
+        question: 'Arrosé régulièrement ?',
+        question_en: 'Basted regularly?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.95
       }
     ],
     thermalProfile: {
@@ -1809,6 +3066,30 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.12,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
+        ],
+        default: 'high',
+        tip: 'Cuisson courte à haute température',
+        tip_en: 'Short cooking at high temperature'
+      },
+      {
+        id: 'sear_first',
+        question: 'Saisir avant le four ?',
+        question_en: 'Sear before oven?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1
       }
     ],
     thermalProfile: {
@@ -1839,6 +3120,30 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.12,
         factorNo: 1.0
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '52°C (saignant)', label_en: '126°F (rare)', factor: 0.95 },
+          { value: 'medium_rare', label: '55°C (rosé)', label_en: '131°F (medium-rare)', factor: 1.0 }
+        ],
+        default: 'medium_rare'
+      },
+      {
+        id: 'pan_butter',
+        question: 'Beurrer en fin de cuisson ?',
+        question_en: 'Butter at end?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.05,
+        factorNo: 1.0,
+        tip: 'Arroser de beurre noisette',
+        tip_en: 'Baste with brown butter'
       }
     ],
     thermalProfile: {
@@ -1870,6 +3175,32 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 0.9,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '200°C', label_en: '400°F', factor: 0.9 },
+          { value: 'medium', label: '170°C', label_en: '340°F', factor: 1.0 },
+          { value: 'low', label: '140°C (lent)', label_en: '285°F (slow)', factor: 1.5 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'braise_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 1.0 },
+          { value: 'beer', label: 'Bière', label_en: 'Beer', factor: 0.95 },
+          { value: 'stock', label: 'Fond de gibier', label_en: 'Game stock', factor: 1.0 }
+        ],
+        default: 'wine'
       }
     ],
     thermalProfile: {
@@ -1901,15 +3232,39 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'roast', label: 'Rôti', label_en: 'Roast', factor: 1.0 },
-          { value: 'braise', label: 'Braisé', label_en: 'Braised', factor: 1.4 }
+          { value: 'high_start', label: '220°C puis 160°C', label_en: '425°F then 325°F', factor: 1.0 },
+          { value: 'medium', label: '170°C constant', label_en: '340°F constant', factor: 1.1 },
+          { value: 'low', label: '140°C (lent)', label_en: '285°F (slow)', factor: 1.6 }
         ],
-        default: 'roast'
+        default: 'high_start'
+      },
+      {
+        id: 'braise_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 1.0 },
+          { value: 'beer', label: 'Bière brune', label_en: 'Dark beer', factor: 0.95 }
+        ],
+        default: 'wine'
+      },
+      {
+        id: 'covered',
+        question: 'Couvert pendant cuisson ?',
+        question_en: 'Covered during cooking?',
+        type: 'boolean',
+        showWhen: { techniques: ['cuisson_lente'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.9
       }
     ],
     thermalProfile: {
@@ -1941,6 +3296,32 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Le sang est ajouté en fin, ne pas faire bouillir',
         tip_en: 'Blood added at end, do not boil'
+      },
+      {
+        id: 'slow_cooker',
+        question: 'Mijoteuse électrique ?',
+        question_en: 'Slow cooker?',
+        type: 'boolean',
+        showWhen: { tools: ['mijoteuse'] },
+        default: true,
+        factorYes: 1.3,
+        factorNo: 1.0,
+        tip: 'Position basse pour cuisson douce',
+        tip_en: 'Low setting for gentle cooking'
+      },
+      {
+        id: 'pressure_release',
+        question: 'Type de dépressurisation ?',
+        question_en: 'Pressure release type?',
+        type: 'select',
+        showWhen: { tools: ['autocuiseur'] },
+        options: [
+          { value: 'natural', label: 'Naturelle', label_en: 'Natural', factor: 1.1 },
+          { value: 'quick', label: 'Rapide', label_en: 'Quick', factor: 1.0 }
+        ],
+        default: 'natural',
+        tip: 'Dépressurisation naturelle pour viande tendre',
+        tip_en: 'Natural release for tender meat'
       }
     ],
     thermalProfile: {
@@ -1978,6 +3359,32 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 1.2,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
+        ],
+        default: 'high',
+        tip: 'Cuisson vive pour garder rosé',
+        tip_en: 'High heat to keep pink'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '54°C (saignant)', label_en: '129°F (rare)', factor: 0.95 },
+          { value: 'medium_rare', label: '58°C (rosé)', label_en: '136°F (medium-rare)', factor: 1.0 }
+        ],
+        default: 'medium_rare'
       }
     ],
     thermalProfile: {
@@ -2010,6 +3417,31 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 0.92,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '200°C', label_en: '400°F', factor: 0.9 },
+          { value: 'medium', label: '170°C', label_en: '340°F', factor: 1.0 }
+        ],
+        default: 'medium'
+      },
+      {
+        id: 'braise_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'wine', label: 'Vin blanc', label_en: 'White wine', factor: 1.0 },
+          { value: 'cider', label: 'Cidre', label_en: 'Cider', factor: 0.95 },
+          { value: 'mustard', label: 'Sauce moutarde', label_en: 'Mustard sauce', factor: 1.0 }
+        ],
+        default: 'wine'
       }
     ],
     thermalProfile: {
@@ -2055,6 +3487,32 @@ export const cutSpecificQuestions = {
         default: true,
         factorYes: 1.05,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
+        ],
+        default: 'high',
+        tip: 'Cuisson rapide pour garder moelleux',
+        tip_en: 'Quick cooking to keep moist'
+      },
+      {
+        id: 'basted',
+        question: 'Arrosé régulièrement ?',
+        question_en: 'Basted regularly?',
+        type: 'boolean',
+        showWhen: { tools: ['four'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 0.9,
+        tip: 'Essentiel pour éviter le dessèchement',
+        tip_en: 'Essential to prevent drying out'
       }
     ],
     thermalProfile: {
@@ -2085,15 +3543,30 @@ export const cutSpecificQuestions = {
         factorNo: 1.0
       },
       {
-        id: 'cooking_style',
-        question: 'Style ?',
-        question_en: 'Style?',
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
         type: 'select',
+        showWhen: { tools: ['four'] },
         options: [
-          { value: 'roast', label: 'Rôtie', label_en: 'Roasted', factor: 1.0 },
-          { value: 'casserole', label: 'En cocotte', label_en: 'Casserole', factor: 1.3 }
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
         ],
-        default: 'roast'
+        default: 'high'
+      },
+      {
+        id: 'braise_liquid',
+        question: 'Liquide de braisage ?',
+        question_en: 'Braising liquid?',
+        type: 'select',
+        showWhen: { techniques: ['cuisson_lente'] },
+        options: [
+          { value: 'wine', label: 'Vin blanc', label_en: 'White wine', factor: 1.0 },
+          { value: 'cabbage', label: 'Au chou', label_en: 'With cabbage', factor: 1.1 }
+        ],
+        default: 'wine',
+        tip: 'Perdrix au chou est un classique',
+        tip_en: 'Partridge with cabbage is a classic'
       }
     ],
     thermalProfile: {
@@ -2131,6 +3604,30 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 1.1,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '200°C', label_en: '400°F', factor: 1.0 }
+        ],
+        default: 'high',
+        tip: 'Cuisson vive pour petites pièces',
+        tip_en: 'High heat for small pieces'
+      },
+      {
+        id: 'grill_direct',
+        question: 'Chaleur directe ?',
+        question_en: 'Direct heat?',
+        type: 'boolean',
+        showWhen: { tools: ['grill', 'bbq_direct'] },
+        default: true,
+        factorYes: 0.9,
+        factorNo: 1.1
       }
     ],
     thermalProfile: {
@@ -2163,6 +3660,20 @@ export const cutSpecificQuestions = {
         factorNo: 1.0,
         tip: 'Flamber à l\'armagnac est traditionnel',
         tip_en: 'Flambéing with armagnac is traditional'
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'very_high', label: '240°C', label_en: '465°F', factor: 0.8 },
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.9 }
+        ],
+        default: 'very_high',
+        tip: 'Cuisson très vive, servir rosée',
+        tip_en: 'Very high heat, serve pink'
       }
     ],
     thermalProfile: {
@@ -2194,6 +3705,42 @@ export const cutSpecificQuestions = {
         default: false,
         factorYes: 1.1,
         factorNo: 1.0
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '200°C', label_en: '400°F', factor: 1.0 }
+        ],
+        default: 'high'
+      },
+      {
+        id: 'sv_temp',
+        question: 'Température sous-vide ?',
+        question_en: 'Sous-vide temperature?',
+        type: 'select',
+        showWhen: { techniques: ['sous_vide'] },
+        options: [
+          { value: 'rare', label: '54°C (saignant)', label_en: '129°F (rare)', factor: 0.9 },
+          { value: 'medium_rare', label: '58°C (rosé)', label_en: '136°F (medium-rare)', factor: 1.0 }
+        ],
+        default: 'medium_rare',
+        tip: 'Finir par une saisie rapide',
+        tip_en: 'Finish with a quick sear'
+      },
+      {
+        id: 'pan_sear',
+        question: 'Saisir à la poêle ?',
+        question_en: 'Pan sear?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1
       }
     ],
     thermalProfile: {
@@ -2235,6 +3782,32 @@ export const cutSpecificQuestions = {
           { value: 'breast', label: 'Filets seuls', label_en: 'Breast only', factor: 0.65 }
         ],
         default: 'whole'
+      },
+      {
+        id: 'oven_temp',
+        question: 'Température du four ?',
+        question_en: 'Oven temperature?',
+        type: 'select',
+        showWhen: { tools: ['four'] },
+        options: [
+          { value: 'high', label: '220°C', label_en: '425°F', factor: 0.85 },
+          { value: 'medium', label: '180°C', label_en: '350°F', factor: 1.0 }
+        ],
+        default: 'high',
+        tip: 'Cuisson rosée recommandée',
+        tip_en: 'Pink cooking recommended'
+      },
+      {
+        id: 'pan_sear',
+        question: 'Saisir à la poêle ?',
+        question_en: 'Pan sear?',
+        type: 'boolean',
+        showWhen: { tools: ['poele'] },
+        default: true,
+        factorYes: 1.0,
+        factorNo: 1.1,
+        tip: 'Saisir côté peau d\'abord',
+        tip_en: 'Sear skin-side first'
       }
     ],
     thermalProfile: {

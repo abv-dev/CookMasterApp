@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { meatCategories, donenessLevels, cookingMethods, intensityLevels } from '../data/meatData'
+import { meatCategories, donenessLevels, cookingMethods, intensityLevels, twoStageConfig, restingTimes, cookingTechniques, cookingTools, techniqueToolsMapping } from '../data/meatData'
 import { cutsData } from '../data/cutsData'
 import { cutSpecificQuestions, calculateSpecificFactors, getEffectiveDiffusivity, heatTransferCoeffs } from '../data/thermalProfiles'
 import { saveToHistory } from '../services/storageService'
@@ -40,6 +40,12 @@ function Calculator() {
       : `Température minimum : ${isImperial ? '165°F' : '74°C'} à cœur`,
     salmonellaWarning: lang === 'en' ? '⚠️ Essential to eliminate salmonella' : '⚠️ Impératif pour éliminer les salmonelles',
     cookingMethod: lang === 'en' ? 'Cooking method' : 'Méthode de cuisson',
+    cookingTechnique: lang === 'en' ? 'Cooking technique' : 'Technique de cuisson',
+    chooseTechnique: lang === 'en' ? 'How do you want to cook?' : 'Comment voulez-vous cuire ?',
+    cookingTool: lang === 'en' ? 'Cooking tool' : 'Outil de cuisson',
+    chooseTool: lang === 'en' ? 'With what?' : 'Avec quoi ?',
+    stage1Tool: lang === 'en' ? 'Stage 1 tool' : 'Outil étape 1',
+    stage2Tool: lang === 'en' ? 'Searing tool' : 'Outil de saisie',
     fireIntensity: lang === 'en' ? '🔥 Fire intensity' : '🔥 Intensité du feu',
     ovenTemp: lang === 'en' ? '🌡️ Oven temperature' : '🌡️ Température du four',
     thermostat: lang === 'en' ? 'Thermostat' : 'Thermostat',
@@ -105,15 +111,18 @@ function Calculator() {
     return obj[field] || ''
   }
 
-  const [step, setStep] = useState(1) // 1: meat, 2: subcategory, 3: cut, 4: options, 5: config, 6: results
+  const [step, setStep] = useState(1) // 1: meat, 2: subcategory, 3: cut, 4: technique, 5: options, 6: config, 7: tool, 8: results
   const [isAdvanced, setIsAdvanced] = useState(false)
   const [selectedMeatId, setSelectedMeatId] = useState(null)
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null)
   const [selectedCutId, setSelectedCutId] = useState(null)
+  const [selectedTechniqueId, setSelectedTechniqueId] = useState(null) // Nouvelle: technique de cuisson
+  const [selectedToolId, setSelectedToolId] = useState(null) // Nouvelle: outil de cuisson
+  const [selectedTool2Id, setSelectedTool2Id] = useState(null) // Pour techniques 2 étapes: outil étape 2
   const [weight, setWeight] = useState('')
   const [thickness, setThickness] = useState('')
   const [doneness, setDoneness] = useState('saignant')
-  const [method, setMethod] = useState('poele')
+  const [method, setMethod] = useState('poele') // Gardé pour compatibilité avec ancien code
   const [intensity, setIntensity] = useState('vif')
   const [ovenTemp, setOvenTemp] = useState(180) // Température du four en °C
   const [surfaceTemp, setSurfaceTemp] = useState(200) // Température surface poêle/grill en °C
@@ -172,16 +181,109 @@ function Calculator() {
     return donenessLevels[donenessType] || donenessLevels.viande_rouge
   }, [selectedCut])
 
-  // Méthode de cuisson sélectionnée
+  // Méthode de cuisson sélectionnée (ancien système - gardé pour compatibilité)
   const selectedMethodData = cookingMethods.find(m => m.id === method)
 
-  // Questions spécifiques au morceau sélectionné
+  // Technique de cuisson sélectionnée (nouveau système)
+  const selectedTechnique = cookingTechniques.find(t => t.id === selectedTechniqueId)
+
+  // Outil de cuisson sélectionné (nouveau système)
+  const selectedTool = cookingTools.find(t => t.id === selectedToolId)
+  const selectedTool2 = cookingTools.find(t => t.id === selectedTool2Id)
+
+  // Techniques de cuisson disponibles pour ce morceau
+  const availableTechniques = useMemo(() => {
+    if (!selectedCut?.cuissons) return cookingTechniques
+    // Filtrer les techniques qui ont au moins un outil compatible avec ce morceau
+    return cookingTechniques.filter(tech => {
+      // Si le morceau a des méthodes prédéfinies, vérifier la compatibilité
+      const techTools = techniqueToolsMapping[tech.id]
+      if (!techTools) return true
+
+      // Pour les techniques à 2 étapes, on accepte si l'outil principal est compatible
+      const mainTools = Array.isArray(techTools) ? techTools : (techTools.stage1 || techTools.stage2 || [])
+      return mainTools.length > 0
+    })
+  }, [selectedCut])
+
+  // Outils disponibles selon la technique sélectionnée
+  const availableTools = useMemo(() => {
+    if (!selectedTechniqueId) return cookingTools
+
+    const techTools = techniqueToolsMapping[selectedTechniqueId]
+    if (!techTools) return cookingTools
+
+    // Pour techniques simples (tableau d'ids)
+    if (Array.isArray(techTools)) {
+      return cookingTools.filter(tool => techTools.includes(tool.id))
+    }
+
+    // Pour techniques à 2 étapes (objet avec stage1/stage2)
+    // Retourner les outils de l'étape 1
+    return cookingTools.filter(tool => techTools.stage1?.includes(tool.id))
+  }, [selectedTechniqueId])
+
+  // Outils disponibles pour l'étape 2 (saisie)
+  const availableTools2 = useMemo(() => {
+    if (!selectedTechniqueId || !selectedTechnique?.isTwoStage) return []
+
+    const techTools = techniqueToolsMapping[selectedTechniqueId]
+    if (!techTools || Array.isArray(techTools)) return []
+
+    return cookingTools.filter(tool => techTools.stage2?.includes(tool.id))
+  }, [selectedTechniqueId, selectedTechnique])
+
+  // Questions spécifiques au morceau sélectionné - filtrées selon technique/outil
   const cutQuestions = useMemo(() => {
     if (!selectedCutId) return null
-    return cutSpecificQuestions[selectedCutId] || null
-  }, [selectedCutId])
+    const cutData = cutSpecificQuestions[selectedCutId]
+    if (!cutData?.questions) return cutData || null
 
-  // Méthodes de cuisson disponibles pour ce morceau
+    // Fonction pour évaluer si une question doit être affichée
+    const shouldShowQuestion = (q) => {
+      if (!q.showWhen) return true // Pas de condition = toujours afficher
+
+      const { techniques, tools, NOT_techniques, NOT_tools } = q.showWhen
+
+      // Vérifier les techniques requises
+      if (techniques && techniques.length > 0) {
+        if (!selectedTechniqueId || !techniques.includes(selectedTechniqueId)) {
+          return false
+        }
+      }
+
+      // Vérifier les outils requis
+      if (tools && tools.length > 0) {
+        if (!selectedToolId || !tools.includes(selectedToolId)) {
+          return false
+        }
+      }
+
+      // Vérifier les techniques exclues
+      if (NOT_techniques && NOT_techniques.length > 0) {
+        if (selectedTechniqueId && NOT_techniques.includes(selectedTechniqueId)) {
+          return false
+        }
+      }
+
+      // Vérifier les outils exclus
+      if (NOT_tools && NOT_tools.length > 0) {
+        if (selectedToolId && NOT_tools.includes(selectedToolId)) {
+          return false
+        }
+      }
+
+      return true
+    }
+
+    // Retourner les questions filtrées
+    return {
+      ...cutData,
+      questions: cutData.questions.filter(shouldShowQuestion)
+    }
+  }, [selectedCutId, selectedTechniqueId, selectedToolId])
+
+  // Méthodes de cuisson disponibles pour ce morceau (ancien système - gardé pour compatibilité)
   const availableMethods = useMemo(() => {
     if (!selectedCut?.cuissons) return cookingMethods
     return cookingMethods.filter(m => selectedCut.cuissons.includes(m.id))
@@ -207,7 +309,12 @@ function Calculator() {
   const handleCutSelect = (cutId) => {
     setSelectedCutId(cutId)
     const cut = selectedSubcategory?.cuts?.[cutId]
-    setStep(4)
+    setStep(4) // Step 4 = sélection de la TECHNIQUE
+
+    // Réinitialiser la technique et l'outil
+    setSelectedTechniqueId(null)
+    setSelectedToolId(null)
+    setSelectedTool2Id(null)
 
     // Réinitialiser les options selon le morceau
     if (cut) {
@@ -234,6 +341,40 @@ function Calculator() {
     }
   }
 
+  // Nouveau: Handler pour la sélection de technique
+  const handleTechniqueSelect = (techniqueId) => {
+    setSelectedTechniqueId(techniqueId)
+    setSelectedToolId(null) // Reset l'outil quand on change de technique
+    setSelectedTool2Id(null)
+
+    // Si la technique a des outils compatibles, pré-sélectionner le premier
+    const techTools = techniqueToolsMapping[techniqueId]
+    if (techTools) {
+      if (Array.isArray(techTools) && techTools.length > 0) {
+        setSelectedToolId(techTools[0])
+      } else if (techTools.stage1?.length > 0) {
+        setSelectedToolId(techTools.stage1[0])
+        if (techTools.stage2?.length > 0) {
+          setSelectedTool2Id(techTools.stage2[0])
+        }
+      }
+    }
+
+    // Mettre à jour l'ancienne méthode pour compatibilité
+    const technique = cookingTechniques.find(t => t.id === techniqueId)
+    if (technique) {
+      // Mapper la technique vers une méthode existante si possible
+      if (techniqueId === 'sous_vide') setMethod('sousvide')
+      else if (techniqueId === 'reverse_sear') setMethod('reverse_sear')
+      else if (techniqueId === 'bbq_low_slow') setMethod('bbq_indirect')
+      else if (techniqueId === 'grill_direct') setMethod('grill')
+      else if (techniqueId === 'cuisson_lente') setMethod('four')
+      else setMethod('poele') // Par défaut
+    }
+
+    setStep(5) // Passer aux options de préparation
+  }
+
   const handleBack = () => {
     if (step === 2) {
       setSelectedMeatId(null)
@@ -242,12 +383,22 @@ function Calculator() {
       setSelectedSubcategoryId(null)
       setStep(2)
     } else if (step === 4) {
+      // Retour depuis technique -> cut
       setSelectedCutId(null)
       setStep(3)
     } else if (step === 5) {
+      // Retour depuis options -> technique
+      setSelectedTechniqueId(null)
       setStep(4)
     } else if (step === 6) {
+      // Retour depuis config -> options
       setStep(5)
+    } else if (step === 7) {
+      // Retour depuis tool -> config
+      setStep(6)
+    } else if (step === 8) {
+      // Retour depuis results -> tool
+      setStep(7)
       setCalculationResult(null)
     }
   }
@@ -364,7 +515,139 @@ function Calculator() {
     const donenessData = availableDoneness.find(d => d.id === doneness)
     const targetTemp = donenessData?.temp || 55
 
+    // ========================================
+    // CUISSONS EN DEUX ÉTAPES
+    // ========================================
+    const methodId = selectedMethodData?.id
+    const twoStageData = twoStageConfig[methodId]
+
+    if (twoStageData && twoStageData.isTwoStage) {
+      // Méthode à deux étapes (reverse sear, sous-vide, bbq indirect)
+      const meatType = selectedMeatId // boeuf, porc, agneau, etc.
+
+      if (methodId === 'sousvide') {
+        // SOUS-VIDE : utiliser les temps et températures du bain
+        const sousVideTemps = twoStageData.stage1.temps[meatType]?.[doneness]
+        if (sousVideTemps) {
+          const bathTemp = sousVideTemps.bath
+          // Temps basé sur l'épaisseur (plus épais = plus long)
+          let thicknessCm = parseFloat(thickness) || 3
+          if (isImperial) thicknessCm = thicknessCm * 2.54
+          const thicknessFactor = Math.max(1, thicknessCm / 3)
+
+          const stage1Minutes = Math.round((sousVideTemps.time_min + (sousVideTemps.time_max - sousVideTemps.time_min) * 0.3) * thicknessFactor)
+          const stage2Seconds = twoStageData.stage2.time_seconds * 2 // 2 faces
+
+          return {
+            isTwoStage: true,
+            methodName: 'Sous-vide',
+            stage1: {
+              name: lang === 'en' ? twoStageData.stage1.name_en : twoStageData.stage1.name,
+              totalMinutes: stage1Minutes,
+              temp: bathTemp,
+              description: lang === 'en' ? `Water bath at ${bathTemp}°C` : `Bain-marie à ${bathTemp}°C`
+            },
+            stage2: {
+              name: lang === 'en' ? twoStageData.stage2.name_en : twoStageData.stage2.name,
+              totalSeconds: stage2Seconds,
+              totalMinutes: Math.floor(stage2Seconds / 60),
+              remainingSeconds: stage2Seconds % 60,
+              description: lang === 'en' ? 'High heat sear, 30s-1min per side' : 'Saisie feu vif, 30s-1min par face'
+            },
+            totalSeconds: stage1Minutes * 60 + stage2Seconds,
+            totalMinutes: stage1Minutes + Math.ceil(stage2Seconds / 60),
+            remainingSeconds: 0,
+            restSeconds: 60, // Repos court après sous-vide
+            restMinutes: 1,
+            targetTemp,
+            pullTemp: bathTemp, // En sous-vide, bath temp = pull temp
+            donenessName: getText(donenessData, 'name') || doneness
+          }
+        }
+      } else if (methodId === 'reverse_sear') {
+        // REVERSE SEAR : four basse temp puis saisie
+        const pullTemps = twoStageData.stage1.pullTemps[meatType]
+        const pullTemp = pullTemps?.[doneness] || (targetTemp - 5)
+        const ovenTempRS = twoStageData.stage1.ovenTemp.recommended
+
+        // Temps phase 1 : calcul basé sur la montée en température lente
+        // Environ 40-60 min pour une viande de 3cm à 110°C pour atteindre 45°C
+        let thicknessCm = parseFloat(thickness) || 3
+        if (isImperial) thicknessCm = thicknessCm * 2.54
+
+        // Formule simplifiée : base 30 min pour 2cm, +15 min par cm supplémentaire
+        const stage1Minutes = Math.round(30 + (thicknessCm - 2) * 15 + (weightG / 100) * 3)
+        const stage2Seconds = twoStageData.stage2.time_seconds * 2 // 2 faces
+
+        return {
+          isTwoStage: true,
+          methodName: 'Reverse Sear',
+          stage1: {
+            name: lang === 'en' ? twoStageData.stage1.name_en : twoStageData.stage1.name,
+            totalMinutes: stage1Minutes,
+            temp: ovenTempRS,
+            description: lang === 'en'
+              ? `Oven at ${ovenTempRS}°C until ${pullTemp}°C internal`
+              : `Four à ${ovenTempRS}°C jusqu'à ${pullTemp}°C à cœur`
+          },
+          stage2: {
+            name: lang === 'en' ? twoStageData.stage2.name_en : twoStageData.stage2.name,
+            totalSeconds: stage2Seconds,
+            totalMinutes: Math.floor(stage2Seconds / 60),
+            remainingSeconds: stage2Seconds % 60,
+            description: lang === 'en' ? 'High heat sear, 45s-1min per side' : 'Saisie feu vif, 45s-1min par face'
+          },
+          totalSeconds: stage1Minutes * 60 + stage2Seconds,
+          totalMinutes: stage1Minutes + Math.ceil(stage2Seconds / 60),
+          remainingSeconds: 0,
+          restSeconds,
+          restMinutes: Math.floor(restSeconds / 60),
+          targetTemp,
+          pullTemp,
+          carryover: twoStageData.carryover,
+          donenessName: getText(donenessData, 'name') || doneness
+        }
+      } else if (methodId === 'bbq_indirect') {
+        // BBQ INDIRECT : zone indirecte puis finition (pour grosses pièces)
+        const times = twoStageData.stage1.times
+        const bbqTime = times.ribs || { min: 240, max: 360 } // Défaut : ribs
+        const stage1Minutes = Math.round((bbqTime.min + bbqTime.max) / 2)
+        const stage2Seconds = twoStageData.stage2.time_seconds
+
+        return {
+          isTwoStage: true,
+          methodName: 'BBQ Indirect',
+          stage1: {
+            name: lang === 'en' ? twoStageData.stage1.name_en : twoStageData.stage1.name,
+            totalMinutes: stage1Minutes,
+            temp: twoStageData.stage1.ovenTemp.recommended,
+            description: lang === 'en'
+              ? `Indirect zone at ${twoStageData.stage1.ovenTemp.recommended}°C`
+              : `Zone indirecte à ${twoStageData.stage1.ovenTemp.recommended}°C`
+          },
+          stage2: {
+            name: lang === 'en' ? twoStageData.stage2.name_en : twoStageData.stage2.name,
+            totalSeconds: stage2Seconds,
+            totalMinutes: Math.floor(stage2Seconds / 60),
+            remainingSeconds: stage2Seconds % 60,
+            description: lang === 'en' ? 'Direct zone to caramelize' : 'Zone directe pour caraméliser'
+          },
+          totalSeconds: stage1Minutes * 60 + stage2Seconds,
+          totalMinutes: stage1Minutes + Math.ceil(stage2Seconds / 60),
+          remainingSeconds: 0,
+          restSeconds: 600, // 10 min repos pour grosses pièces
+          restMinutes: 10,
+          targetTemp,
+          pullTemp: targetTemp - twoStageData.carryover,
+          carryover: twoStageData.carryover,
+          donenessName: getText(donenessData, 'name') || doneness
+        }
+      }
+    }
+
+    // Cuisson standard (une seule étape)
     return {
+      isTwoStage: false,
       totalSeconds,
       totalMinutes: Math.floor(totalSeconds / 60),
       remainingSeconds: totalSeconds % 60,
@@ -379,7 +662,7 @@ function Calculator() {
     const result = calculateCookingTime()
     if (result) {
       setCalculationResult(result)
-      setStep(6)
+      setStep(8) // Nouveau: étape 8 = résultats
     }
   }
 
@@ -408,16 +691,62 @@ function Calculator() {
       restSeconds: result.restSeconds
     })
 
-    navigate('/timer', {
-      state: {
-        totalSeconds: result.totalSeconds,
-        restSeconds: result.restSeconds,
-        meatName: selectedMeat?.name,
-        cutName: selectedCut?.name,
-        doneness: result.donenessName,
-        targetTemp: result.targetTemp
-      }
-    })
+    // Préparer les données pour le Timer
+    const timerData = {
+      // Identifiants pour annonces contextuelles
+      meatId: selectedMeatId,
+      cutId: selectedCutId,
+      methodId: selectedMethodId, // Legacy - gardé pour compatibilité
+      techniqueId: selectedTechniqueId,
+      toolId: selectedToolId,
+      tool2Id: selectedTool2Id,
+      // Noms pour affichage
+      meatName: selectedMeat?.name,
+      meatName_en: selectedMeat?.name_en,
+      cutName: selectedCut?.name,
+      cutName_en: selectedCut?.name_en,
+      techniqueName: selectedTechnique?.name,
+      techniqueName_en: selectedTechnique?.name_en,
+      techniqueIcon: selectedTechnique?.icon,
+      toolName: selectedTool?.name,
+      toolName_en: selectedTool?.name_en,
+      toolIcon: selectedTool?.icon,
+      tool2Name: selectedTool2?.name,
+      tool2Name_en: selectedTool2?.name_en,
+      tool2Icon: selectedTool2?.icon,
+      doneness: result.donenessName,
+      targetTemp: result.targetTemp,
+      restSeconds: result.restSeconds,
+      // Intensité et température de l'outil
+      toolIntensity: intensity,
+      toolTemp: ovenTemp
+    }
+
+    if (result.isTwoStage) {
+      // Cuisson en deux étapes (reverse sear, sous-vide, etc.)
+      timerData.isTwoStage = true
+      timerData.stage1Seconds = result.stage1.totalMinutes * 60
+      timerData.stage2Seconds = result.stage2.totalSeconds || (result.stage2.totalMinutes * 60)
+      timerData.pullTemp = result.pullTemp
+      timerData.methodName = result.methodName
+      timerData.techniqueName = selectedTechnique?.name
+      timerData.stage1Name = result.stage1.name || selectedTool?.name
+      timerData.stage2Name = result.stage2.name || selectedTool2?.name
+      timerData.stage1Desc = result.stage1.description
+      timerData.stage2Desc = result.stage2.description
+      // Outils par étape pour affichage
+      timerData.stage1Tool = selectedTool?.name
+      timerData.stage1Tool_en = selectedTool?.name_en
+      timerData.stage1ToolIcon = selectedTool?.icon
+      timerData.stage2Tool = selectedTool2?.name
+      timerData.stage2Tool_en = selectedTool2?.name_en
+      timerData.stage2ToolIcon = selectedTool2?.icon
+    } else {
+      // Cuisson simple
+      timerData.totalSeconds = result.totalSeconds
+    }
+
+    navigate('/timer', { state: timerData })
   }
 
   // Convertir les catégories en tableau pour l'affichage
@@ -454,9 +783,9 @@ function Calculator() {
         <span></span>
       </header>
 
-      {/* Progress indicator */}
+      {/* Progress indicator - 8 étapes */}
       <div className="flex gap-1 mb-6">
-        {[1, 2, 3, 4, 5, 6].map((s) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
           <div
             key={s}
             className={`h-1 flex-1 rounded-full transition-all ${
@@ -562,8 +891,65 @@ function Calculator() {
         </section>
       )}
 
-      {/* Step 4: Cooking Options */}
+      {/* Step 4: Technique Selection (NOUVEAU) */}
       {step === 4 && selectedCut && (
+        <section className="space-y-4">
+          {/* Selected Cut Card */}
+          <div
+            className="card flex items-center gap-3 border-2"
+            style={{ borderColor: selectedMeat.color }}
+          >
+            <div
+              className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+              style={{ backgroundColor: selectedMeat.color }}
+            >
+              {selectedCut.icon || selectedMeat.icon}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-text-dark">{getText(selectedCut, 'name')}</h3>
+              <p className="text-xs text-text-light">{getText(selectedMeat, 'name')} • {getText(selectedSubcategory, 'name')}</p>
+            </div>
+          </div>
+
+          <h2 className="text-lg font-semibold text-text-dark">
+            {t.chooseTechnique}
+          </h2>
+
+          {/* Grid of techniques */}
+          <div className="grid grid-cols-2 gap-3">
+            {availableTechniques.map((technique) => (
+              <button
+                key={technique.id}
+                onClick={() => handleTechniqueSelect(technique.id)}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                  selectedTechniqueId === technique.id
+                    ? 'border-accent bg-accent-light'
+                    : 'border-gray-200 bg-white hover:border-accent/50'
+                }`}
+              >
+                <div className="text-2xl mb-2">{technique.icon}</div>
+                <div className="font-semibold text-text-dark text-sm">{getText(technique, 'name')}</div>
+                <div className="text-xs text-text-light mt-1">{getText(technique, 'description')}</div>
+                {technique.isTwoStage && (
+                  <div className="mt-2 text-xs text-accent font-medium">
+                    {lang === 'en' ? '2 stages' : '2 étapes'}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Tip for selected technique */}
+          {selectedTechnique?.tips && (
+            <div className="bg-accent-light rounded-xl p-3 text-sm text-accent">
+              💡 {lang === 'en' ? selectedTechnique.tips.en : selectedTechnique.tips.fr}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Step 5: Cooking Options (anciennement Step 4) */}
+      {step === 5 && selectedCut && selectedTechnique && (
         <section className="space-y-4">
           {/* Selected Cut Card */}
           <div
@@ -586,9 +972,9 @@ function Calculator() {
             {lang === 'en' ? '🍖 Preparation Options' : '🍖 Options de préparation'}
           </h2>
 
-          {/* Quick Cooking Options */}
+          {/* Dynamic Cooking Options based on cut properties */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Mariné */}
+            {/* Mariné - Toujours pertinent */}
             <button
               onClick={() => setSpecificAnswers(prev => ({ ...prev, marinated: !prev.marinated }))}
               className={`p-4 rounded-xl border-2 transition-all ${
@@ -597,46 +983,50 @@ function Calculator() {
                   : 'border-gray-200 bg-white'
               }`}
             >
-              <div className="text-2xl mb-1">🫒</div>
+              <div className="text-2xl mb-1">🥣</div>
               <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Marinated' : 'Mariné'}</div>
               <div className={`text-xs mt-1 font-bold ${specificAnswers.marinated ? 'text-accent' : 'text-text-light'}`}>
                 {specificAnswers.marinated ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
               </div>
             </button>
 
-            {/* Bardé */}
-            <button
-              onClick={() => setSpecificAnswers(prev => ({ ...prev, barded: !prev.barded }))}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                specificAnswers.barded
-                  ? 'border-accent bg-accent-light'
-                  : 'border-gray-200 bg-white'
-              }`}
-            >
-              <div className="text-2xl mb-1">🥓</div>
-              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Barded' : 'Bardé'}</div>
-              <div className={`text-xs mt-1 font-bold ${specificAnswers.barded ? 'text-accent' : 'text-text-light'}`}>
-                {specificAnswers.barded ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
-              </div>
-            </button>
+            {/* Bardé - Seulement si canBeBarded === true */}
+            {selectedCut.canBeBarded && (
+              <button
+                onClick={() => setSpecificAnswers(prev => ({ ...prev, barded: !prev.barded }))}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  specificAnswers.barded
+                    ? 'border-accent bg-accent-light'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <div className="text-2xl mb-1">🥓</div>
+                <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Barded' : 'Bardé'}</div>
+                <div className={`text-xs mt-1 font-bold ${specificAnswers.barded ? 'text-accent' : 'text-text-light'}`}>
+                  {specificAnswers.barded ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+                </div>
+              </button>
+            )}
 
-            {/* Avec Os */}
-            <button
-              onClick={() => setWithBone(!withBone)}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                withBone
-                  ? 'border-accent bg-accent-light'
-                  : 'border-gray-200 bg-white'
-              }`}
-            >
-              <div className="text-2xl mb-1">🦴</div>
-              <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'With Bone' : 'Avec Os'}</div>
-              <div className={`text-xs mt-1 font-bold ${withBone ? 'text-accent' : 'text-text-light'}`}>
-                {withBone ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
-              </div>
-            </button>
+            {/* Avec Os - Seulement si hasBone === 'optional' */}
+            {selectedCut.hasBone === 'optional' && (
+              <button
+                onClick={() => setWithBone(!withBone)}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  withBone
+                    ? 'border-accent bg-accent-light'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <div className="text-2xl mb-1">🦴</div>
+                <div className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'With Bone' : 'Avec Os'}</div>
+                <div className={`text-xs mt-1 font-bold ${withBone ? 'text-accent' : 'text-text-light'}`}>
+                  {withBone ? (lang === 'en' ? 'Yes' : 'Oui') : (lang === 'en' ? 'No' : 'Non')}
+                </div>
+              </button>
+            )}
 
-            {/* Sonde thermique */}
+            {/* Sonde thermique - Toujours pertinent */}
             <button
               onClick={() => setSpecificAnswers(prev => ({ ...prev, probe: !prev.probe }))}
               className={`p-4 rounded-xl border-2 transition-all ${
@@ -653,6 +1043,74 @@ function Calculator() {
               </div>
             </button>
           </div>
+
+          {/* Cut-Specific Questions from thermalProfiles.js */}
+          {cutQuestions && cutQuestions.questions && cutQuestions.questions.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-text-dark">
+                {lang === 'en' ? '🎯 Specific to this cut' : '🎯 Spécifique à ce morceau'}
+              </h3>
+              {cutQuestions.questions.map((q) => (
+                <div key={q.id} className="card">
+                  <label className="block text-sm text-text-dark mb-2 font-medium">
+                    {lang === 'en' && q.question_en ? q.question_en : q.question}
+                  </label>
+
+                  {/* Boolean question */}
+                  {q.type === 'boolean' && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: true }))}
+                        className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
+                          specificAnswers[q.id] === true
+                            ? 'bg-accent text-white'
+                            : 'bg-gray-100 text-text-dark'
+                        }`}
+                      >
+                        {lang === 'en' ? 'Yes' : 'Oui'}
+                      </button>
+                      <button
+                        onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: false }))}
+                        className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
+                          specificAnswers[q.id] === false
+                            ? 'bg-accent text-white'
+                            : 'bg-gray-100 text-text-dark'
+                        }`}
+                      >
+                        {lang === 'en' ? 'No' : 'Non'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Select question */}
+                  {q.type === 'select' && (
+                    <div className="flex flex-wrap gap-2">
+                      {q.options.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setSpecificAnswers(prev => ({ ...prev, [q.id]: opt.value }))}
+                          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                            specificAnswers[q.id] === opt.value
+                              ? 'bg-accent text-white'
+                              : 'bg-gray-100 text-text-dark'
+                          }`}
+                        >
+                          {lang === 'en' && opt.label_en ? opt.label_en : opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Tip */}
+                  {q.tip && (
+                    <p className="text-xs text-accent mt-2">
+                      💡 {lang === 'en' && q.tip_en ? q.tip_en : q.tip}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Thickness Slider */}
           <div className="card">
@@ -698,7 +1156,7 @@ function Calculator() {
 
           {/* Continue Button */}
           <button
-            onClick={() => setStep(5)}
+            onClick={() => setStep(6)}
             className="btn-primary flex items-center justify-center gap-2"
           >
             <span>{lang === 'en' ? 'Continue' : 'Continuer'}</span>
@@ -707,8 +1165,8 @@ function Calculator() {
         </section>
       )}
 
-      {/* Step 5: Configuration */}
-      {step === 5 && selectedCut && (
+      {/* Step 6: Configuration (anciennement Step 5) */}
+      {step === 6 && selectedCut && selectedTechnique && (
         <section className="space-y-4">
           {/* Mode Toggle */}
           <div className="flex bg-surface rounded-xl p-1">
@@ -1440,12 +1898,181 @@ function Calculator() {
             </div>
           )}
 
-          {/* Calculate Button */}
+          {/* Continue to Tool Selection */}
           <button
-            onClick={handleCalculate}
+            onClick={() => setStep(7)}
             disabled={!weight}
             className={`btn-primary flex items-center justify-center gap-2 ${
               !weight ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <span>{lang === 'en' ? 'Continue' : 'Continuer'}</span>
+            <span>→</span>
+          </button>
+        </section>
+      )}
+
+      {/* Step 7: Tool Selection (NOUVEAU) */}
+      {step === 7 && selectedCut && selectedTechnique && (
+        <section className="space-y-4">
+          {/* Selected Cut & Technique Card */}
+          <div
+            className="card flex items-center gap-3 border-2"
+            style={{ borderColor: selectedMeat.color }}
+          >
+            <div
+              className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+              style={{ backgroundColor: selectedMeat.color }}
+            >
+              {selectedCut.icon || selectedMeat.icon}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-text-dark">{getText(selectedCut, 'name')}</h3>
+              <p className="text-xs text-text-light">
+                {getText(selectedTechnique, 'name')} • {weight}{isImperial ? 'oz' : 'g'}
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-lg font-semibold text-text-dark">
+            {t.chooseTool}
+          </h2>
+
+          {/* Two-stage technique: show both tools */}
+          {selectedTechnique.isTwoStage ? (
+            <>
+              {/* Stage 1 Tool */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-text-dark">
+                  {t.stage1Tool} - {getText(selectedTechnique, 'name')}
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {availableTools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      onClick={() => setSelectedToolId(tool.id)}
+                      className={`py-3 px-2 rounded-lg text-center transition-all ${
+                        selectedToolId === tool.id
+                          ? 'bg-accent text-white'
+                          : 'bg-surface text-text-dark'
+                      }`}
+                    >
+                      <div className="text-xl">{tool.icon}</div>
+                      <div className="text-xs font-medium mt-1">{getText(tool, 'name')}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stage 2 Tool (Searing) */}
+              {availableTools2.length > 0 && (
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-text-dark">
+                    {t.stage2Tool}
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {availableTools2.map((tool) => (
+                      <button
+                        key={tool.id}
+                        onClick={() => setSelectedTool2Id(tool.id)}
+                        className={`py-3 px-2 rounded-lg text-center transition-all ${
+                          selectedTool2Id === tool.id
+                            ? 'bg-accent text-white'
+                            : 'bg-surface text-text-dark'
+                        }`}
+                      >
+                        <div className="text-xl">{tool.icon}</div>
+                        <div className="text-xs font-medium mt-1">{getText(tool, 'name')}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Single-stage technique: show one tool selection */
+            <div className="grid grid-cols-3 gap-2">
+              {availableTools.map((tool) => (
+                <button
+                  key={tool.id}
+                  onClick={() => setSelectedToolId(tool.id)}
+                  className={`py-3 px-2 rounded-lg text-center transition-all ${
+                    selectedToolId === tool.id
+                      ? 'bg-accent text-white'
+                      : 'bg-surface text-text-dark'
+                  }`}
+                >
+                  <div className="text-xl">{tool.icon}</div>
+                  <div className="text-xs font-medium mt-1">{getText(tool, 'name')}</div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Tool tips */}
+          {selectedTool?.tips && (
+            <div className="bg-surface rounded-xl p-3 text-sm text-text-light">
+              💡 {lang === 'en' ? selectedTool.tips.en : selectedTool.tips.fr}
+            </div>
+          )}
+
+          {/* Intensity/Temperature based on tool */}
+          {selectedTool?.hasIntensity && (
+            <div>
+              <label className="block text-sm font-semibold text-text-dark mb-2">
+                {t.fireIntensity}
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {intensityLevels.map((level) => (
+                  <button
+                    key={level.id}
+                    onClick={() => {
+                      setIntensity(level.id)
+                      const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
+                      setSurfaceTemp(tempMap[level.id] || 200)
+                    }}
+                    className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+                      intensity === level.id
+                        ? 'bg-accent text-white'
+                        : 'bg-surface text-text-dark'
+                    }`}
+                  >
+                    {lang === 'en' ? level.name_en : level.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedTool?.hasThermostat && (
+            <div>
+              <label className="block text-sm font-semibold text-text-dark mb-2">
+                {t.ovenTemp}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[100, 120, 150, 180, 200, 220, 250].map((temp) => (
+                  <button
+                    key={temp}
+                    onClick={() => setOvenTemp(temp)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      ovenTemp === temp
+                        ? 'bg-accent text-white'
+                        : 'bg-surface text-text-dark'
+                    }`}
+                  >
+                    {isImperial ? Math.round(temp * 9/5 + 32) : temp}°{isImperial ? 'F' : 'C'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Calculate Button */}
+          <button
+            onClick={handleCalculate}
+            disabled={!selectedToolId}
+            className={`btn-primary flex items-center justify-center gap-2 ${
+              !selectedToolId ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             <span>🔥</span>
@@ -1454,44 +2081,116 @@ function Calculator() {
         </section>
       )}
 
-      {/* Step 6: Results */}
-      {step === 6 && calculationResult && (
+      {/* Step 8: Results (anciennement Step 6) */}
+      {step === 8 && calculationResult && (
         <section className="space-y-4">
-          {/* Result Card */}
-          <div className="card text-center py-6 border-2 border-green">
-            <div className="text-5xl mb-2">⏱️</div>
-            <h2 className="text-3xl font-bold text-text-dark">
-              {calculationResult.totalMinutes > 0 && `${calculationResult.totalMinutes} ${t.min} `}
-              {calculationResult.remainingSeconds > 0 && `${calculationResult.remainingSeconds} ${t.sec}`}
-            </h2>
-            <p className="text-text-light">{t.estimatedCookingTime}</p>
-          </div>
+          {/* Two-Stage Cooking Results */}
+          {calculationResult.isTwoStage ? (
+            <>
+              {/* Method Header */}
+              <div className="card text-center py-4 bg-accent-light border-2 border-accent">
+                <div className="text-3xl mb-1">🔄</div>
+                <h2 className="text-xl font-bold text-accent">{calculationResult.methodName}</h2>
+                <p className="text-sm text-text-light">{lang === 'en' ? 'Two-stage cooking' : 'Cuisson en deux étapes'}</p>
+              </div>
 
-          {/* Details */}
-          <div className="card space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-text-light">{t.meat}</span>
-              <span className="font-semibold text-text-dark flex items-center gap-2">
-                {selectedMeat.icon} {getText(selectedCut, 'name')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-text-light">{t.weightLabel}</span>
-              <span className="font-semibold text-text-dark">{weight}{isImperial ? 'oz' : 'g'}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-text-light">{t.doneness}</span>
-              <span className="font-semibold text-text-dark">{calculationResult.donenessName}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-text-light">{t.targetTemp}</span>
-              <span className="font-semibold text-accent">{unitConversion.formatTemperature(calculationResult.targetTemp, measurementSystem)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-text-light">{t.restTime}</span>
-              <span className="font-semibold text-text-dark">{calculationResult.restMinutes} {t.min}</span>
-            </div>
-          </div>
+              {/* Stage 1 */}
+              <div className="card border-2 border-blue-400">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                  <h3 className="font-bold text-text-dark">{calculationResult.stage1.name}</h3>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-4 text-center mb-3">
+                  <div className="text-3xl font-bold text-blue-600">
+                    {calculationResult.stage1.totalMinutes} {t.min}
+                  </div>
+                  <div className="text-sm text-blue-500">{calculationResult.stage1.description}</div>
+                </div>
+                {calculationResult.pullTemp && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-light">{lang === 'en' ? 'Remove at' : 'Retirer à'}</span>
+                    <span className="font-bold text-blue-600">{unitConversion.formatTemperature(calculationResult.pullTemp, measurementSystem)} {lang === 'en' ? 'internal' : 'à cœur'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Stage 2 */}
+              <div className="card border-2 border-orange-400">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                  <h3 className="font-bold text-text-dark">{calculationResult.stage2.name}</h3>
+                </div>
+                <div className="bg-orange-50 rounded-lg p-4 text-center mb-3">
+                  <div className="text-3xl font-bold text-orange-600">
+                    {calculationResult.stage2.totalMinutes > 0 && `${calculationResult.stage2.totalMinutes} ${t.min} `}
+                    {calculationResult.stage2.remainingSeconds > 0 && `${calculationResult.stage2.remainingSeconds} ${t.sec}`}
+                  </div>
+                  <div className="text-sm text-orange-500">{calculationResult.stage2.description}</div>
+                </div>
+              </div>
+
+              {/* Total + Rest */}
+              <div className="card bg-green-light border-2 border-green">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-text-dark font-medium">{lang === 'en' ? 'Total time' : 'Temps total'}</span>
+                  <span className="font-bold text-green text-xl">{calculationResult.totalMinutes} {t.min}</span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-text-light">{t.targetTemp}</span>
+                  <span className="font-semibold text-accent">{unitConversion.formatTemperature(calculationResult.targetTemp, measurementSystem)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.restTime}</span>
+                  <span className="font-semibold text-text-dark">{calculationResult.restMinutes} {t.min}</span>
+                </div>
+                {calculationResult.carryover && (
+                  <div className="mt-2 pt-2 border-t border-green-200 text-xs text-text-light">
+                    ⚠️ {lang === 'en'
+                      ? `Temperature will rise +${calculationResult.carryover}°C during rest`
+                      : `La température montera de +${calculationResult.carryover}°C au repos`}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Standard Single-Stage Result Card */}
+              <div className="card text-center py-6 border-2 border-green">
+                <div className="text-5xl mb-2">⏱️</div>
+                <h2 className="text-3xl font-bold text-text-dark">
+                  {calculationResult.totalMinutes > 0 && `${calculationResult.totalMinutes} ${t.min} `}
+                  {calculationResult.remainingSeconds > 0 && `${calculationResult.remainingSeconds} ${t.sec}`}
+                </h2>
+                <p className="text-text-light">{t.estimatedCookingTime}</p>
+              </div>
+
+              {/* Details */}
+              <div className="card space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.meat}</span>
+                  <span className="font-semibold text-text-dark flex items-center gap-2">
+                    {selectedMeat.icon} {getText(selectedCut, 'name')}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.weightLabel}</span>
+                  <span className="font-semibold text-text-dark">{weight}{isImperial ? 'oz' : 'g'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.doneness}</span>
+                  <span className="font-semibold text-text-dark">{calculationResult.donenessName}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.targetTemp}</span>
+                  <span className="font-semibold text-accent">{unitConversion.formatTemperature(calculationResult.targetTemp, measurementSystem)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-light">{t.restTime}</span>
+                  <span className="font-semibold text-text-dark">{calculationResult.restMinutes} {t.min}</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Sauces & Accompaniments */}
           {(selectedCut.sauces || selectedCut.accompagnements) && (

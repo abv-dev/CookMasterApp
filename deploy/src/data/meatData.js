@@ -191,35 +191,50 @@ export const meatCategories = {
   }
 };
 
-// Niveaux de cuisson avec températures
+// Niveaux de cuisson avec températures (Source: Guide Complet Températures de Cuisson)
 export const donenessLevels = {
   viande_rouge: [
-    { id: 'bleu', name: 'Bleu', name_en: 'Blue Rare', temp: 45, tempMax: 48, description: 'Centre froid et rouge vif', description_en: 'Cold and bright red center', color: '#D32F2F' },
-    { id: 'saignant', name: 'Saignant', name_en: 'Rare', temp: 50, tempMax: 52, description: 'Centre tiède et rouge', description_en: 'Warm and red center', color: '#E53935' },
-    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 55, tempMax: 58, description: 'Centre chaud et rosé', description_en: 'Hot and pink center', color: '#F4511E' },
-    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 63, tempMax: 68, description: 'Centre gris-brun, plus de rose', description_en: 'Gray-brown center, no pink', color: '#8D6E63' }
+    { id: 'bleu', name: 'Bleu', name_en: 'Blue Rare', temp: 38, tempMax: 42, description: 'Centre froid et rouge vif', description_en: 'Cold and bright red center', color: '#D32F2F' },
+    { id: 'saignant', name: 'Saignant', name_en: 'Rare', temp: 42, tempMax: 45, description: 'Centre tiède et rouge', description_en: 'Warm and red center', color: '#E53935' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 50, tempMax: 55, description: 'Centre chaud et rosé', description_en: 'Hot and pink center', color: '#F4511E' },
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 58, tempMax: 62, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#8D6E63' },
+    { id: 'tres_bien_cuit', name: 'Très bien cuit', name_en: 'Very Well Done', temp: 65, tempMax: 70, description: 'Centre gris-brun, pas de rose', description_en: 'Gray-brown center, no pink', color: '#5D4037' }
   ],
   agneau: [
-    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 54, tempMax: 56, description: 'Centre rosé juteux', description_en: 'Juicy pink center', color: '#E57373' },
-    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 58, tempMax: 62, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#F4511E' },
-    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 68, tempMax: 72, description: 'Entièrement cuit', description_en: 'Fully cooked', color: '#8D6E63' }
+    { id: 'saignant', name: 'Saignant', name_en: 'Rare', temp: 42, tempMax: 48, description: 'Centre rouge vif', description_en: 'Bright red center', color: '#D32F2F' },
+    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 48, tempMax: 52, description: 'Centre rosé tendre', description_en: 'Tender pink center', color: '#E57373' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 55, tempMax: 60, description: 'Centre rose pâle', description_en: 'Pale pink center', color: '#F4511E' },
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 65, tempMax: 68, description: 'Pas de rose', description_en: 'No pink', color: '#8D6E63' }
+  ],
+  veau: [
+    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 52, tempMax: 56, description: 'Centre rose délicat', description_en: 'Delicate pink center', color: '#F8BBD9' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 58, tempMax: 62, description: 'Légèrement rosé', description_en: 'Slightly pink', color: '#F48FB1' },
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 65, tempMax: 68, description: 'Blanc, entièrement cuit', description_en: 'White, fully cooked', color: '#EC407A' }
   ],
   porc: [
-    { id: 'juste_cuit', name: 'Juste cuit', name_en: 'Just Cooked', temp: 63, tempMax: 65, description: 'Légèrement rosé au centre (moderne)', description_en: 'Slightly pink center (modern)', color: '#F48FB1' },
-    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 68, tempMax: 70, description: 'Cuit mais juteux', description_en: 'Cooked but juicy', color: '#EC407A' },
-    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 72, tempMax: 75, description: 'Entièrement cuit (traditionnel)', description_en: 'Fully cooked (traditional)', color: '#AD1457' }
+    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 58, tempMax: 62, description: 'Rose pâle tendre (filet)', description_en: 'Tender pale pink (tenderloin)', color: '#F8BBD9' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 60, tempMax: 65, description: 'À peine rosé, juteux', description_en: 'Barely pink, juicy', color: '#F48FB1' },
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 68, tempMax: 71, description: 'Cuit traditionnel', description_en: 'Traditional cooked', color: '#EC407A' },
+    { id: 'effiloche', name: 'Effiloché', name_en: 'Pulled', temp: 88, tempMax: 93, description: 'Très tendre, se défait', description_en: 'Very tender, falls apart', color: '#AD1457' }
   ],
   volaille: [
-    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 74, tempMax: 82, description: 'Obligatoire - jus clair', description_en: 'Required - clear juices', color: '#FFB300' }
+    { id: 'poulet_entier', name: 'Poulet entier', name_en: 'Whole chicken', temp: 72, tempMax: 74, description: '74°C obligatoire - jus clair', description_en: '74°C required - clear juices', color: '#FFB300' },
+    { id: 'blanc_poulet', name: 'Blanc de poulet', name_en: 'Chicken breast', temp: 68, tempMax: 70, description: 'Sous-vide idéal, juteux', description_en: 'Sous-vide ideal, juicy', color: '#FFCA28' },
+    { id: 'cuisse', name: 'Cuisses de poulet', name_en: 'Chicken thighs', temp: 74, tempMax: 78, description: 'Fondant', description_en: 'Tender', color: '#FFA000' },
+    { id: 'dinde', name: 'Dinde', name_en: 'Turkey', temp: 74, tempMax: 74, description: '74°C obligatoire', description_en: '74°C required', color: '#FF8F00' },
+    { id: 'magret', name: 'Magret canard', name_en: 'Duck breast', temp: 52, tempMax: 56, description: 'Rosé comme bœuf', description_en: 'Pink like beef', color: '#E53935' },
+    { id: 'canard_entier', name: 'Canard entier', name_en: 'Whole duck', temp: 74, tempMax: 74, description: 'Cuisse 74°C / Magret 60°C', description_en: 'Thigh 74°C / Breast 60°C', color: '#D84315' }
   ],
   gibier: [
-    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 52, tempMax: 54, description: 'Centre rosé (recommandé)', description_en: 'Pink center (recommended)', color: '#A1887F' },
-    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 56, tempMax: 60, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#8D6E63' },
-    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 65, tempMax: 70, description: 'Attention: devient sec', description_en: 'Warning: becomes dry', color: '#5D4037' }
+    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 48, tempMax: 52, description: 'Cerf, biche, chevreuil', description_en: 'Deer, doe, roe deer', color: '#A1887F' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 55, tempMax: 60, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#8D6E63' },
+    { id: 'lievre', name: 'Lièvre', name_en: 'Hare', temp: 60, tempMax: 65, description: 'Rose pâle, viande ferme', description_en: 'Pale pink, firm meat', color: '#6D4C41' },
+    { id: 'sanglier', name: 'Sanglier', name_en: 'Wild boar', temp: 65, tempMax: 71, description: '71°C obligatoire (trichinose)', description_en: '71°C required (trichinosis)', color: '#5D4037' },
+    { id: 'faisan', name: 'Faisan', name_en: 'Pheasant', temp: 65, tempMax: 68, description: 'Légèrement rosé', description_en: 'Slightly pink', color: '#4E342E' }
   ]
 };
 
-// Méthodes de cuisson - Liste complète
+// Méthodes de cuisson - Liste complète (legacy, gardé pour compatibilité)
 export const cookingMethods = [
   // === CUISSONS RAPIDES (feu vif) ===
   {
@@ -630,11 +645,585 @@ export const intensityLevels = [
 export const thermostatToTemp = (th) => th * 30;
 export const tempToThermostat = (temp) => Math.round(temp / 30);
 
+// ============================================
+// CUISSONS EN DEUX ÉTAPES (Source: Guide PDF)
+// ============================================
+
+// Températures pour retirer du four AVANT saisie (carryover + saisie = +5-8°C)
+export const twoStageConfig = {
+  // SOUS-VIDE : Température du bain = température finale exacte
+  sousvide: {
+    isTwoStage: true,
+    stage1: {
+      name: 'Bain-marie',
+      name_en: 'Water bath',
+      // Températures par type de viande et cuisson
+      temps: {
+        boeuf: {
+          bleu: { bath: 38, time_min: 45, time_max: 90 },      // 45min-1h30
+          saignant: { bath: 43, time_min: 60, time_max: 180 }, // 1-3h
+          a_point: { bath: 52, time_min: 90, time_max: 240 },  // 1h30-4h
+          bien_cuit: { bath: 60, time_min: 120, time_max: 300 } // 2-5h
+        },
+        porc: {
+          rose: { bath: 58, time_min: 120, time_max: 240 },    // 2-4h
+          a_point: { bath: 62, time_min: 150, time_max: 300 }, // 2h30-5h
+          effiloche: { bath: 74, time_min: 480, time_max: 1440 } // 8-24h
+        },
+        agneau: {
+          saignant: { bath: 45, time_min: 60, time_max: 180 },
+          rose: { bath: 50, time_min: 90, time_max: 180 },
+          a_point: { bath: 57, time_min: 120, time_max: 240 }
+        },
+        volaille: {
+          poulet_entier: { bath: 63, time_min: 120, time_max: 240 },  // 2-4h, 62-65°C selon PDF
+          blanc_poulet: { bath: 63, time_min: 90, time_max: 180 },    // 1h30-3h
+          cuisse: { bath: 65, time_min: 120, time_max: 240 },         // 2-4h, plus de collagène
+          dinde: { bath: 63, time_min: 180, time_max: 300 },          // 3-5h (plus gros)
+          magret: { bath: 54, time_min: 90, time_max: 180 }           // 1h30-3h, rosé
+        },
+        gibier: {
+          rose: { bath: 50, time_min: 60, time_max: 180 },            // 1-3h, cerf/biche/chevreuil
+          a_point: { bath: 57, time_min: 90, time_max: 240 },         // 1h30-4h
+          lievre: { bath: 62, time_min: 120, time_max: 300 },         // 2-5h, viande ferme
+          faisan: { bath: 63, time_min: 120, time_max: 240 }          // 2-4h, comme volaille
+        }
+      }
+    },
+    stage2: {
+      name: 'Saisie',
+      name_en: 'Sear',
+      time_seconds: 60,  // 30s-1min par face
+      temp_surface: 250  // Très haute température
+    },
+    carryover: 0  // Pas de carryover significatif en sous-vide
+  },
+
+  // REVERSE SEAR : Four basse temp puis saisie
+  reverse_sear: {
+    isTwoStage: true,
+    stage1: {
+      name: 'Four basse température',
+      name_en: 'Low temp oven',
+      ovenTemp: { min: 100, max: 130, recommended: 110 },
+      // Température interne à atteindre AVANT saisie (cible finale - 5°C pour carryover/saisie)
+      pullTemps: {
+        boeuf: {
+          bleu: 33,      // cible 38-42, retire à 33
+          saignant: 37,  // cible 42-45, retire à 37
+          a_point: 45,   // cible 50-55, retire à 45
+          bien_cuit: 53  // cible 58-62, retire à 53
+        },
+        agneau: {
+          saignant: 37,
+          rose: 43,
+          a_point: 50,
+          bien_cuit: 60
+        },
+        veau: {
+          rose: 47,
+          a_point: 53,
+          bien_cuit: 60
+        },
+        gibier: {
+          rose: 43,       // cible 48-52, retire à 43
+          a_point: 50,    // cible 55-60, retire à 50
+          lievre: 55,     // cible 60-65, retire à 55
+          faisan: 60      // cible 65-68, retire à 60
+        },
+        volaille: {
+          magret: 47,     // cible 52-56, retire à 47 (rosé)
+          blanc_poulet: 63  // cible 68-70, retire à 63
+        }
+      }
+    },
+    stage2: {
+      name: 'Saisie finale',
+      name_en: 'Final sear',
+      time_seconds: 90,  // 45s-1min par face
+      temp_surface: 250
+    },
+    carryover: 5  // +5°C pendant repos après saisie
+  },
+
+  // BASSE TEMPÉRATURE (sans saisie finale)
+  basse_temp: {
+    isTwoStage: false,
+    stage1: {
+      name: 'Four basse température',
+      name_en: 'Low temp oven',
+      ovenTemp: { min: 60, max: 90, recommended: 80 },
+      // Température interne à atteindre (+ 3°C de carryover au repos)
+      pullTemps: {
+        boeuf: {
+          bleu: 35,
+          saignant: 39,
+          a_point: 47,
+          bien_cuit: 55
+        }
+      }
+    },
+    carryover: 3
+  },
+
+  // BBQ INDIRECT / LOW & SLOW
+  bbq_indirect: {
+    isTwoStage: true,
+    stage1: {
+      name: 'Zone indirecte',
+      name_en: 'Indirect zone',
+      ovenTemp: { min: 107, max: 150, recommended: 120 },
+      // Pour les grosses pièces (brisket, pulled pork)
+      pullTemps: {
+        boeuf: {
+          brisket: 88  // cible 88-93°C (effiloché)
+        },
+        porc: {
+          effiloche: 93  // cible 93-96°C
+        }
+      },
+      // Temps approximatifs
+      times: {
+        brisket: { min: 480, max: 720 },    // 8-12h
+        pulled_pork: { min: 480, max: 600 }, // 8-10h
+        ribs: { min: 240, max: 360 }         // 4-6h
+      }
+    },
+    stage2: {
+      name: 'Finition (optionnelle)',
+      name_en: 'Finishing (optional)',
+      time_seconds: 120,  // 2min zone directe pour caraméliser
+      temp_surface: 200
+    },
+    carryover: 8  // Grosses pièces = plus de carryover
+  }
+};
+
+// Temps de repos recommandés par épaisseur
+export const restingTimes = {
+  thin: { cm: 2, seconds: 180 },    // 3 min
+  medium: { cm: 4, seconds: 300 },  // 5 min
+  thick: { cm: 6, seconds: 420 },   // 7 min
+  roast: { cm: 10, seconds: 600 }   // 10 min (rôtis)
+};
+
+// ============================================
+// TECHNIQUES DE CUISSON (le COMMENT cuire)
+// ============================================
+// La technique définit l'approche/méthode de cuisson
+export const cookingTechniques = [
+  {
+    id: 'saisie_simple',
+    name: 'Saisie seule',
+    name_en: 'Pan sear only',
+    description: 'Cuisson rapide à haute température - steaks fins',
+    description_en: 'Quick high-heat cooking - thin steaks',
+    icon: '🔥',
+    isTwoStage: false,
+    compatibleTools: ['poele', 'grill', 'plancha', 'bbq_direct'],
+    idealFor: ['steak_fin', 'escalope', 'bavette', 'onglet'],
+    donenessRange: ['bleu', 'saignant', 'a_point'], // Pas bien cuit en saisie seule
+    tips: {
+      fr: 'Poêle très chaude, ne pas bouger la viande pendant la saisie',
+      en: 'Very hot pan, don\'t move the meat during searing'
+    }
+  },
+  {
+    id: 'saisie_puis_cuisson',
+    name: 'Saisie + cuisson',
+    name_en: 'Sear then cook',
+    description: 'Saisir d\'abord puis finir au four ou à couvert',
+    description_en: 'Sear first then finish in oven or covered',
+    icon: '🍳➡️🔥',
+    isTwoStage: true,
+    stage1: 'searing',
+    stage2: 'cooking',
+    stage1Tools: ['poele', 'grill', 'plancha'],
+    stage2Tools: ['four', 'poele_couverte', 'bbq_indirect'],
+    idealFor: ['cote_boeuf', 'filet_epais', 'magret', 'cuisse_poulet'],
+    tips: {
+      fr: 'Saisir à feu vif puis baisser le feu ou passer au four',
+      en: 'Sear over high heat then lower heat or transfer to oven'
+    }
+  },
+  {
+    id: 'reverse_sear',
+    name: 'Reverse sear',
+    name_en: 'Reverse sear',
+    description: 'Four basse température puis saisie finale - cuisson homogène',
+    description_en: 'Low temp oven then final sear - even cooking',
+    icon: '🌡️➡️🔥',
+    isTwoStage: true,
+    stage1: 'low_temp_cooking',
+    stage2: 'searing',
+    stage1Tools: ['four', 'bbq_indirect'],
+    stage2Tools: ['poele', 'grill', 'chalumeau', 'bbq_direct'],
+    idealFor: ['entrecote_epaisse', 'cote_boeuf', 'filet_epais', 'prime_rib'],
+    tips: {
+      fr: 'Four à 110°C jusqu\'à 5°C sous la cible, puis saisie 45s/face',
+      en: 'Oven at 230°F until 10°F below target, then sear 45s/side'
+    }
+  },
+  {
+    id: 'sous_vide',
+    name: 'Sous-vide',
+    name_en: 'Sous-vide',
+    description: 'Cuisson précise sous vide puis saisie - perfection garantie',
+    description_en: 'Precise vacuum cooking then sear - guaranteed perfection',
+    icon: '💧➡️🔥',
+    isTwoStage: true,
+    stage1: 'water_bath',
+    stage2: 'searing',
+    stage1Tools: ['bain_eau', 'thermoplongeur', 'braises_indirectes'],
+    stage2Tools: ['poele', 'grill', 'chalumeau', 'bbq_direct'],
+    idealFor: ['tous_morceaux', 'viandes_delicates', 'cuissons_longues'],
+    requiresVacuum: true, // Nécessite mise sous vide
+    tips: {
+      fr: 'Sécher parfaitement la viande avant de saisir',
+      en: 'Pat meat completely dry before searing'
+    }
+  },
+  {
+    id: 'basse_temperature',
+    name: 'Basse température',
+    name_en: 'Low temperature',
+    description: 'Cuisson lente au four sans saisie - tendre et moelleux',
+    description_en: 'Slow oven cooking without searing - tender and moist',
+    icon: '🌡️',
+    isTwoStage: false,
+    compatibleTools: ['four', 'bbq_indirect'],
+    idealFor: ['roti', 'gigot', 'epaule', 'cote_boeuf'],
+    tips: {
+      fr: 'Four entre 60-90°C, temps long mais résultat parfait',
+      en: 'Oven at 140-195°F, long time but perfect result'
+    }
+  },
+  {
+    id: 'cuisson_lente',
+    name: 'Mijoté / Braisé',
+    name_en: 'Braised / Stewed',
+    description: 'Cuisson longue en liquide - viandes à collagène',
+    description_en: 'Long cooking in liquid - collagen-rich meats',
+    icon: '🥘',
+    isTwoStage: false,
+    compatibleTools: ['cocotte', 'faitout', 'four', 'autocuiseur'],
+    idealFor: ['bourguignon', 'joue', 'paleron', 'jarret', 'queue'],
+    requiresLiquid: true,
+    tips: {
+      fr: 'Saisir avant de braiser pour plus de saveur',
+      en: 'Sear before braising for more flavor'
+    }
+  },
+  {
+    id: 'grill_direct',
+    name: 'Grill direct',
+    name_en: 'Direct grilling',
+    description: 'Cuisson directe sur les flammes/braises',
+    description_en: 'Direct cooking over flames/coals',
+    icon: '🔥',
+    isTwoStage: false,
+    compatibleTools: ['bbq_direct', 'grill', 'plancha'],
+    idealFor: ['steak', 'brochette', 'cote_agneau', 'saucisse'],
+    tips: {
+      fr: 'Braises bien chaudes, retourner une seule fois',
+      en: 'Hot coals, flip only once'
+    }
+  },
+  {
+    id: 'bbq_low_slow',
+    name: 'BBQ Low & Slow',
+    name_en: 'BBQ Low & Slow',
+    description: 'Cuisson indirecte longue - pulled pork, brisket',
+    description_en: 'Long indirect cooking - pulled pork, brisket',
+    icon: '🍖',
+    isTwoStage: true,
+    stage1: 'smoking',
+    stage2: 'resting', // Le repos est crucial
+    stage1Tools: ['bbq_indirect', 'fumoir'],
+    idealFor: ['brisket', 'pulled_pork', 'ribs', 'epaule'],
+    tips: {
+      fr: 'Température stable 107-120°C, patience est la clé',
+      en: 'Stable temp 225-250°F, patience is key'
+    }
+  },
+  {
+    id: 'rotissoire',
+    name: 'Rôtissoire',
+    name_en: 'Rotisserie',
+    description: 'Rotation continue - cuisson uniforme et peau croustillante',
+    description_en: 'Continuous rotation - even cooking and crispy skin',
+    icon: '🔄',
+    isTwoStage: false,
+    compatibleTools: ['rotissoire', 'bbq_rotissoire', 'four_rotissoire'],
+    idealFor: ['poulet_entier', 'gigot', 'roti_boeuf'],
+    tips: {
+      fr: 'Bien ficeler la viande, récupérer le jus',
+      en: 'Truss meat well, collect the drippings'
+    }
+  },
+  {
+    id: 'wok',
+    name: 'Sauté au wok',
+    name_en: 'Wok stir-fry',
+    description: 'Cuisson ultra-rapide à très haute température',
+    description_en: 'Ultra-fast cooking at very high temperature',
+    icon: '🥢',
+    isTwoStage: false,
+    compatibleTools: ['wok'],
+    idealFor: ['emince', 'lamelles', 'petits_morceaux'],
+    tips: {
+      fr: 'Tout préparer avant, cuire par petites quantités',
+      en: 'Prepare everything first, cook in small batches'
+    }
+  }
+];
+
+// ============================================
+// OUTILS DE CUISSON (le AVEC QUOI cuire)
+// ============================================
+// L'outil est le matériel/équipement utilisé
+export const cookingTools = [
+  // === INTÉRIEUR ===
+  {
+    id: 'poele',
+    name: 'Poêle',
+    name_en: 'Pan / Skillet',
+    icon: '🍳',
+    category: 'interieur',
+    hasIntensity: true, // Feu doux/moyen/vif
+    heatSource: 'direct',
+    idealMaterials: ['fonte', 'inox', 'fer'],
+    tips: {
+      fr: 'Préchauffer 2-3 min, huile qui fume légèrement',
+      en: 'Preheat 2-3 min, oil slightly smoking'
+    }
+  },
+  {
+    id: 'four',
+    name: 'Four',
+    name_en: 'Oven',
+    icon: '🔲',
+    category: 'interieur',
+    hasThermostat: true,
+    tempRange: [60, 280],
+    modes: ['convection', 'statique', 'grill'],
+    tips: {
+      fr: 'Toujours préchauffer, utiliser une sonde',
+      en: 'Always preheat, use a probe thermometer'
+    }
+  },
+  {
+    id: 'cocotte',
+    name: 'Cocotte / Faitout',
+    name_en: 'Dutch oven',
+    icon: '🥘',
+    category: 'interieur',
+    hasIntensity: true,
+    hasLid: true,
+    idealFor: ['braise', 'mijote', 'roti_cocotte'],
+    tips: {
+      fr: 'Fonte émaillée idéale, couvercle pour garder l\'humidité',
+      en: 'Enameled cast iron ideal, lid to retain moisture'
+    }
+  },
+  {
+    id: 'wok',
+    name: 'Wok',
+    name_en: 'Wok',
+    icon: '🥡',
+    category: 'interieur',
+    hasIntensity: true,
+    heatSource: 'direct',
+    requiresHighHeat: true,
+    tips: {
+      fr: 'Feu très vif, huile avec point de fumée élevé',
+      en: 'Very high heat, oil with high smoke point'
+    }
+  },
+  {
+    id: 'autocuiseur',
+    name: 'Autocuiseur / Cocotte-minute',
+    name_en: 'Pressure cooker',
+    icon: '♨️',
+    category: 'interieur',
+    speedFactor: 3, // 3x plus rapide
+    tips: {
+      fr: 'Diviser les temps de cuisson par 3',
+      en: 'Divide cooking times by 3'
+    }
+  },
+
+  // === PRÉCISION (Sous-vide) ===
+  {
+    id: 'bain_eau',
+    name: 'Bain d\'eau chaude',
+    name_en: 'Hot water bath',
+    icon: '💧',
+    category: 'precision',
+    hasThermostat: true,
+    tempRange: [45, 85],
+    requiresThermometer: true,
+    tips: {
+      fr: 'Maintenir température stable, circulateur recommandé',
+      en: 'Maintain stable temperature, circulator recommended'
+    }
+  },
+  {
+    id: 'thermoplongeur',
+    name: 'Thermoplongeur / Circulateur',
+    name_en: 'Immersion circulator',
+    icon: '🌡️',
+    category: 'precision',
+    hasThermostat: true,
+    tempRange: [25, 95],
+    precision: 0.1, // Précision au dixième de degré
+    tips: {
+      fr: 'Le must pour le sous-vide, précision au dixième',
+      en: 'The best for sous-vide, precise to 0.1°'
+    }
+  },
+  {
+    id: 'chalumeau',
+    name: 'Chalumeau de cuisine',
+    name_en: 'Kitchen torch',
+    icon: '🔦',
+    category: 'precision',
+    heatSource: 'direct',
+    forSearing: true,
+    tips: {
+      fr: 'Pour finition après sous-vide, mouvement constant',
+      en: 'For finishing after sous-vide, constant motion'
+    }
+  },
+
+  // === EXTÉRIEUR / BBQ ===
+  {
+    id: 'bbq_direct',
+    name: 'BBQ zone directe',
+    name_en: 'BBQ direct zone',
+    icon: '🔥',
+    category: 'exterieur',
+    heatSource: 'direct',
+    hasIntensity: true,
+    tips: {
+      fr: 'Braises incandescentes, viande directement au-dessus',
+      en: 'Glowing coals, meat directly above'
+    }
+  },
+  {
+    id: 'bbq_indirect',
+    name: 'BBQ zone indirecte',
+    name_en: 'BBQ indirect zone',
+    icon: '🌡️',
+    category: 'exterieur',
+    heatSource: 'indirect',
+    hasThermostat: false, // Contrôle par les évents
+    tips: {
+      fr: 'Braises d\'un côté, viande de l\'autre, couvercle fermé',
+      en: 'Coals on one side, meat on the other, lid closed'
+    }
+  },
+  {
+    id: 'braises_indirectes',
+    name: 'Braises (indirect/enterré)',
+    name_en: 'Indirect coals/buried',
+    icon: '🪨',
+    category: 'exterieur',
+    heatSource: 'indirect',
+    forSousVide: true, // Peut faire du sous-vide BBQ style
+    tips: {
+      fr: 'Pour cuisson enterrée ou pochage en sachet dans les braises',
+      en: 'For buried cooking or pouch cooking in coals'
+    }
+  },
+  {
+    id: 'fumoir',
+    name: 'Fumoir',
+    name_en: 'Smoker',
+    icon: '💨',
+    category: 'exterieur',
+    heatSource: 'indirect',
+    addsFlavor: true,
+    tempRange: [80, 150],
+    tips: {
+      fr: 'Bois de qualité, température basse et stable',
+      en: 'Quality wood, low and steady temperature'
+    }
+  },
+  {
+    id: 'grill',
+    name: 'Grill / Grille',
+    name_en: 'Grill grate',
+    icon: '🍖',
+    category: 'exterieur',
+    heatSource: 'direct',
+    hasIntensity: true,
+    tips: {
+      fr: 'Grille propre et huilée, marques de grill parfaites',
+      en: 'Clean and oiled grate, perfect grill marks'
+    }
+  },
+  {
+    id: 'plancha',
+    name: 'Plancha',
+    name_en: 'Plancha / Flat top',
+    icon: '🔳',
+    category: 'exterieur',
+    heatSource: 'direct',
+    hasIntensity: true,
+    surface: 'flat',
+    tips: {
+      fr: 'Surface très chaude, idéal pour saisie uniforme',
+      en: 'Very hot surface, ideal for even searing'
+    }
+  },
+  {
+    id: 'rotissoire',
+    name: 'Rôtissoire',
+    name_en: 'Rotisserie',
+    icon: '🔄',
+    category: 'exterieur',
+    hasRotation: true,
+    tips: {
+      fr: 'Bien équilibrer la pièce, ficeler serré',
+      en: 'Balance the meat well, truss tightly'
+    }
+  }
+];
+
+// Mapping technique -> outils compatibles (pour filtrer dans le Calculator)
+export const techniqueToolsMapping = {
+  saisie_simple: ['poele', 'grill', 'plancha', 'bbq_direct', 'wok'],
+  saisie_puis_cuisson: {
+    stage1: ['poele', 'grill', 'plancha'],
+    stage2: ['four', 'poele', 'bbq_indirect']
+  },
+  reverse_sear: {
+    stage1: ['four', 'bbq_indirect'],
+    stage2: ['poele', 'grill', 'chalumeau', 'bbq_direct', 'plancha']
+  },
+  sous_vide: {
+    stage1: ['bain_eau', 'thermoplongeur', 'braises_indirectes'],
+    stage2: ['poele', 'grill', 'chalumeau', 'bbq_direct', 'plancha']
+  },
+  basse_temperature: ['four', 'bbq_indirect'],
+  cuisson_lente: ['cocotte', 'four', 'autocuiseur'],
+  grill_direct: ['bbq_direct', 'grill', 'plancha'],
+  bbq_low_slow: ['bbq_indirect', 'fumoir'],
+  rotissoire: ['rotissoire'],
+  wok: ['wok']
+};
+
 export default {
   meatCategories,
   donenessLevels,
   cookingMethods,
   intensityLevels,
   thermostatToTemp,
-  tempToThermostat
+  tempToThermostat,
+  twoStageConfig,
+  restingTimes,
+  cookingTechniques,
+  cookingTools,
+  techniqueToolsMapping
 };
