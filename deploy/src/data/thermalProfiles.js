@@ -3157,37 +3157,41 @@ export const cutSpecificQuestions = {
     questions: [
       {
         id: 'age',
-        question: 'Âge ?',
-        question_en: 'Age?',
+        question: 'Âge du marcassin ?',
+        question_en: 'Young boar age?',
         type: 'select',
+        tip: 'Marcassin = sanglier < 6 mois. Plus jeune = plus tendre, saveur moins prononcée',
+        tip_en: 'Marcassin = wild boar < 6 months. Younger = more tender, milder flavor',
         options: [
-          { value: 'young', label: 'Jeune (< 6 mois)', label_en: 'Young (< 6 months)', factor: 0.9 },
-          { value: 'medium', label: 'Moyen (6-12 mois)', label_en: 'Medium', factor: 1.0 },
-          { value: 'older', label: 'Plus âgé', label_en: 'Older', factor: 1.15 }
+          { value: 'young', label: 'Très jeune (2-3 mois, 3-5kg)', label_en: 'Very young (2-3 months, 6-11lb)', factor: 0.85, description: 'Chair très tendre, saveur douce', description_en: 'Very tender meat, mild flavor' },
+          { value: 'medium', label: 'Jeune (4-5 mois, 5-7kg)', label_en: 'Young (4-5 months, 11-15lb)', factor: 1.0, description: 'Équilibre tendreté/saveur', description_en: 'Balance of tenderness/flavor' },
+          { value: 'older', label: 'Marcassin tardif (6 mois, 7-8kg)', label_en: 'Late marcassin (6 months, 15-18lb)', factor: 1.15, description: 'Plus de caractère, marinade recommandée', description_en: 'More character, marinating recommended' }
         ],
-        default: 'young'
+        default: 'medium'
       },
       {
         id: 'marinated',
-        question: 'Mariné ?',
-        question_en: 'Marinated?',
+        question: 'Mariné au vin ?',
+        question_en: 'Wine marinated?',
         type: 'boolean',
         default: true,
         factorYes: 0.9,
-        factorNo: 1.0
+        factorNo: 1.0,
+        tip: 'Marinade 12-24h recommandée (vin rouge, genièvre, aromates)',
+        tip_en: 'Marinate 12-24h recommended (red wine, juniper, aromatics)'
       },
       {
         id: 'oven_temp',
         question: 'Température du four ?',
         question_en: 'Oven temperature?',
         type: 'select',
-        showWhen: { tools: ['four'] },
+        showWhen: { tools: ['four'], NOT_techniques: ['sous_vide', 'cuisson_lente'] },
         options: [
-          { value: 'high', label: '200°C', label_en: '400°F', factor: 0.9 },
-          { value: 'medium', label: '170°C', label_en: '340°F', factor: 1.0 },
-          { value: 'low', label: '140°C (lent)', label_en: '285°F (slow)', factor: 1.5 }
+          { value: 'high_start', label: '220°C → 160°C (recommandé)', label_en: '425°F → 325°F (recommended)', factor: 1.0 },
+          { value: 'medium', label: '170°C constant', label_en: '340°F constant', factor: 1.1 },
+          { value: 'low', label: '140°C (très lent)', label_en: '285°F (very slow)', factor: 1.6 }
         ],
-        default: 'medium'
+        default: 'high_start'
       },
       {
         id: 'braise_liquid',
@@ -3196,16 +3200,19 @@ export const cutSpecificQuestions = {
         type: 'select',
         showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 1.0 },
-          { value: 'beer', label: 'Bière', label_en: 'Beer', factor: 0.95 },
+          { value: 'wine', label: 'Vin rouge corsé', label_en: 'Full-bodied red wine', factor: 1.0 },
+          { value: 'beer', label: 'Bière brune', label_en: 'Dark beer', factor: 0.95 },
           { value: 'stock', label: 'Fond de gibier', label_en: 'Game stock', factor: 1.0 }
         ],
-        default: 'wine'
+        default: 'wine',
+        tip: '⚠️ Rappel : 71°C à cœur obligatoire (trichinose)',
+        tip_en: '⚠️ Reminder: 160°F internal temp required (trichinosis)'
       }
     ],
     thermalProfile: {
       geometry: 'irregular',
-      defaultThickness_cm: 8
+      defaultThickness_cm: 12,
+      isWholeAnimal: true
     }
   },
 
@@ -3213,14 +3220,14 @@ export const cutSpecificQuestions = {
     questions: [
       {
         id: 'marinated',
-        question: 'Mariné ?',
-        question_en: 'Marinated?',
+        question: 'Mariné au vin rouge ?',
+        question_en: 'Red wine marinated?',
         type: 'boolean',
         default: true,
         factorYes: 0.88,
         factorNo: 1.0,
-        tip: 'Marinade vin rouge 24-48h recommandée',
-        tip_en: 'Red wine marinade 24-48h recommended'
+        tip: '⚠️ Marinade 24-48h OBLIGATOIRE (attendrit et assainit)',
+        tip_en: '⚠️ 24-48h marinade REQUIRED (tenderizes and sanitizes)'
       },
       {
         id: 'larded',
@@ -3229,16 +3236,18 @@ export const cutSpecificQuestions = {
         type: 'boolean',
         default: true,
         factorYes: 1.1,
-        factorNo: 1.0
+        factorNo: 1.0,
+        tip: 'Viande très maigre - lardage fortement recommandé',
+        tip_en: 'Very lean meat - larding highly recommended'
       },
       {
         id: 'oven_temp',
         question: 'Température du four ?',
         question_en: 'Oven temperature?',
         type: 'select',
-        showWhen: { tools: ['four'] },
+        showWhen: { tools: ['four'], NOT_techniques: ['sous_vide', 'cuisson_lente'] },
         options: [
-          { value: 'high_start', label: '220°C puis 160°C', label_en: '425°F then 325°F', factor: 1.0 },
+          { value: 'high_start', label: '220°C → 160°C (recommandé)', label_en: '425°F → 325°F (recommended)', factor: 1.0 },
           { value: 'medium', label: '170°C constant', label_en: '340°F constant', factor: 1.1 },
           { value: 'low', label: '140°C (lent)', label_en: '285°F (slow)', factor: 1.6 }
         ],
@@ -3251,10 +3260,12 @@ export const cutSpecificQuestions = {
         type: 'select',
         showWhen: { techniques: ['cuisson_lente'] },
         options: [
-          { value: 'wine', label: 'Vin rouge', label_en: 'Red wine', factor: 1.0 },
+          { value: 'wine', label: 'Vin rouge corsé', label_en: 'Full-bodied red wine', factor: 1.0 },
           { value: 'beer', label: 'Bière brune', label_en: 'Dark beer', factor: 0.95 }
         ],
-        default: 'wine'
+        default: 'wine',
+        tip: '⚠️ Rappel : 71°C à cœur obligatoire (trichinose)',
+        tip_en: '⚠️ Reminder: 160°F internal temp required (trichinosis)'
       },
       {
         id: 'covered',

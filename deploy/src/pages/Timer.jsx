@@ -126,6 +126,8 @@ function Timer() {
 
   // Référence pour le timer
   const intervalRef = useRef(null)
+  // Ref pour la fonction goToNextPhase (évite les problèmes de dépendances dans useEffect)
+  const goToNextPhaseRef = useRef(null)
 
   // Initialiser l'audio
   const initAudio = () => {
@@ -442,13 +444,21 @@ function Timer() {
     }
   }, [phase, searSubPhase, searConfig, restSeconds, playAlert, lang, voiceContext])
 
-  // Effet pour le compte à rebours
+  // Mettre à jour la ref à chaque changement de goToNextPhase
+  useEffect(() => {
+    goToNextPhaseRef.current = goToNextPhase
+  }, [goToNextPhase])
+
+  // Effet pour le compte à rebours - utilise la ref pour éviter les problèmes de dépendances
   useEffect(() => {
     if (isRunning && remainingSeconds > 0) {
       intervalRef.current = setInterval(() => {
         setRemainingSeconds((prev) => {
           if (prev <= 1) {
-            goToNextPhase()
+            // Utiliser la ref pour appeler la fonction à jour
+            if (goToNextPhaseRef.current) {
+              goToNextPhaseRef.current()
+            }
             return 0
           }
           return prev - 1
@@ -461,7 +471,7 @@ function Timer() {
         clearInterval(intervalRef.current)
       }
     }
-  }, [isRunning, goToNextPhase])
+  }, [isRunning]) // Seulement isRunning comme dépendance maintenant
 
   // Demander permission notifications
   useEffect(() => {

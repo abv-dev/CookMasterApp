@@ -13,7 +13,7 @@ export default {
 
   // Page d'accueil
   home: {
-    title: 'Cookmaster',
+    title: 'CookMaster',
     subtitle: 'Votre assistant cuisson',
     quickStart: 'Démarrage rapide',
     recentHistory: 'Historique récent',

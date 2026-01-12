@@ -19,7 +19,7 @@ function Home() {
 
   // Textes selon la langue
   const texts = {
-    title: 'Cookmaster',
+    title: 'CookMaster',
     subtitle: lang === 'en' ? 'Master the cooking of your meats' : 'Maîtrisez la cuisson de vos viandes',
     meats: lang === 'en' ? 'meats' : 'viandes',
     cuts: lang === 'en' ? 'cuts' : 'morceaux',
@@ -40,7 +40,10 @@ function Home() {
     safety: lang === 'en' ? 'Safety' : 'Sécurité',
     alwaysWellDone: lang === 'en' ? 'Always well done' : 'Toujours bien cuit',
     minimum: lang === 'en' ? 'minimum' : 'minimum',
-    clearJuice: lang === 'en' ? 'Clear juice, never pink' : 'Jus clair, jamais rosé'
+    clearJuice: lang === 'en' ? 'Clear juice, never pink' : 'Jus clair, jamais rosé',
+    tempNote: lang === 'en' ? 'Target internal temperatures (French culinary standards)' : 'Températures cibles à cœur (standards culinaires français)',
+    wildBoarWarning: lang === 'en' ? 'Wild boar: 71°C min (trichinosis)' : 'Sanglier : 71°C min (trichinose)',
+    groundMeatWarning: lang === 'en' ? 'Ground meat: always well done' : 'Viande hachée : toujours bien cuite'
   }
 
   // Formater la date relative
@@ -161,7 +164,7 @@ function Home() {
     {
       icon: '🧂',
       title: 'Salt at the right time',
-      description: 'Just before or after cooking, never during',
+      description: 'Preferably just before or after cooking (avoid during for most methods)',
     },
     {
       icon: '⏸️',
@@ -182,7 +185,7 @@ function Home() {
     {
       icon: '🧂',
       title: 'Saler au bon moment',
-      description: 'Juste avant ou après cuisson, jamais pendant',
+      description: 'De préférence juste avant ou après (éviter pendant pour la plupart des méthodes)',
     },
     {
       icon: '⏸️',
@@ -389,7 +392,7 @@ function Home() {
               style={{ borderLeft: `3px solid ${cat.color}` }}
             >
               <span className="text-2xl mb-1">{cat.icon}</span>
-              <span className="text-xs font-medium text-text-dark">{cat.name}</span>
+              <span className="text-xs font-medium text-text-dark">{lang === 'en' && cat.name_en ? cat.name_en : cat.name}</span>
             </Link>
           ))}
         </div>
@@ -421,6 +424,9 @@ function Home() {
         <h2 className="text-lg font-bold text-text-dark mb-3">
           {texts.coreTemps}
         </h2>
+        <p className="text-xs text-text-light mb-3 italic">
+          {texts.tempNote}
+        </p>
         <div className="space-y-2">
           {/* Boeuf / Viande rouge */}
           <div className="card py-3">
@@ -470,6 +476,22 @@ function Home() {
             </div>
           </div>
 
+          {/* Veau */}
+          <div className="card py-3">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">🐄</span>
+              <span className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Veal' : 'Veau'}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-1 text-center">
+              {donenessLevels.veau.map((level) => (
+                <div key={level.id} className="p-1 rounded" style={{ backgroundColor: level.color + '20' }}>
+                  <div className="text-xs text-text-light">{level.name}</div>
+                  <div className="font-bold text-xs" style={{ color: level.color }}>{level.temp}°C</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Volaille */}
           <div className="card py-3 border-2" style={{ borderColor: '#FFB300' }}>
             <div className="flex items-center gap-2 mb-2">
@@ -491,12 +513,23 @@ function Home() {
               <span className="font-semibold text-text-dark text-sm">{lang === 'en' ? 'Game' : 'Gibier'}</span>
             </div>
             <div className="grid grid-cols-3 gap-1 text-center">
-              {donenessLevels.gibier.map((level) => (
+              {donenessLevels.gibier.slice(0, 3).map((level) => (
                 <div key={level.id} className="p-1 rounded" style={{ backgroundColor: level.color + '20' }}>
                   <div className="text-xs text-text-light">{level.name}</div>
                   <div className="font-bold text-xs" style={{ color: level.color }}>{level.temp}°C</div>
                 </div>
               ))}
+            </div>
+            <div className="mt-2 p-2 rounded bg-red-50 border border-red-200">
+              <div className="text-xs text-red-600 font-medium">⚠️ {texts.wildBoarWarning}</div>
+            </div>
+          </div>
+
+          {/* Avertissement viande hachée */}
+          <div className="card py-3 bg-amber-50 border border-amber-200">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
+              <span className="text-xs text-amber-700 font-medium">{texts.groundMeatWarning}</span>
             </div>
           </div>
         </div>

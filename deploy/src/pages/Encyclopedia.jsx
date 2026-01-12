@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect } from 'react'
+import { Routes, Route, Link, useParams, useNavigate, useLocation } from 'react-router-dom'
 import { meatCategories, donenessLevels } from '../data/meatData'
 import { cutsData } from '../data/cutsData'
 import { getRecipesByCut } from '../data/recipesData'
@@ -22,6 +22,15 @@ const getText = (obj, field, lang) => {
     return obj[`${field}_en`]
   }
   return obj[field] || ''
+}
+
+// Helper pour obtenir un array traduit (conseils, erreurs, etc.)
+const getTextArray = (obj, field, lang) => {
+  if (!obj) return []
+  if (lang === 'en' && obj[`${field}_en`] && Array.isArray(obj[`${field}_en`])) {
+    return obj[`${field}_en`]
+  }
+  return obj[field] || []
 }
 
 // Translations object
@@ -67,7 +76,33 @@ const getTranslations = (lang) => ({
   wineAccords: lang === 'en' ? '🍷 Wine pairings' : '🍷 Accords vins',
   calculateCookingTime: lang === 'en' ? 'Calculate cooking time' : 'Calculer le temps de cuisson',
   steps: lang === 'en' ? '📝 Steps' : '📝 Étapes',
-  pairsWellWith: lang === 'en' ? '🍖 Pairs well with' : '🍖 Se marie bien avec'
+  pairsWellWith: lang === 'en' ? '🍖 Pairs well with' : '🍖 Se marie bien avec',
+  history: lang === 'en' ? '📜 History' : '📜 Histoire',
+  cookingMethodsTitle: lang === 'en' ? '🔥 Cooking methods' : '🔥 Modes de cuisson',
+  nutritionLabel: lang === 'en' ? '🥗 Nutrition' : '🥗 Nutrition',
+  conservationLabel: lang === 'en' ? '❄️ Storage' : '❄️ Conservation',
+  howToChoose: lang === 'en' ? '🔍 How to choose' : '🔍 Comment bien choisir',
+  // Selection keys translations
+  selectionKeys: {
+    couleur: lang === 'en' ? 'Color' : 'Couleur',
+    texture: lang === 'en' ? 'Texture' : 'Texture',
+    maturite: lang === 'en' ? 'Aging' : 'Maturité',
+    qualite: lang === 'en' ? 'Quality' : 'Qualité',
+    age: lang === 'en' ? 'Age' : 'Âge',
+    aspect: lang === 'en' ? 'Appearance' : 'Aspect',
+    saison: lang === 'en' ? 'Season' : 'Saison'
+  },
+  raw: lang === 'en' ? '❄️ Raw' : '❄️ Cru',
+  persons: lang === 'en' ? 'serv.' : 'pers.',
+  subcategories: lang === 'en' ? 'subcategories' : 'sous-catégories',
+  nutritionPer100g: lang === 'en' ? '📊 Nutrition (per 100g)' : '📊 Nutrition (pour 100g)',
+  difficultyEasy: lang === 'en' ? 'easy' : 'facile',
+  difficultyMedium: lang === 'en' ? 'medium' : 'moyen',
+  difficultyHard: lang === 'en' ? 'hard' : 'difficile',
+  calories: 'Calories',
+  proteins: lang === 'en' ? 'Proteins' : 'Protéines',
+  carbs: lang === 'en' ? 'Carbs' : 'Glucides',
+  fats: lang === 'en' ? 'Fats' : 'Lipides'
 })
 
 // Modal pour afficher une recette d'accompagnement ou de sauce
@@ -86,10 +121,14 @@ function RecipeModal({ recipe, onClose }) {
   }
 
   const isSauce = recipe.recipeType === 'sauce'
-  const ingredients = recipe.ingredients || []
-  const steps = recipe.steps || []
-  const tips = recipe.tips || []
+  // Utiliser les versions traduites si disponibles
+  const ingredients = lang === 'en' && recipe.ingredients_en ? recipe.ingredients_en : (recipe.ingredients || [])
+  const steps = lang === 'en' && recipe.steps_en ? recipe.steps_en : (recipe.steps || [])
+  const tips = lang === 'en' && recipe.tips_en ? recipe.tips_en : (recipe.tips || [])
   const pairings = recipe.pairings || []
+  const recipeName = lang === 'en' && recipe.name_en ? recipe.name_en : recipe.name
+  const recipeDescription = lang === 'en' && recipe.description_en ? recipe.description_en : recipe.description
+  const chefTips = lang === 'en' && recipe.chefTips_en ? recipe.chefTips_en : (recipe.chefTips || [])
 
   const mainColor = isSauce ? '#db2777' : '#16a34a'
   const lightBg = isSauce ? '#fce7f3' : '#dcfce7'
@@ -139,7 +178,7 @@ function RecipeModal({ recipe, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '40px' }}>{recipe.icon || '🍽️'}</span>
             <div>
-              <h2 style={{ fontWeight: 'bold', fontSize: '20px', color: '#111827', margin: 0 }}>{recipe.name}</h2>
+              <h2 style={{ fontWeight: 'bold', fontSize: '20px', color: '#111827', margin: 0 }}>{recipeName}</h2>
               <span style={{
                 fontSize: '12px',
                 padding: '4px 8px',
@@ -174,8 +213,8 @@ function RecipeModal({ recipe, onClose }) {
 
         <div style={{ padding: '20px' }}>
           {/* Description */}
-          {recipe.description && (
-            <p style={{ fontSize: '16px', color: '#374151', marginBottom: '16px' }}>{recipe.description}</p>
+          {recipeDescription && (
+            <p style={{ fontSize: '16px', color: '#374151', marginBottom: '16px' }}>{recipeDescription}</p>
           )}
 
           {/* Badges info */}
@@ -189,20 +228,20 @@ function RecipeModal({ recipe, onClose }) {
                 fontWeight: '500',
                 backgroundColor: recipe.difficulty === 'facile' ? '#22c55e' : recipe.difficulty === 'moyen' ? '#f59e0b' : '#ef4444'
               }}>
-                {recipe.difficulty}
+                {recipe.difficulty === 'facile' ? t.difficultyEasy : recipe.difficulty === 'moyen' ? t.difficultyMedium : t.difficultyHard}
               </span>
             )}
             <span style={{ fontSize: '14px', padding: '4px 12px', borderRadius: '9999px', backgroundColor: '#e5e7eb', color: '#374151' }}>
-              ⏱️ Prépa: {formatTime(recipe.prepTime)}
+              {t.prepTime}: {formatTime(recipe.prepTime)}
             </span>
             {recipe.cookTime > 0 && (
               <span style={{ fontSize: '14px', padding: '4px 12px', borderRadius: '9999px', backgroundColor: '#e5e7eb', color: '#374151' }}>
-                🔥 Cuisson: {formatTime(recipe.cookTime)}
+                {t.cookTime}: {formatTime(recipe.cookTime)}
               </span>
             )}
             {recipe.servings && (
               <span style={{ fontSize: '14px', padding: '4px 12px', borderRadius: '9999px', backgroundColor: '#e5e7eb', color: '#374151' }}>
-                👥 {recipe.servings} pers.
+                👥 {recipe.servings} {t.persons}
               </span>
             )}
           </div>
@@ -351,16 +390,16 @@ function CategoryList() {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-text-dark">{lang === 'en' && cat.name_en ? cat.name_en : cat.name}</h3>
-              <p className="text-sm text-text-light line-clamp-1">{cat.histoire?.substring(0, 60)}...</p>
+              <p className="text-sm text-text-light line-clamp-1">{getText(cat, 'histoire', lang)?.substring(0, 60)}...</p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex items-center gap-2">
               <span
                 className="text-white text-xs px-2 py-1 rounded-full"
                 style={{ backgroundColor: cat.color }}
               >
-                {cat.cutsCount}
+                {cat.cutsCount} {t.cuts}
               </span>
-              <span className="text-text-light ml-2">→</span>
+              <span className="text-text-light">→</span>
             </div>
           </Link>
         ))}
@@ -403,42 +442,42 @@ function CategoryDetail() {
           <span className="text-5xl">{category.icon}</span>
           <div>
             <h1 className="text-2xl font-bold text-text-dark">{lang === 'en' && category.name_en ? category.name_en : category.name}</h1>
-            <p className="text-sm text-text-light">{subcategoriesArray.length} {lang === 'en' ? 'subcategories' : 'sous-catégories'}</p>
+            <p className="text-sm text-text-light">{subcategoriesArray.length} {t.subcategories}</p>
           </div>
         </div>
 
         {/* Histoire */}
-        {category.histoire && (
+        {(category.histoire || category.histoire_en) && (
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-text-dark mb-1">📜 Histoire</h3>
-            <p className="text-sm text-text-light">{category.histoire}</p>
+            <h3 className="text-sm font-semibold text-text-dark mb-1">{t.history}</h3>
+            <p className="text-sm text-text-light">{getText(category, 'histoire', lang)}</p>
           </div>
         )}
 
         {/* Nutrition */}
-        {category.nutrition && (
+        {(category.nutrition || category.nutrition_en) && (
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-text-dark mb-1">🥗 Nutrition</h3>
-            <p className="text-sm text-text-light">{category.nutrition}</p>
+            <h3 className="text-sm font-semibold text-text-dark mb-1">{t.nutritionLabel}</h3>
+            <p className="text-sm text-text-light">{getText(category, 'nutrition', lang)}</p>
           </div>
         )}
 
         {/* Conservation */}
-        {category.conservation && (
+        {(category.conservation || category.conservation_en) && (
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-text-dark mb-1">❄️ Conservation</h3>
-            <p className="text-sm text-text-light">{category.conservation}</p>
+            <h3 className="text-sm font-semibold text-text-dark mb-1">{t.conservationLabel}</h3>
+            <p className="text-sm text-text-light">{getText(category, 'conservation', lang)}</p>
           </div>
         )}
 
         {/* Selection Tips */}
         {category.selection && (
           <div className="bg-gold-light rounded-lg p-3">
-            <h3 className="text-sm font-semibold text-text-dark mb-2">🔍 Comment bien choisir</h3>
+            <h3 className="text-sm font-semibold text-text-dark mb-2">{t.howToChoose}</h3>
             <ul className="text-xs text-text-light space-y-1">
-              {Object.entries(category.selection).map(([key, value]) => (
+              {Object.entries(lang === 'en' && category.selection_en ? category.selection_en : category.selection).map(([key, value]) => (
                 <li key={key} className="flex gap-2">
-                  <span className="font-medium capitalize">{key}:</span>
+                  <span className="font-medium">{t.selectionKeys[key] || key}:</span>
                   <span>{value}</span>
                 </li>
               ))}
@@ -501,7 +540,7 @@ function SubcategoryDetail() {
   return (
     <div>
       <Link to={`/encyclopedia/${categoryId}`} className="text-accent mb-4 inline-block">
-        ← {category.name}
+        ← {lang === 'en' && category.name_en ? category.name_en : category.name}
       </Link>
 
       {/* Header */}
@@ -510,7 +549,7 @@ function SubcategoryDetail() {
           className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
           style={{ backgroundColor: category.color + '20' }}
         >
-          {category.icon}
+          {subcategory.icon || category.icon}
         </div>
         <div>
           <h1 className="text-xl font-bold text-text-dark">{getText(subcategory, 'name', lang)}</h1>
@@ -527,7 +566,7 @@ function SubcategoryDetail() {
             className="card flex items-center justify-between hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{cut.icon || category.icon}</span>
+              <span className="text-2xl">{cut.icon || subcategory.icon || category.icon}</span>
               <div>
                 <h3 className="font-semibold text-text-dark">{getText(cut, 'name', lang)}</h3>
                 <p className="text-xs text-text-light">{cut.poids_moyen}</p>
@@ -542,12 +581,23 @@ function SubcategoryDetail() {
 }
 
 // Section des recettes pour un morceau
-function RecipesSection({ cutId, categoryId, category }) {
+function RecipesSection({ cutId, categoryId, category, initialOpenRecipe }) {
   const lang = getLanguage()
   const t = getTranslations(lang)
-  const [expandedRecipe, setExpandedRecipe] = useState(null)
+  const [expandedRecipe, setExpandedRecipe] = useState(initialOpenRecipe || null)
   // Passer categoryId pour éviter les conflits (ex: escalope de veau vs escalope de dinde)
   const recipes = getRecipesByCut(cutId, categoryId)
+
+  // Ouvrir automatiquement la recette si passée en paramètre
+  useEffect(() => {
+    if (initialOpenRecipe) {
+      setExpandedRecipe(initialOpenRecipe)
+      // Scroller vers la section des recettes
+      setTimeout(() => {
+        document.getElementById('recipes-section')?.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    }
+  }, [initialOpenRecipe])
 
   if (!recipes || recipes.length === 0) {
     return null
@@ -571,7 +621,7 @@ function RecipesSection({ cutId, categoryId, category }) {
   }
 
   return (
-    <div className="mb-4">
+    <div id="recipes-section" className="mb-4">
       <h3 className="font-bold text-text-dark mb-3">{t.recipes}</h3>
       <div className="space-y-3">
         {recipes.map((recipe) => (
@@ -584,8 +634,8 @@ function RecipesSection({ cutId, categoryId, category }) {
               <div className="flex items-start gap-3">
                 <span className="text-3xl">{recipe.icon}</span>
                 <div className="flex-1">
-                  <h4 className="font-bold text-text-dark">{recipe.name}</h4>
-                  <p className="text-sm text-text-light line-clamp-2">{recipe.description}</p>
+                  <h4 className="font-bold text-text-dark">{lang === 'en' && recipe.name_en ? recipe.name_en : recipe.name}</h4>
+                  <p className="text-sm text-text-light line-clamp-2">{lang === 'en' && recipe.description_en ? recipe.description_en : recipe.description}</p>
 
                   {/* Badges info */}
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -593,23 +643,23 @@ function RecipesSection({ cutId, categoryId, category }) {
                       className="text-xs px-2 py-1 rounded-full text-white"
                       style={{ backgroundColor: getDifficultyColor(recipe.difficulty) }}
                     >
-                      {recipe.difficulty}
+                      {recipe.difficulty === 'facile' ? t.difficultyEasy : recipe.difficulty === 'moyen' ? t.difficultyMedium : t.difficultyHard}
                     </span>
                     <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-text-light">
-                      ⏱️ Prépa: {formatTime(recipe.prepTime)}
+                      {t.prepTime}: {formatTime(recipe.prepTime)}
                     </span>
                     {recipe.cookTime > 0 && (
                       <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-text-light">
-                        🔥 Cuisson: {formatTime(recipe.cookTime)}
+                        {t.cookTime}: {formatTime(recipe.cookTime)}
                       </span>
                     )}
                     {recipe.isCru && (
                       <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-600">
-                        ❄️ Cru
+                        {t.raw}
                       </span>
                     )}
                     <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-text-light">
-                      👥 {recipe.servings} pers.
+                      👥 {recipe.servings} {t.persons}
                     </span>
                   </div>
                 </div>
@@ -626,7 +676,7 @@ function RecipesSection({ cutId, categoryId, category }) {
                 <div className="mb-4">
                   <h5 className="font-bold text-text-dark mb-2">{t.ingredients}</h5>
                   <ul className="space-y-1">
-                    {recipe.ingredients.map((ing, i) => (
+                    {(lang === 'en' && recipe.ingredients_en ? recipe.ingredients_en : recipe.ingredients).map((ing, i) => (
                       <li key={i} className="text-sm text-text-light flex gap-2">
                         <span className="text-accent">•</span>
                         <span>
@@ -640,9 +690,9 @@ function RecipesSection({ cutId, categoryId, category }) {
 
                 {/* Étapes */}
                 <div className="mb-4">
-                  <h5 className="font-bold text-text-dark mb-2">📝 Étapes</h5>
+                  <h5 className="font-bold text-text-dark mb-2">{t.steps}</h5>
                   <ol className="space-y-3">
-                    {recipe.steps.map((step) => (
+                    {(lang === 'en' && recipe.steps_en ? recipe.steps_en : recipe.steps).map((step) => (
                       <li key={step.step} className="text-sm">
                         <div className="flex gap-3">
                           <span
@@ -665,11 +715,11 @@ function RecipesSection({ cutId, categoryId, category }) {
                 </div>
 
                 {/* Conseils du chef */}
-                {recipe.chefTips && recipe.chefTips.length > 0 && (
+                {((lang === 'en' && recipe.chefTips_en) || recipe.chefTips) && ((lang === 'en' && recipe.chefTips_en ? recipe.chefTips_en : recipe.chefTips) || []).length > 0 && (
                   <div className="p-3 rounded-lg" style={{ backgroundColor: '#FFD93D20' }}>
                     <h5 className="font-bold text-text-dark mb-2">{t.chefTips}</h5>
                     <ul className="space-y-1">
-                      {recipe.chefTips.map((tip, i) => (
+                      {(lang === 'en' && recipe.chefTips_en ? recipe.chefTips_en : recipe.chefTips).map((tip, i) => (
                         <li key={i} className="text-sm text-text-light flex gap-2">
                           <span className="text-gold">★</span>
                           <span>{tip}</span>
@@ -682,22 +732,22 @@ function RecipesSection({ cutId, categoryId, category }) {
                 {/* Nutrition */}
                 {recipe.nutritionPer100g && (
                   <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <h5 className="font-bold text-text-dark text-sm mb-2">📊 Nutrition (pour 100g)</h5>
+                    <h5 className="font-bold text-text-dark text-sm mb-2">{t.nutritionPer100g}</h5>
                     <div className="grid grid-cols-4 gap-2 text-center">
                       <div>
-                        <div className="text-xs text-text-light">Calories</div>
+                        <div className="text-xs text-text-light">{t.calories}</div>
                         <div className="font-bold text-sm text-text-dark">{recipe.nutritionPer100g.calories}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-text-light">Protéines</div>
+                        <div className="text-xs text-text-light">{t.proteins}</div>
                         <div className="font-bold text-sm text-text-dark">{recipe.nutritionPer100g.proteins}g</div>
                       </div>
                       <div>
-                        <div className="text-xs text-text-light">Glucides</div>
+                        <div className="text-xs text-text-light">{t.carbs}</div>
                         <div className="font-bold text-sm text-text-dark">{recipe.nutritionPer100g.carbs}g</div>
                       </div>
                       <div>
-                        <div className="text-xs text-text-light">Lipides</div>
+                        <div className="text-xs text-text-light">{t.fats}</div>
                         <div className="font-bold text-sm text-text-dark">{recipe.nutritionPer100g.fat}g</div>
                       </div>
                     </div>
@@ -718,9 +768,13 @@ function CutDetail() {
   const t = getTranslations(lang)
   const { categoryId, subcategoryId, cutId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const category = meatCategories[categoryId]
   const subcategory = cutsData[categoryId]?.[subcategoryId]
   const cut = subcategory?.cuts?.[cutId]
+
+  // Récupérer l'ID de recette à ouvrir depuis la navigation
+  const openRecipeId = location.state?.openRecipe || null
 
   // État pour forcer le re-rendu après toggle
   const [, forceUpdate] = useState(0)
@@ -769,8 +823,12 @@ function CutDetail() {
   }
 
   // Niveaux de cuisson pour ce type de viande
+  // Filtrer pour n'afficher que les températures définies dans temps_base_100g du morceau
   const donenessType = cut.donenessType || 'viande_rouge'
-  const cutDoneness = donenessLevels[donenessType] || donenessLevels.viande_rouge
+  const allDoneness = donenessLevels[donenessType] || donenessLevels.viande_rouge
+  const cutDoneness = cut.temps_base_100g
+    ? allDoneness.filter(level => level.id in cut.temps_base_100g)
+    : allDoneness
 
   return (
     <div className="pb-24">
@@ -853,66 +911,67 @@ function CutDetail() {
       )}
 
       {/* Anatomie / Description */}
-      {cut.anatomie && (
+      {(cut.anatomie || cut.anatomie_en) && (
         <div className="card mb-4">
           <h3 className="font-bold text-text-dark mb-2">{t.anatomy}</h3>
-          <p className="text-sm text-text-light">{cut.anatomie}</p>
+          <p className="text-sm text-text-light">{getText(cut, 'anatomie', lang)}</p>
         </div>
       )}
 
       {/* Modes de cuisson */}
       {cut.cuissons && (
         <div className="card mb-4">
-          <h3 className="font-bold text-text-dark mb-3">🔥 Modes de cuisson</h3>
+          <h3 className="font-bold text-text-dark mb-3">{t.cookingMethodsTitle}</h3>
           <div className="flex flex-wrap gap-2">
             {cut.cuissons.map((method) => {
               const methodLabels = {
-                // Cuisson rapide
-                poele: '🍳 Poêle',
-                saisir: '🔥 Saisir',
-                grill: '♨️ Grill',
-                plancha: '🫓 Plancha',
-                wok: '🥘 Wok',
-                flambe: '🔥 Flambé',
-                pierrade: '🪨 Pierrade',
-                // Four
-                four: '🔥 Four',
-                rotissoire: '🔄 Rôtissoire',
-                broche: '🍢 Broche',
-                gratin: '🧀 Gratin',
-                croute: '🥖 En croûte',
-                sel: '🧂 Croûte de sel',
-                papillote: '📄 Papillote',
-                // Cuisson lente
-                braise: '🍲 Braisé',
-                mijoter: '🥣 Mijoté',
-                cocotte: '🫕 Cocotte',
-                confit: '🍯 Confit',
-                tajine: '🫖 Tajine',
-                basse_temp: '🌡️ Basse temp.',
-                sousvide: '💧 Sous-vide',
-                reverse_sear: '↩️ Reverse sear',
-                // Extérieur
-                bbq: '🍖 BBQ direct',
-                bbq_indirect: '🍖 BBQ indirect',
-                fumage: '💨 Fumage',
-                fumage_froid: '❄️ Fumage froid',
-                cheminee: '🏠 Cheminée',
-                // Cuisson humide
-                pocher: '💧 Poché',
-                vapeur: '♨️ Vapeur',
-                bouillir: '🫗 Bouilli',
-                // Friture
-                friture: '🍟 Friture',
-                paner: '🍞 Pané'
+                // Cuisson rapide / Quick cooking
+                poele: { fr: '🍳 Poêle', en: '🍳 Pan' },
+                saisir: { fr: '🔥 Saisir', en: '🔥 Sear' },
+                grill: { fr: '♨️ Grill', en: '♨️ Grill' },
+                plancha: { fr: '🫓 Plancha', en: '🫓 Griddle' },
+                wok: { fr: '🥘 Wok', en: '🥘 Wok' },
+                flambe: { fr: '🔥 Flambé', en: '🔥 Flambé' },
+                pierrade: { fr: '🪨 Pierrade', en: '🪨 Hot stone' },
+                // Four / Oven
+                four: { fr: '🔥 Four', en: '🔥 Oven' },
+                rotissoire: { fr: '🔄 Rôtissoire', en: '🔄 Rotisserie' },
+                broche: { fr: '🍢 Broche', en: '🍢 Spit' },
+                gratin: { fr: '🧀 Gratin', en: '🧀 Gratin' },
+                croute: { fr: '🥖 En croûte', en: '🥖 In crust' },
+                sel: { fr: '🧂 Croûte de sel', en: '🧂 Salt crust' },
+                papillote: { fr: '📄 Papillote', en: '📄 En papillote' },
+                // Cuisson lente / Slow cooking
+                braise: { fr: '🍲 Braisé', en: '🍲 Braised' },
+                mijoter: { fr: '🥣 Mijoté', en: '🥣 Stewed' },
+                cocotte: { fr: '🫕 Cocotte', en: '🫕 Dutch oven' },
+                confit: { fr: '🍯 Confit', en: '🍯 Confit' },
+                tajine: { fr: '🫖 Tajine', en: '🫖 Tagine' },
+                basse_temp: { fr: '🌡️ Basse temp.', en: '🌡️ Low temp.' },
+                sousvide: { fr: '💧 Sous-vide', en: '💧 Sous-vide' },
+                reverse_sear: { fr: '↩️ Reverse sear', en: '↩️ Reverse sear' },
+                // Extérieur / Outdoor
+                bbq: { fr: '🍖 BBQ direct', en: '🍖 Direct BBQ' },
+                bbq_indirect: { fr: '🍖 BBQ indirect', en: '🍖 Indirect BBQ' },
+                fumage: { fr: '💨 Fumage', en: '💨 Smoking' },
+                fumage_froid: { fr: '❄️ Fumage froid', en: '❄️ Cold smoking' },
+                cheminee: { fr: '🏠 Cheminée', en: '🏠 Fireplace' },
+                // Cuisson humide / Wet cooking
+                pocher: { fr: '💧 Poché', en: '💧 Poached' },
+                vapeur: { fr: '♨️ Vapeur', en: '♨️ Steamed' },
+                bouillir: { fr: '🫗 Bouilli', en: '🫗 Boiled' },
+                // Friture / Frying
+                friture: { fr: '🍟 Friture', en: '🍟 Deep fried' },
+                paner: { fr: '🍞 Pané', en: '🍞 Breaded' }
               }
+              const label = methodLabels[method]
               return (
                 <span
                   key={method}
                   className="text-sm px-3 py-1 rounded-full"
                   style={{ backgroundColor: category.color + '20', color: category.color }}
                 >
-                  {methodLabels[method] || method}
+                  {label ? (lang === 'en' ? label.en : label.fr) : method}
                 </span>
               )
             })}
@@ -931,9 +990,9 @@ function CutDetail() {
                 className="text-center p-2 rounded-lg"
                 style={{ backgroundColor: level.color + '20' }}
               >
-                <div className="text-xs text-text-dark font-medium">{level.name}</div>
+                <div className="text-xs text-text-dark font-medium">{getText(level, 'name', lang)}</div>
                 <div className="font-bold" style={{ color: level.color }}>{level.temp}°C</div>
-                <div className="text-xs text-text-light">{level.description}</div>
+                <div className="text-xs text-text-light">{getText(level, 'description', lang)}</div>
               </div>
             ))}
           </div>
@@ -953,11 +1012,11 @@ function CutDetail() {
       )}
 
       {/* Conseils */}
-      {cut.conseils && cut.conseils.length > 0 && (
+      {getTextArray(cut, 'conseils', lang).length > 0 && (
         <div className="card mb-4 bg-gold-light border border-gold">
           <h3 className="font-bold text-text-dark mb-2">{t.tips}</h3>
           <ul className="space-y-2">
-            {cut.conseils.map((conseil, i) => (
+            {getTextArray(cut, 'conseils', lang).map((conseil, i) => (
               <li key={i} className="text-sm text-text-light flex items-start gap-2">
                 <span className="text-green">✓</span>
                 <span>{conseil}</span>
@@ -968,11 +1027,11 @@ function CutDetail() {
       )}
 
       {/* Erreurs à éviter */}
-      {cut.erreurs && cut.erreurs.length > 0 && (
+      {getTextArray(cut, 'erreurs', lang).length > 0 && (
         <div className="card mb-4 bg-red-50 border border-red-200">
           <h3 className="font-bold text-text-dark mb-2">{t.mistakesToAvoid}</h3>
           <ul className="space-y-2">
-            {cut.erreurs.map((erreur, i) => (
+            {getTextArray(cut, 'erreurs', lang).map((erreur, i) => (
               <li key={i} className="text-sm text-text-light flex items-start gap-2">
                 <span className="text-error">✗</span>
                 <span>{erreur}</span>
@@ -1059,7 +1118,7 @@ function CutDetail() {
       )}
 
       {/* Recettes */}
-      <RecipesSection cutId={cutId} categoryId={categoryId} category={category} />
+      <RecipesSection cutId={cutId} categoryId={categoryId} category={category} initialOpenRecipe={openRecipeId} />
 
       {/* Action Button */}
       <button

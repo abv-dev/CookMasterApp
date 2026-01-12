@@ -4,17 +4,25 @@
 export const meatCategories = {
   boeuf: {
     id: 'boeuf',
-    name: 'Boeuf',
+    name: 'Bœuf',
     name_en: 'Beef',
     icon: '🥩',
     color: '#C62828',
     histoire: "Le bœuf est consommé depuis la domestication des bovins il y a plus de 10 000 ans. En France, l'élevage bovin s'est développé au Moyen Âge, avec l'émergence de races prestigieuses comme la Charolaise, la Limousine ou la Blonde d'Aquitaine.",
+    histoire_en: "Beef has been consumed since cattle domestication over 10,000 years ago. In France, cattle farming developed during the Middle Ages, with the emergence of prestigious breeds such as Charolais, Limousin, and Blonde d'Aquitaine.",
     nutrition: "Excellente source de protéines complètes (26g/100g), de fer héminique hautement biodisponible, de zinc, de vitamine B12, et de créatine.",
+    nutrition_en: "Excellent source of complete proteins (26g/100g), highly bioavailable heme iron, zinc, vitamin B12, and creatine.",
     conservation: "Viande fraîche : 2-3 jours à 2-4°C. Sous-vide : 5-7 jours. Congélation : -18°C maximum 6-12 mois.",
+    conservation_en: "Fresh meat: 2-3 days at 35-40°F. Vacuum-sealed: 5-7 days. Frozen: 0°F for up to 6-12 months.",
     selection: {
       couleur: "Rouge vif à rouge sombre selon la maturation",
       texture: "Grain fin et régulier, persillage garantit tendreté et saveur",
       maturite: "Maturation optimale : 14-21 jours pour morceaux nobles, 28-45 jours pour dry-aged"
+    },
+    selection_en: {
+      couleur: "Bright red to dark red depending on aging",
+      texture: "Fine and even grain, marbling ensures tenderness and flavor",
+      maturite: "Optimal aging: 14-21 days for prime cuts, 28-45 days for dry-aged"
     },
     preparation: {
       temperaturage: "Sortir 30-60 minutes avant cuisson pour atteindre 18-20°C",
@@ -40,12 +48,20 @@ export const meatCategories = {
     icon: '🐷',
     color: '#F48FB1',
     histoire: "Le porc est élevé depuis 9000 ans. En France, les porcs fermiers Label Rouge et les races patrimoniales (Noir de Bigorre, Porc Basque, Cul Noir Limousin) offrent une qualité supérieure.",
+    histoire_en: "Pork has been raised for 9,000 years. In France, Label Rouge farm pigs and heritage breeds (Noir de Bigorre, Basque Pig, Cul Noir Limousin) offer superior quality.",
     nutrition: "Excellente source de protéines (22g/100g), vitamines B1 (thiamine), B6, B12, zinc et sélénium. Le filet mignon est très maigre (3% lipides).",
+    nutrition_en: "Excellent source of proteins (22g/100g), vitamins B1 (thiamine), B6, B12, zinc and selenium. Tenderloin is very lean (3% fat).",
     conservation: "Viande fraîche : 2-3 jours à 2-4°C. Sous-vide : 5-7 jours. Congélation : -18°C maximum 4-6 mois.",
+    conservation_en: "Fresh meat: 2-3 days at 35-40°F. Vacuum-sealed: 5-7 days. Frozen: 0°F for up to 4-6 months.",
     selection: {
       couleur: "Rose pâle à rose soutenu, jamais grisâtre",
       texture: "Chair ferme et élastique, gras blanc et ferme",
       qualite: "Label Rouge, Porc Fermier, races patrimoniales AOP"
+    },
+    selection_en: {
+      couleur: "Pale pink to deep pink, never grayish",
+      texture: "Firm and elastic meat, white and firm fat",
+      qualite: "Look for heritage breeds, free-range or organic certified"
     },
     preparation: {
       temperaturage: "Sortir 30 minutes avant cuisson",
@@ -71,12 +87,20 @@ export const meatCategories = {
     icon: '🐑',
     color: '#8D6E63',
     histoire: "L'agneau est élevé depuis 10 000 ans au Moyen-Orient. En France, les Label Rouge (Agneau de Sisteron, Agneau du Quercy) et AOP (Prés-salés du Mont-Saint-Michel) garantissent une qualité exceptionnelle.",
+    histoire_en: "Lamb has been raised for 10,000 years in the Middle East. In France, Label Rouge (Sisteron Lamb, Quercy Lamb) and AOP (Salt Meadow Lamb from Mont-Saint-Michel) guarantee exceptional quality.",
     nutrition: "Riche en protéines (25g/100g), fer héminique, zinc, vitamines B12 et B3. L'agneau de lait est plus tendre et délicat.",
+    nutrition_en: "Rich in proteins (25g/100g), heme iron, zinc, vitamins B12 and B3. Milk-fed lamb is more tender and delicate.",
     conservation: "Viande fraîche : 2-3 jours à 2-4°C. Congélation : -18°C maximum 6-8 mois.",
+    conservation_en: "Fresh meat: 2-3 days at 35-40°F. Frozen: 0°F for up to 6-8 months.",
     selection: {
       couleur: "Rose pâle (agneau de lait) à rouge clair (agneau)",
       texture: "Chair fine et tendre, gras blanc ferme",
       age: "Agneau de lait (< 3 mois), agneau (3-12 mois), mouton (> 1 an)"
+    },
+    selection_en: {
+      couleur: "Pale pink (milk-fed lamb) to light red (lamb)",
+      texture: "Fine and tender meat, firm white fat",
+      age: "Milk-fed lamb (< 3 months), lamb (3-12 months), mutton (> 1 year)"
     },
     preparation: {
       temperaturage: "Sortir 30-45 minutes avant cuisson",
@@ -102,12 +126,20 @@ export const meatCategories = {
     icon: '🐄',
     color: '#FFAB91',
     histoire: "Le veau de lait français est réputé mondialement. Les Labels Rouge et le Veau d'Aveyron et du Ségala (IGP) garantissent une alimentation lactée et une chair claire et tendre.",
+    histoire_en: "French milk-fed veal is world-renowned. Label Rouge and Aveyron & Ségala Veal (IGP) guarantee milk-fed diet and pale, tender meat.",
     nutrition: "Viande maigre (5-8% lipides), riche en protéines (20g/100g), fer, zinc et vitamines B. Plus digeste que le bœuf.",
+    nutrition_en: "Lean meat (5-8% fat), rich in proteins (20g/100g), iron, zinc and B vitamins. More digestible than beef.",
     conservation: "Viande très fragile : 2 jours maximum à 2°C. Congélation : -18°C maximum 4 mois.",
+    conservation_en: "Very delicate meat: 2 days maximum at 35°F. Frozen: 0°F for up to 4 months.",
     selection: {
       couleur: "Rose très pâle à blanc rosé (veau de lait)",
       texture: "Chair fine, tendre et délicate",
       qualite: "Label Rouge, IGP, veau élevé sous la mère"
+    },
+    selection_en: {
+      couleur: "Very pale pink to pinkish white (milk-fed veal)",
+      texture: "Fine, tender and delicate meat",
+      qualite: "Look for milk-fed, organic or pasture-raised veal"
     },
     preparation: {
       temperaturage: "Sortir 20-30 minutes avant cuisson",
@@ -133,12 +165,20 @@ export const meatCategories = {
     icon: '🍗',
     color: '#FFB300',
     histoire: "Le poulet fut domestiqué en Asie il y a 8000 ans. La Volaille de Bresse est la seule volaille au monde à bénéficier d'une AOP. Les races patrimoniales françaises sont réputées mondialement.",
+    histoire_en: "Chicken was domesticated in Asia 8,000 years ago. Bresse Poultry is the only poultry in the world to hold an AOP designation. French heritage breeds are world-renowned.",
     nutrition: "Viande maigre exceptionnelle (poulet sans peau : 3% lipides), riche en protéines (24g/100g), vitamines B et niacine.",
+    nutrition_en: "Exceptionally lean meat (skinless chicken: 3% fat), rich in proteins (24g/100g), B vitamins and niacin.",
     conservation: "Volaille fraîche : 2 jours à 2-4°C maximum. Très périssable. Congélation : -18°C maximum 6-8 mois.",
+    conservation_en: "Fresh poultry: 2 days maximum at 35-40°F. Highly perishable. Frozen: 0°F for up to 6-8 months.",
     selection: {
       couleur: "Peau blanc crème à jaune, chair rose pâle ferme",
       texture: "Peau tendue sans déchirures, chair ferme",
       qualite: "AOP Volaille de Bresse, Label Rouge, Agriculture Biologique"
+    },
+    selection_en: {
+      couleur: "Cream to yellow skin, firm pale pink flesh",
+      texture: "Taut skin without tears, firm meat",
+      qualite: "Free-range, organic, or heritage breed certified"
     },
     preparation: {
       temperaturage: "Sortir 30 minutes avant cuisson",
@@ -165,12 +205,20 @@ export const meatCategories = {
     icon: '🦌',
     color: '#5D4037',
     histoire: "Le gibier désigne les animaux sauvages chassés : grands gibiers (cervidés, sangliers) et gibiers à plumes (faisans, perdrix). La chasse est encadrée légalement avec saisons et quotas.",
+    histoire_en: "Game refers to wild hunted animals: large game (deer, wild boar) and game birds (pheasant, partridge). Hunting is legally regulated with seasons and quotas.",
     nutrition: "Viande extrêmement maigre (1-3% lipides), très riche en protéines (25-30g/100g), fer héminique, zinc. Valeur calorique faible : 100-120 kcal/100g.",
+    nutrition_en: "Extremely lean meat (1-3% fat), very high in proteins (25-30g/100g), heme iron, zinc. Low caloric value: 100-120 kcal/100g.",
     conservation: "Gibier frais : 2-3 jours maximum à 2°C. Faisandage : 3-7 jours à 4-8°C. Congélation : -18°C jusqu'à 8-10 mois.",
+    conservation_en: "Fresh game: 2-3 days maximum at 35°F. Hanging/aging: 3-7 days at 40-46°F. Frozen: 0°F for up to 8-10 months.",
     selection: {
       age: "Jeunes animaux plus tendres : marcassin vs sanglier, faon vs cerf",
       aspect: "Chair rouge foncé à brun, odeur forte mais agréable, forestière",
       saison: "Automne-hiver (septembre à février) : saison de chasse"
+    },
+    selection_en: {
+      age: "Young animals are more tender: young boar vs adult, fawn vs deer",
+      aspect: "Dark red to brown flesh, strong but pleasant, forest-like scent",
+      saison: "Fall-winter (September to February): hunting season"
     },
     preparation: {
       temperaturage: "Sortir 1h avant cuisson",
@@ -194,7 +242,7 @@ export const meatCategories = {
 // Niveaux de cuisson avec températures (Source: Guide Complet Températures de Cuisson)
 export const donenessLevels = {
   viande_rouge: [
-    { id: 'bleu', name: 'Bleu', name_en: 'Blue Rare', temp: 38, tempMax: 42, description: 'Centre froid et rouge vif', description_en: 'Cold and bright red center', color: '#D32F2F' },
+    { id: 'bleu', name: 'Bleu', name_en: 'Blue', temp: 38, tempMax: 42, description: 'Centre froid et rouge vif', description_en: 'Cold and bright red center', color: '#D32F2F' },
     { id: 'saignant', name: 'Saignant', name_en: 'Rare', temp: 42, tempMax: 45, description: 'Centre tiède et rouge', description_en: 'Warm and red center', color: '#E53935' },
     { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 50, tempMax: 55, description: 'Centre chaud et rosé', description_en: 'Hot and pink center', color: '#F4511E' },
     { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well Done', temp: 58, tempMax: 62, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#8D6E63' },
@@ -226,11 +274,15 @@ export const donenessLevels = {
     { id: 'canard_entier', name: 'Canard entier', name_en: 'Whole duck', temp: 74, tempMax: 74, description: 'Cuisse 74°C / Magret 60°C', description_en: 'Thigh 74°C / Breast 60°C', color: '#D84315' }
   ],
   gibier: [
-    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 48, tempMax: 52, description: 'Cerf, biche, chevreuil', description_en: 'Deer, doe, roe deer', color: '#A1887F' },
-    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 55, tempMax: 60, description: 'Centre légèrement rosé', description_en: 'Slightly pink center', color: '#8D6E63' },
-    { id: 'lievre', name: 'Lièvre', name_en: 'Hare', temp: 60, tempMax: 65, description: 'Rose pâle, viande ferme', description_en: 'Pale pink, firm meat', color: '#6D4C41' },
-    { id: 'sanglier', name: 'Sanglier', name_en: 'Wild boar', temp: 65, tempMax: 71, description: '71°C obligatoire (trichinose)', description_en: '71°C required (trichinosis)', color: '#5D4037' },
-    { id: 'faisan', name: 'Faisan', name_en: 'Pheasant', temp: 65, tempMax: 68, description: 'Légèrement rosé', description_en: 'Slightly pink', color: '#4E342E' }
+    { id: 'rose', name: 'Rosé', name_en: 'Pink', temp: 48, tempMax: 52, description: 'Cervidés (cerf, chevreuil) - centre rosé', description_en: 'Deer family - pink center', color: '#A1887F' },
+    { id: 'a_point', name: 'À point', name_en: 'Medium', temp: 55, tempMax: 60, description: 'Centre légèrement rosé, tendre', description_en: 'Slightly pink center, tender', color: '#8D6E63' },
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well done', temp: 65, tempMax: 68, description: 'Gibier à plumes, lièvre - cuit à cœur', description_en: 'Game birds, hare - cooked through', color: '#6D4C41' },
+    { id: 'tres_bien_cuit', name: 'Très bien cuit (sécuritaire)', name_en: 'Very well done (safe)', temp: 71, tempMax: 74, description: '⚠️ Obligatoire sanglier/marcassin (trichinose)', description_en: '⚠️ Required for wild boar (trichinosis)', color: '#5D4037' }
+  ],
+  // Type spécifique pour sanglier/marcassin - SÉCURITÉ ALIMENTAIRE (trichinose)
+  sanglier: [
+    { id: 'bien_cuit', name: 'Bien cuit', name_en: 'Well done', temp: 68, tempMax: 71, description: 'Cuit à cœur, tendre', description_en: 'Cooked through, tender', color: '#8D6E63' },
+    { id: 'tres_bien_cuit', name: 'Sécuritaire (71°C)', name_en: 'Safe (160°F)', temp: 71, tempMax: 74, description: '⚠️ Minimum recommandé (trichinose)', description_en: '⚠️ Recommended minimum (trichinosis)', color: '#5D4037' }
   ]
 };
 
@@ -685,8 +737,13 @@ export const twoStageConfig = {
         gibier: {
           rose: { bath: 50, time_min: 60, time_max: 180 },            // 1-3h, cerf/biche/chevreuil
           a_point: { bath: 57, time_min: 90, time_max: 240 },         // 1h30-4h
-          lievre: { bath: 62, time_min: 120, time_max: 300 },         // 2-5h, viande ferme
-          faisan: { bath: 63, time_min: 120, time_max: 240 }          // 2-4h, comme volaille
+          bien_cuit: { bath: 63, time_min: 120, time_max: 300 },      // 2-5h, gibier à plumes/lièvre
+          tres_bien_cuit: { bath: 71, time_min: 180, time_max: 480 }  // 3-8h, sanglier (71°C obligatoire)
+        },
+        // Sanglier/Marcassin - SÉCURITÉ : 71°C minimum obligatoire
+        sanglier: {
+          bien_cuit: { bath: 68, time_min: 240, time_max: 480 },      // 4-8h
+          tres_bien_cuit: { bath: 71, time_min: 300, time_max: 600 }  // 5-10h, sécuritaire
         }
       }
     },
@@ -699,12 +756,12 @@ export const twoStageConfig = {
     carryover: 0  // Pas de carryover significatif en sous-vide
   },
 
-  // REVERSE SEAR : Four basse temp puis saisie
+  // REVERSE SEAR : Cuisson basse temp puis saisie (four, BBQ indirect, kamado, fumoir...)
   reverse_sear: {
     isTwoStage: true,
     stage1: {
-      name: 'Four basse température',
-      name_en: 'Low temp oven',
+      name: 'Montée lente (basse température)',
+      name_en: 'Low & slow (indirect heat)',
       ovenTemp: { min: 100, max: 130, recommended: 110 },
       // Température interne à atteindre AVANT saisie (cible finale - 5°C pour carryover/saisie)
       pullTemps: {
@@ -726,10 +783,15 @@ export const twoStageConfig = {
           bien_cuit: 60
         },
         gibier: {
-          rose: 43,       // cible 48-52, retire à 43
-          a_point: 50,    // cible 55-60, retire à 50
-          lievre: 55,     // cible 60-65, retire à 55
-          faisan: 60      // cible 65-68, retire à 60
+          rose: 43,            // cible 48-52, retire à 43
+          a_point: 50,         // cible 55-60, retire à 50
+          bien_cuit: 60,       // cible 65-68, retire à 60
+          tres_bien_cuit: 66   // cible 71-74, retire à 66
+        },
+        // Sanglier/Marcassin - SÉCURITÉ : pas de rosé/à point !
+        sanglier: {
+          bien_cuit: 63,       // cible 68-71, retire à 63
+          tres_bien_cuit: 66   // cible 71-74, retire à 66
         },
         volaille: {
           magret: 47,     // cible 52-56, retire à 47 (rosé)
@@ -746,12 +808,12 @@ export const twoStageConfig = {
     carryover: 5  // +5°C pendant repos après saisie
   },
 
-  // BASSE TEMPÉRATURE (sans saisie finale)
+  // BASSE TEMPÉRATURE (sans saisie finale) - four, kamado, BBQ indirect...
   basse_temp: {
     isTwoStage: false,
     stage1: {
-      name: 'Four basse température',
-      name_en: 'Low temp oven',
+      name: 'Cuisson basse température',
+      name_en: 'Low temperature cooking',
       ovenTemp: { min: 60, max: 90, recommended: 80 },
       // Température interne à atteindre (+ 3°C de carryover au repos)
       pullTemps: {
@@ -796,6 +858,45 @@ export const twoStageConfig = {
       temp_surface: 200
     },
     carryover: 8  // Grosses pièces = plus de carryover
+  },
+
+  // SAISIE PUIS CUISSON : L'inverse du reverse sear - saisir d'abord puis finir au four
+  saisie_puis_cuisson: {
+    isTwoStage: true,
+    stage1: {
+      name: 'Saisie',
+      name_en: 'Sear',
+      time_seconds: 90,  // 45s-1min par face
+      temp_surface: 250  // Très haute température
+    },
+    stage2: {
+      name: 'Finition au four',
+      name_en: 'Oven finish',
+      ovenTemp: { min: 150, max: 180, recommended: 160 },
+      // Temps basé sur épaisseur et température cible
+      pullTemps: {
+        boeuf: {
+          bleu: 35,
+          saignant: 40,
+          a_point: 48,
+          bien_cuit: 55
+        },
+        agneau: {
+          saignant: 40,
+          rose: 45,
+          a_point: 52
+        },
+        veau: {
+          rose: 48,
+          a_point: 55
+        },
+        volaille: {
+          magret: 48,
+          poulet: 70
+        }
+      }
+    },
+    carryover: 5  // La saisie initiale ajoute du carryover
   }
 };
 
@@ -974,6 +1075,36 @@ export const cookingTechniques = [
     tips: {
       fr: 'Tout préparer avant, cuire par petites quantités',
       en: 'Prepare everything first, cook in small batches'
+    }
+  },
+  {
+    id: 'rotir',
+    name: 'Rôtir',
+    name_en: 'Roast',
+    description: 'Rôtissage classique au four ou en cocotte - poulet du quotidien',
+    description_en: 'Classic roasting in oven or Dutch oven - everyday chicken',
+    icon: '🍗',
+    isTwoStage: false,
+    compatibleTools: ['four', 'cocotte', 'bbq_gaz', 'bbq_charbon', 'kamado'],
+    idealFor: ['poulet_entier', 'roti_boeuf', 'roti_porc', 'gigot', 'dinde'],
+    tips: {
+      fr: 'Préchauffer, arroser régulièrement, laisser reposer',
+      en: 'Preheat, baste regularly, let it rest'
+    }
+  },
+  {
+    id: 'convivial',
+    name: 'Cuisson conviviale',
+    name_en: 'Table cooking',
+    description: 'Cuisson à table pour repas partagé - fondue, raclette, pierrade',
+    description_en: 'Table cooking for shared meals - fondue, raclette, hot stone',
+    icon: '🫕',
+    isTwoStage: false,
+    compatibleTools: ['pierrade', 'fondue', 'raclette'],
+    idealFor: ['emince', 'lamelles', 'cubes', 'petits_morceaux'],
+    tips: {
+      fr: 'Viande émincée très finement, prévoir sauces variées',
+      en: 'Thinly sliced meat, provide various sauces'
     }
   }
 ];
@@ -1188,30 +1319,230 @@ export const cookingTools = [
       fr: 'Bien équilibrer la pièce, ficeler serré',
       en: 'Balance the meat well, truss tightly'
     }
+  },
+
+  // === BBQ GAZ / CHARBON ===
+  {
+    id: 'bbq_gaz',
+    name: 'BBQ Gaz',
+    name_en: 'Gas BBQ / Gas Grill',
+    icon: '🔥',
+    category: 'exterieur',
+    heatSource: 'both', // Direct et indirect possible
+    hasThermostat: true, // Contrôle facile
+    tempRange: [100, 350],
+    modes: ['direct', 'indirect'],
+    tips: {
+      fr: 'Allumage facile, contrôle précis, préchauffer 10-15 min',
+      en: 'Easy start, precise control, preheat 10-15 min'
+    }
+  },
+  {
+    id: 'bbq_charbon',
+    name: 'BBQ Charbon',
+    name_en: 'Charcoal BBQ / Kettle Grill',
+    icon: '🪵',
+    category: 'exterieur',
+    heatSource: 'both', // Direct et indirect
+    hasThermostat: false, // Contrôle par évents
+    tempRange: [100, 400],
+    modes: ['direct', 'indirect', 'fumage'],
+    addsFlavor: true,
+    tips: {
+      fr: 'Saveur fumée authentique, maîtrise des évents, charbon de bois de qualité',
+      en: 'Authentic smoky flavor, vent control mastery, quality charcoal'
+    }
+  },
+
+  // === BBQ MODERNES / POLYVALENTS ===
+  {
+    id: 'kamado',
+    name: 'Kamado (Big Green Egg, Montvel...)',
+    name_en: 'Kamado (Big Green Egg, Kamado Joe...)',
+    icon: '🥚',
+    category: 'exterieur',
+    heatSource: 'both', // Direct et indirect
+    hasThermostat: false, // Contrôle par évents
+    tempRange: [80, 400], // Très polyvalent
+    modes: ['direct', 'indirect', 'fumage', 'pizza'],
+    tips: {
+      fr: 'Céramique = inertie thermique, contrôle par les évents, polyvalent',
+      en: 'Ceramic = thermal mass, vent control, very versatile'
+    }
+  },
+  {
+    id: 'pellet_smoker',
+    name: 'Pellet smoker (Traeger, Weber...)',
+    name_en: 'Pellet smoker (Traeger, Weber...)',
+    icon: '💨',
+    category: 'exterieur',
+    heatSource: 'indirect',
+    hasThermostat: true, // Contrôle électronique
+    tempRange: [80, 260],
+    addsFlavor: true,
+    tips: {
+      fr: 'Fumage automatisé, température stable, set & forget',
+      en: 'Automated smoking, stable temp, set & forget'
+    }
+  },
+
+  // === ÉLECTROMÉNAGER MODERNE ===
+  {
+    id: 'mijoteuse',
+    name: 'Mijoteuse électrique (Crock-Pot)',
+    name_en: 'Slow cooker (Crock-Pot)',
+    icon: '🍲',
+    category: 'interieur',
+    hasIntensity: true, // Low / High
+    tempRange: [80, 150],
+    speedFactor: 0.5, // Plus lent que cocotte
+    tips: {
+      fr: 'Set & forget, cuisson sans surveillance, idéal pour braisés',
+      en: 'Set & forget, unattended cooking, ideal for braises'
+    }
+  },
+  {
+    id: 'airfryer',
+    name: 'Air Fryer',
+    name_en: 'Air Fryer',
+    icon: '🌀',
+    category: 'interieur',
+    hasThermostat: true,
+    tempRange: [80, 200],
+    heatSource: 'convection',
+    tips: {
+      fr: 'Croustillant sans huile, préchauffage rapide, petites portions',
+      en: 'Crispy without oil, quick preheat, small portions'
+    }
+  },
+  {
+    id: 'multicuiseur',
+    name: 'Multicuiseur (Instant Pot, Cookeo)',
+    name_en: 'Multi-cooker (Instant Pot)',
+    icon: '⚡',
+    category: 'interieur',
+    modes: ['pression', 'mijoteuse', 'saisir', 'vapeur'],
+    speedFactor: 3, // Mode pression
+    tips: {
+      fr: 'Tout-en-un : pression, mijoteuse, saisie, vapeur',
+      en: 'All-in-one: pressure, slow cook, sear, steam'
+    }
+  },
+  {
+    id: 'four_vapeur',
+    name: 'Four vapeur / Combi',
+    name_en: 'Steam oven / Combi',
+    icon: '💨',
+    category: 'interieur',
+    hasThermostat: true,
+    tempRange: [40, 230],
+    modes: ['vapeur', 'convection', 'combi'],
+    tips: {
+      fr: 'Cuisson douce à la vapeur, viande ultra-juteuse',
+      en: 'Gentle steam cooking, ultra-juicy meat'
+    }
+  },
+
+  // === CUISSON TRADITIONNELLE ===
+  {
+    id: 'cheminee',
+    name: 'Cheminée / Âtre',
+    name_en: 'Fireplace / Hearth',
+    icon: '🔥',
+    category: 'traditionnel',
+    heatSource: 'direct',
+    addsFlavor: true,
+    tips: {
+      fr: 'Cuisson ancestrale, saveur unique, nécessite surveillance',
+      en: 'Ancestral cooking, unique flavor, requires attention'
+    }
+  },
+  {
+    id: 'pierrade',
+    name: 'Pierrade / Pierre chaude',
+    name_en: 'Hot stone',
+    icon: '🪨',
+    category: 'table',
+    heatSource: 'direct',
+    tips: {
+      fr: 'Cuisson conviviale à table, tranches très fines',
+      en: 'Convivial table cooking, very thin slices'
+    }
+  },
+  {
+    id: 'fondue',
+    name: 'Fondue bourguignonne',
+    name_en: 'Fondue pot',
+    icon: '🫕',
+    category: 'table',
+    heatSource: 'direct',
+    tips: {
+      fr: 'Huile à 180°C, petits cubes de viande, convivial',
+      en: 'Oil at 350°F, small meat cubes, convivial'
+    }
+  },
+  {
+    id: 'raclette',
+    name: 'Appareil à raclette (avec grill)',
+    name_en: 'Raclette grill',
+    icon: '🧀',
+    category: 'table',
+    heatSource: 'direct',
+    tips: {
+      fr: 'Petites portions, cuisson rapide à table, tranches fines',
+      en: 'Small portions, quick table cooking, thin slices'
+    }
   }
 ];
 
 // Mapping technique -> outils compatibles (pour filtrer dans le Calculator)
+// Pour les techniques en 2 temps: stage1 = première étape, stage2 = deuxième étape
+// Mise à jour: 2026-01-09 selon mapping utilisateur
 export const techniqueToolsMapping = {
-  saisie_simple: ['poele', 'grill', 'plancha', 'bbq_direct', 'wok'],
+  // Saisie simple - haute température, cuisson rapide
+  saisie_simple: ['poele', 'wok', 'chalumeau', 'bbq_gaz', 'bbq_charbon', 'kamado', 'grill', 'plancha', 'cheminee', 'pierrade', 'fondue', 'raclette', 'airfryer', 'multicuiseur'],
+
+  // Saisie puis cuisson - saisir d'abord, puis finir au four/couvert (2 outils)
   saisie_puis_cuisson: {
-    stage1: ['poele', 'grill', 'plancha'],
-    stage2: ['four', 'poele', 'bbq_indirect']
+    stage1: ['poele', 'wok', 'bbq_gaz', 'bbq_charbon', 'kamado', 'grill', 'plancha', 'cheminee', 'pierrade', 'raclette', 'airfryer', 'multicuiseur'],
+    stage2: ['four', 'cocotte', 'bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker', 'airfryer', 'multicuiseur', 'poele', 'cheminee']
   },
+
+  // Reverse sear - basse temp d'abord, saisie ensuite (2 outils différents)
   reverse_sear: {
-    stage1: ['four', 'bbq_indirect'],
-    stage2: ['poele', 'grill', 'chalumeau', 'bbq_direct', 'plancha']
+    stage1: ['four', 'four_vapeur', 'bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker'],
+    stage2: ['poele', 'chalumeau', 'bbq_gaz', 'bbq_charbon', 'kamado', 'grill', 'plancha', 'cheminee']
   },
+
+  // Sous-vide - bain puis saisie (2 outils différents obligatoirement)
   sous_vide: {
-    stage1: ['bain_eau', 'thermoplongeur', 'braises_indirectes'],
-    stage2: ['poele', 'grill', 'chalumeau', 'bbq_direct', 'plancha']
+    stage1: ['bain_eau', 'thermoplongeur'],
+    stage2: ['poele', 'chalumeau', 'bbq_gaz', 'bbq_charbon', 'kamado', 'grill', 'plancha']
   },
-  basse_temperature: ['four', 'bbq_indirect'],
-  cuisson_lente: ['cocotte', 'four', 'autocuiseur'],
-  grill_direct: ['bbq_direct', 'grill', 'plancha'],
-  bbq_low_slow: ['bbq_indirect', 'fumoir'],
-  rotissoire: ['rotissoire'],
-  wok: ['wok']
+
+  // Basse température - cuisson longue douce
+  basse_temperature: ['four', 'cocotte', 'mijoteuse', 'four_vapeur', 'bain_eau', 'thermoplongeur', 'bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker', 'multicuiseur'],
+
+  // Cuisson lente / Braisé
+  cuisson_lente: ['four', 'cocotte', 'mijoteuse', 'four_vapeur', 'bbq_charbon', 'kamado', 'pellet_smoker', 'autocuiseur', 'multicuiseur', 'cheminee'],
+
+  // Grill direct - haute chaleur directe
+  grill_direct: ['bbq_gaz', 'bbq_charbon', 'kamado', 'grill', 'plancha', 'cheminee'],
+
+  // BBQ Low & Slow - fumage longue durée
+  bbq_low_slow: ['bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker', 'fumoir', 'cheminee'],
+
+  // Rôtissoire / Tournebroche
+  rotissoire: ['rotissoire', 'four', 'bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker', 'cheminee'],
+
+  // Wok - haute chaleur, mouvement constant
+  wok: ['wok', 'poele'],
+
+  // Rôtir - technique de rôtissage classique (four, cocotte, BBQ)
+  rotir: ['four', 'cocotte', 'four_vapeur', 'bbq_gaz', 'bbq_charbon', 'kamado', 'pellet_smoker', 'rotissoire', 'cheminee', 'airfryer'],
+
+  // Convivial / Table - cuisson à table
+  convivial: ['pierrade', 'fondue', 'raclette', 'bbq_gaz', 'bbq_charbon', 'plancha', 'cheminee']
 };
 
 export default {

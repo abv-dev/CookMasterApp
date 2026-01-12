@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formule de Calcul du Temps de Cuisson - Cookmaster</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #fff;
+    }
+    h1 {
+      color: #e85d04;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    h2 {
+      color: #d00000;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e85d04;
+    }
+    h3 {
+      color: #370617;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .formula-box {
+      background: linear-gradient(135deg, #fff3e6 0%, #ffe8d6 100%);
+      border: 2px solid #e85d04;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .formula {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      color: #370617;
+      word-break: break-word;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    th {
+      background: #e85d04;
+      color: white;
+      padding: 12px 8px;
+      text-align: left;
+    }
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    tr:hover {
+      background: #fff3e6;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #d00000;
+    }
+    .note {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+    .warning {
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      padding: 15px;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .rest-table {
+      width: auto;
+      margin: 15px 0;
+    }
+    .rest-table td, .rest-table th {
+      padding: 8px 15px;
+    }
+    footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+    @media print {
+      body {
+        padding: 20px;
+      }
+      .formula-box {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      th {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Formule de Calcul du Temps de Cuisson</h1>
+  <p class="subtitle">Documentation technique - Cookmaster App</p>
+
+  <div class="section">
+    <h2>Formule Principale</h2>
+    <div class="formula-box">
+      <div class="formula">
+        T<sub>total</sub> = T<sub>base</sub> &times; F<sub>poids</sub> &times; F<sub>epaisseur</sub> &times; F<sub>temp</sub> &times; F<sub>os</sub> &times; F<sub>bardage</sub> &times; F<sub>marinade</sub> &times; F<sub>peau</sub> &times; F<sub>intensite</sub> &times; F<sub>four</sub> &times; F<sub>specifique</sub>
+      </div>
+    </div>
+    <p>Le temps total en secondes est calculé en multipliant un temps de base par une série de facteurs correctifs.</p>
+  </div>
+
+  <div class="section">
+    <h2>Facteurs de Calcul</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Facteur</th>
+          <th>Formule</th>
+          <th>Explication</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>T<sub>base</sub></strong><br><em>Temps de base</em></td>
+          <td><code>temps_base_100g[cuisson]</code></td>
+          <td>Temps de base en secondes pour 100g de viande, selon le niveau de cuisson souhaité (bleu, saignant, à point, bien cuit)</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>poids</sub></strong><br><em>Facteur poids</em></td>
+          <td><code>(poids / 100)<sup>0.85</sup></code></td>
+          <td>Relation non-linéaire : le centre d'une pièce plus grosse cuit proportionnellement plus lentement. L'exposant 0.85 reflète ce phénomène physique.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>epaisseur</sub></strong><br><em>Facteur épaisseur</em></td>
+          <td><code>(epaisseur / 2.5)<sup>1.5</sup></code></td>
+          <td>Référence : 2.5 cm. L'épaisseur a un impact exponentiel sur le temps car la chaleur doit pénétrer jusqu'au centre.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>temp</sub></strong><br><em>Facteur température initiale</em></td>
+          <td>
+            Congelé : <code>1.30</code><br>
+            Frigo (&lt;15°C) : <code>1.10</code><br>
+            Ambiante : <code>1.00</code>
+          </td>
+          <td>Une viande congelée nécessite 30% de temps supplémentaire. Une viande sortie du frigo nécessite 10% de plus.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>os</sub></strong><br><em>Facteur os</em></td>
+          <td><code>1.15</code> si avec os<br><code>1.00</code> sinon</td>
+          <td>L'os conduit moins bien la chaleur que la chair. Comptez +15% de temps pour une pièce avec os.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>bardage</sub></strong><br><em>Facteur bardage</em></td>
+          <td><code>1.10</code> si bardé<br><code>1.00</code> sinon</td>
+          <td>Le gras de la barde crée une isolation thermique légère. Important pour le gibier (viande très maigre).</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>marinade</sub></strong><br><em>Facteur marinade</em></td>
+          <td><code>0.90</code> si mariné<br><code>1.00</code> sinon</td>
+          <td>La marinade attendrit les fibres et permet une cuisson 10% plus rapide.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>peau</sub></strong><br><em>Facteur peau</em></td>
+          <td>Variable selon la viande</td>
+          <td>Pour la volaille : la peau protège la chair et modifie légèrement le transfert thermique.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>intensite</sub></strong><br><em>Facteur intensité</em></td>
+          <td><code>180 / T<sub>surface</sub></code></td>
+          <td>Référence : 180°C. Un feu plus vif (température de surface plus haute) accélère la cuisson proportionnellement.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>four</sub></strong><br><em>Facteur thermostat</em></td>
+          <td><code>180 / T<sub>four</sub></code></td>
+          <td>Référence : four à 180°C. Un four plus chaud cuit plus vite.</td>
+        </tr>
+        <tr>
+          <td><strong>F<sub>specifique</sub></strong><br><em>Facteur spécifique</em></td>
+          <td>Variable</td>
+          <td>Facteurs additionnels calculés selon les réponses aux questions spécifiques du morceau (persillage, âge de l'animal, etc.)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Temps de Repos</h2>
+    <div class="formula-box">
+      <div class="formula">
+        T<sub>repos</sub> = max(120, T<sub>total</sub> &times; ratio)
+      </div>
+    </div>
+    <p>Le temps de repos minimum est de 2 minutes (120 secondes). Le ratio varie selon le type de viande :</p>
+
+    <table class="rest-table">
+      <thead>
+        <tr>
+          <th>Type de viande</th>
+          <th>Ratio</th>
+          <th>Raison</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Gibier / Boeuf</strong></td>
+          <td>40%</td>
+          <td>Viandes denses, nécessitent plus de temps pour redistribuer les jus</td>
+        </tr>
+        <tr>
+          <td><strong>Veau</strong></td>
+          <td>30%</td>
+          <td>Viande plus délicate</td>
+        </tr>
+        <tr>
+          <td><strong>Volaille</strong></td>
+          <td>25%</td>
+          <td>Repos court pour éviter le refroidissement</td>
+        </tr>
+        <tr>
+          <td><strong>Autres (porc, agneau)</strong></td>
+          <td>33%</td>
+          <td>Valeur par défaut équilibrée</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Pourquoi le repos est important ?</strong><br>
+      Pendant la cuisson, les jus migrent vers le centre de la viande. Le repos permet aux fibres de se détendre et aux jus de se redistribuer uniformément, garantissant une viande juteuse et tendre.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Principes Physiques</h2>
+
+    <h3>Transfert thermique</h3>
+    <p>La cuisson d'une viande repose sur le transfert de chaleur de la surface vers le centre. Ce transfert suit les lois de la thermodynamique :</p>
+    <ul style="margin: 15px 0 15px 20px;">
+      <li><strong>Conduction</strong> : la chaleur se propage de proche en proche dans la chair</li>
+      <li><strong>Convection</strong> : l'air chaud (four) ou l'huile chaude (poêle) transfère la chaleur à la surface</li>
+      <li><strong>Le temps augmente avec le carré de l'épaisseur</strong> (d'où l'exposant ~1.5)</li>
+    </ul>
+
+    <h3>Pourquoi des exposants non-linéaires ?</h3>
+    <div class="warning">
+      <strong>Poids (exposant 0.85)</strong> : Une pièce 2× plus lourde ne prend pas 2× plus de temps car seule la distance au centre compte, pas le volume total.<br><br>
+      <strong>Épaisseur (exposant 1.5)</strong> : La chaleur doit parcourir plus de distance ET la masse à chauffer augmente. L'effet est plus que proportionnel.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Exemple de Calcul</h2>
+    <p><strong>Situation :</strong> Entrecôte de 400g, épaisseur 3cm, sortie du frigo, sans os, cuisson à point, poêle à feu moyen (180°C)</p>
+
+    <table>
+      <tr>
+        <td>Temps de base (à point, 100g)</td>
+        <td><code>180 secondes</code></td>
+      </tr>
+      <tr>
+        <td>Facteur poids</td>
+        <td><code>(400/100)<sup>0.85</sup> = 3.03</code></td>
+      </tr>
+      <tr>
+        <td>Facteur épaisseur</td>
+        <td><code>(3/2.5)<sup>1.5</sup> = 1.31</code></td>
+      </tr>
+      <tr>
+        <td>Facteur température</td>
+        <td><code>1.10</code> (frigo)</td>
+      </tr>
+      <tr>
+        <td>Facteur os</td>
+        <td><code>1.00</code></td>
+      </tr>
+      <tr>
+        <td>Facteur intensité</td>
+        <td><code>180/180 = 1.00</code></td>
+      </tr>
+      <tr style="background: #fff3e6; font-weight: bold;">
+        <td>TOTAL</td>
+        <td><code>180 × 3.03 × 1.31 × 1.10 = 786 sec ≈ 13 min</code></td>
+      </tr>
+      <tr>
+        <td>Temps de repos (33%)</td>
+        <td><code>786 × 0.33 ≈ 260 sec ≈ 4-5 min</code></td>
+      </tr>
+    </table>
+  </div>
+
+  <footer>
+    <p><strong>Cookmaster</strong> - Application de calcul des temps de cuisson</p>
+    <p>Document généré le <script>document.write(new Date().toLocaleDateString('fr-FR'))</script></p>
+  </footer>
+</body>
+</html>

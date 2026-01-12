@@ -2896,6 +2896,46 @@ export const accompanimentRecipes = {
         'Utiliser le jus de cuisson du canard pour plus de saveur'
       ],
       pairings: ['Canard rôti', 'Canard à l\'orange', 'Magret', 'Oie']
+    },
+
+    sauce_satay: {
+      id: 'sauce_satay',
+      name: 'Sauce satay',
+      type: 'sauce',
+      category: 'asiatique',
+      icon: '🥜',
+      difficulty: 'facile',
+      prepTime: 10,
+      cookTime: 10,
+      servings: 4,
+      description: 'Sauce indonésienne aux cacahuètes, parfaite pour brochettes et grillades.',
+      ingredients: [
+        { name: 'Beurre de cacahuètes', quantity: '150', unit: 'g', note: 'non sucré de préférence' },
+        { name: 'Lait de coco', quantity: '20', unit: 'cl' },
+        { name: 'Sauce soja', quantity: '3', unit: 'c. à soupe' },
+        { name: 'Jus de citron vert', quantity: '2', unit: 'c. à soupe' },
+        { name: 'Sucre roux', quantity: '1', unit: 'c. à soupe' },
+        { name: 'Gingembre', quantity: '1', unit: 'c. à café', note: 'râpé' },
+        { name: 'Ail', quantity: '2', unit: 'gousses', note: 'pressées' },
+        { name: 'Piment', quantity: '1', unit: 'pincée', note: 'selon goût' },
+        { name: 'Eau chaude', quantity: '5', unit: 'cl', note: 'pour ajuster' }
+      ],
+      steps: [
+        'Dans une casserole à feu doux, faire chauffer le lait de coco jusqu\'à ce qu\'il frémisse légèrement. Ne pas faire bouillir pour éviter que le lait ne se sépare.',
+        'Ajouter le beurre de cacahuètes et remuer constamment avec un fouet jusqu\'à ce qu\'il soit complètement fondu et incorporé au lait de coco. La texture doit être lisse.',
+        'Incorporer la sauce soja, le jus de citron vert, le sucre roux, le gingembre râpé et l\'ail pressé. Bien mélanger pour homogénéiser tous les ingrédients.',
+        'Ajouter le piment selon votre tolérance - commencer par une pincée et ajuster. Laisser mijoter à feu très doux pendant 5 minutes en remuant régulièrement.',
+        'Si la sauce est trop épaisse, l\'allonger avec un peu d\'eau chaude jusqu\'à obtenir la consistance désirée. Elle doit napper une cuillère mais rester coulante.',
+        'Goûter et ajuster : plus de citron vert pour l\'acidité, plus de sucre pour la douceur, plus de piment pour le piquant. L\'équilibre sucré-salé-acide est la clé.',
+        'Servir tiède avec des brochettes de poulet, de bœuf ou de porc. Cette sauce peut aussi accompagner des légumes grillés ou des rouleaux de printemps.'
+      ],
+      tips: [
+        'Un beurre de cacahuètes 100% cacahuètes (sans huile de palme ajoutée) donne un meilleur résultat',
+        'La sauce épaissit en refroidissant - la réchauffer doucement en ajoutant un peu d\'eau',
+        'Se conserve 5 jours au réfrigérateur dans un récipient hermétique',
+        'Pour une version plus authentique, utiliser de la pâte de tamarin à la place du citron vert'
+      ],
+      pairings: ['Brochettes de poulet', 'Brochettes de boeuf', 'Porc grillé', 'Légumes grillés']
     }
   },
 
@@ -5447,7 +5487,7 @@ export const accompanimentRecipes = {
 
 // Alias pour les noms alternatifs de recettes
 const recipeAliases = {
-  // Sauces
+  // Sauces - variantes de noms
   'sauce bbq': 'sauce barbecue',
   'sauce champignons': 'sauce aux champignons',
   'sauce roquefort': 'sauce au roquefort',
@@ -5456,6 +5496,19 @@ const recipeAliases = {
   'ketchup': 'sauce barbecue',
   'sauce aux pommes': 'compote de pommes',
   'navarin printanier': 'sauce blanquette',
+  'sauce chimichurri': 'chimichurri',
+  'sauce tartare maison': 'sauce tartare',
+  'sauce a l\'orange': 'sauce a l\'orange',
+  'sauce orange': 'sauce a l\'orange',
+  'sauce au miel': 'sauce au miel et epices',
+  // Jus - variantes avec agneau/viande
+  'jus d\'agneau au romarin': 'jus au romarin',
+  'jus d\'agneau au thym': 'jus au thym',
+  'jus de cuisson reduit': 'jus de cuisson',
+  'jus de viande reduit': 'jus de viande',
+  'jus d\'agneau': 'jus d\'agneau',
+  // Condiments (simples - pas de recette élaborée)
+  'moutarde': 'sauce moutarde',
   // Accompagnements
   'champignons poeles': 'champignons poeles',
   'pommes de terre roties': 'pommes de terre roties',

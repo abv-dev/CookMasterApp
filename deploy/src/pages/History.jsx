@@ -139,7 +139,7 @@ function History() {
               >
                 <span className="text-2xl">{item.icon || '🍖'}</span>
                 <div className="flex-1">
-                  <h3 className="font-medium text-text-dark">{item.name}</h3>
+                  <h3 className="font-medium text-text-dark">{lang === 'en' && item.name_en ? item.name_en : item.name}</h3>
                   <p className="text-xs text-text-light">
                     {item.details || ''} • {formatDate(item.timestamp)}
                   </p>

@@ -72,7 +72,7 @@ function Favorites() {
                   <span className="text-4xl">{item.icon || '🍖'}</span>
                 </div>
                 <h3 className="font-medium text-text-dark text-sm text-center truncate">
-                  {item.name}
+                  {lang === 'en' && item.name_en ? item.name_en : item.name}
                 </h3>
                 {item.details && (
                   <p className="text-xs text-text-light text-center truncate">

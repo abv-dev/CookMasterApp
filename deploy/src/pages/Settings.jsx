@@ -5,10 +5,13 @@ import { settingsService } from '../services/settingsService'
 import { storageService } from '../services/storageService'
 
 // Composant Toggle
-function Toggle({ value, onChange }) {
+function Toggle({ value, onChange, label }) {
   return (
     <button
       onClick={() => onChange(!value)}
+      role="switch"
+      aria-checked={value}
+      aria-label={label}
       className={`w-12 h-7 rounded-full transition-all relative ${
         value ? 'bg-green' : 'bg-gray-300'
       }`}
@@ -24,7 +27,7 @@ function Toggle({ value, onChange }) {
 
 // Labels de cuisson
 const donenessLabels = {
-  bleu: { fr: 'Bleu', en: 'Blue rare' },
+  bleu: { fr: 'Bleu', en: 'Blue' },
   saignant: { fr: 'Saignant', en: 'Rare' },
   a_point: { fr: 'À point', en: 'Medium' },
   bien_cuit: { fr: 'Bien cuit', en: 'Well done' }
@@ -92,10 +95,11 @@ function Settings() {
                   ? 'bg-accent text-white'
                   : 'bg-surface text-text-dark border border-gray-200'
               }`}
+              aria-label={effectiveLang === 'en' ? 'Auto (browser language)' : 'Auto (langue du navigateur)'}
             >
               Auto
               <span className="block text-xs opacity-70">
-                {effectiveLang === 'en' ? 'Browser' : 'Navigateur'}
+                {effectiveLang === 'en' ? '(Browser)' : '(Navigateur)'}
               </span>
             </button>
             <button
@@ -140,6 +144,7 @@ function Settings() {
             <Toggle
               value={settings.notifications}
               onChange={(v) => updateSetting('notifications', v)}
+              label={effectiveLang === 'en' ? 'Toggle notifications' : 'Activer les notifications'}
             />
           </div>
 
@@ -155,6 +160,7 @@ function Settings() {
             <Toggle
               value={settings.sound}
               onChange={(v) => updateSetting('sound', v)}
+              label={effectiveLang === 'en' ? 'Toggle sound' : 'Activer le son'}
             />
           </div>
 
@@ -170,6 +176,7 @@ function Settings() {
             <Toggle
               value={settings.vibration}
               onChange={(v) => updateSetting('vibration', v)}
+              label={effectiveLang === 'en' ? 'Toggle vibration' : 'Activer la vibration'}
             />
           </div>
         </div>
@@ -314,7 +321,7 @@ function Settings() {
             <span className="text-text-dark">
               {effectiveLang === 'en' ? 'Developer' : 'Développeur'}
             </span>
-            <span className="text-text-light">Cookmaster Team</span>
+            <span className="text-text-light">CookMaster Team</span>
           </div>
           <a
             href="mailto:contact@cook-master.app"

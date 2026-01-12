@@ -13,7 +13,7 @@ export default {
 
   // Home page
   home: {
-    title: 'Cookmaster',
+    title: 'CookMaster',
     subtitle: 'Your cooking assistant',
     quickStart: 'Quick start',
     recentHistory: 'Recent history',

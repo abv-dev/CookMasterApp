@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { meatCategories, donenessLevels, cookingMethods, intensityLevels, twoStageConfig, restingTimes, cookingTechniques, cookingTools, techniqueToolsMapping } from '../data/meatData'
 import { cutsData } from '../data/cutsData'
 import { cutSpecificQuestions, calculateSpecificFactors, getEffectiveDiffusivity, heatTransferCoeffs } from '../data/thermalProfiles'
+import { getRecipesByCut } from '../data/recipesData'
 import { saveToHistory } from '../services/storageService'
 import { settingsService } from '../services/settingsService'
 import { unitConversion } from '../utils/unitConversion'
@@ -44,8 +45,8 @@ function Calculator() {
     chooseTechnique: lang === 'en' ? 'How do you want to cook?' : 'Comment voulez-vous cuire ?',
     cookingTool: lang === 'en' ? 'Cooking tool' : 'Outil de cuisson',
     chooseTool: lang === 'en' ? 'With what?' : 'Avec quoi ?',
-    stage1Tool: lang === 'en' ? 'Stage 1 tool' : 'Outil étape 1',
-    stage2Tool: lang === 'en' ? 'Searing tool' : 'Outil de saisie',
+    stage1Tool: lang === 'en' ? 'Stage 1' : 'Étape 1',
+    stage2Tool: lang === 'en' ? 'Stage 2' : 'Étape 2',
     fireIntensity: lang === 'en' ? '🔥 Fire intensity' : '🔥 Intensité du feu',
     ovenTemp: lang === 'en' ? '🌡️ Oven temperature' : '🌡️ Température du four',
     thermostat: lang === 'en' ? 'Thermostat' : 'Thermostat',
@@ -63,8 +64,8 @@ function Calculator() {
       : `Ambiante (${isImperial ? '77°F' : '25°C'})`,
     advancedOptions: lang === 'en' ? '⚙️ Advanced options' : '⚙️ Options avancées',
     thickness: lang === 'en'
-      ? `Thickness (${isImperial ? 'in' : 'cm'})`
-      : `Épaisseur (${isImperial ? 'in' : 'cm'})`,
+      ? `Cut thickness (${isImperial ? 'in' : 'cm'})`
+      : `Épaisseur de la pièce (${isImperial ? 'in' : 'cm'})`,
     ideal: lang === 'en' ? 'Ideal' : 'Idéal',
     withBone: lang === 'en' ? '🦴 With bone?' : '🦴 Avec os ?',
     boned: lang === 'en' ? 'With bone' : 'Avec os',
@@ -99,7 +100,10 @@ function Calculator() {
     yes: lang === 'en' ? 'Yes' : 'Oui',
     no: lang === 'en' ? 'No' : 'Non',
     precisionMode: lang === 'en' ? '🔬 Precision mode' : '🔬 Mode précision',
-    precisionModeDesc: lang === 'en' ? 'Answer these questions for a more accurate calculation' : 'Répondez à ces questions pour un calcul plus précis'
+    precisionModeDesc: lang === 'en' ? 'Answer these questions for a more accurate calculation' : 'Répondez à ces questions pour un calcul plus précis',
+    recipes: lang === 'en' ? '👨‍🍳 Recipes' : '👨‍🍳 Recettes',
+    viewRecipe: lang === 'en' ? 'View recipe' : 'Voir la recette',
+    noRecipes: lang === 'en' ? 'No recipes for this cut' : 'Pas de recettes pour ce morceau'
   }
 
   // Helper pour obtenir le texte traduit
@@ -124,8 +128,11 @@ function Calculator() {
   const [doneness, setDoneness] = useState('saignant')
   const [method, setMethod] = useState('poele') // Gardé pour compatibilité avec ancien code
   const [intensity, setIntensity] = useState('vif')
-  const [ovenTemp, setOvenTemp] = useState(180) // Température du four en °C
+  const [intensity2, setIntensity2] = useState('vif') // Pour étape 2
+  const [ovenTemp, setOvenTemp] = useState(180) // Température du four en °C (étape 1)
+  const [ovenTemp2, setOvenTemp2] = useState(180) // Température du four en °C (étape 2)
   const [surfaceTemp, setSurfaceTemp] = useState(200) // Température surface poêle/grill en °C
+  const [surfaceTemp2, setSurfaceTemp2] = useState(250) // Température surface étape 2 (saisie)
   const [initialTemp, setInitialTemp] = useState(4)
   const [withBone, setWithBone] = useState(false)
   const [withSkin, setWithSkin] = useState(true)
@@ -167,6 +174,11 @@ function Calculator() {
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
+
+  // Scroll en haut de page quand on change d'étape
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [step])
 
   // Données dérivées
   const selectedMeat = selectedMeatId ? meatCategories[selectedMeatId] : null
@@ -366,9 +378,15 @@ function Calculator() {
       // Mapper la technique vers une méthode existante si possible
       if (techniqueId === 'sous_vide') setMethod('sousvide')
       else if (techniqueId === 'reverse_sear') setMethod('reverse_sear')
+      else if (techniqueId === 'saisie_puis_cuisson') setMethod('saisie_puis_cuisson')
       else if (techniqueId === 'bbq_low_slow') setMethod('bbq_indirect')
       else if (techniqueId === 'grill_direct') setMethod('grill')
       else if (techniqueId === 'cuisson_lente') setMethod('four')
+      else if (techniqueId === 'saisir') setMethod('poele')
+      else if (techniqueId === 'poeler') setMethod('poele')
+      else if (techniqueId === 'rotir') setMethod('four')
+      else if (techniqueId === 'braiser') setMethod('braise')
+      else if (techniqueId === 'mijoter') setMethod('braise')
       else setMethod('poele') // Par défaut
     }
 
@@ -642,6 +660,51 @@ function Calculator() {
           carryover: twoStageData.carryover,
           donenessName: getText(donenessData, 'name') || doneness
         }
+      } else if (methodId === 'saisie_puis_cuisson') {
+        // SAISIE PUIS CUISSON : Saisir d'abord puis finir au four
+        const pullTemps = twoStageData.stage2.pullTemps[meatType]
+        const pullTemp = pullTemps?.[doneness] || (targetTemp - 5)
+        const ovenTempSPC = twoStageData.stage2.ovenTemp.recommended
+
+        // Temps saisie : temps fixe par face
+        const stage1Seconds = twoStageData.stage1.time_seconds * 2 // 2 faces
+
+        // Temps phase 2 (four) : basé sur épaisseur et montée en température
+        let thicknessCm = parseFloat(thickness) || 3
+        if (isImperial) thicknessCm = thicknessCm * 2.54
+
+        // Formule : base 10 min pour 2cm, +8 min par cm supplémentaire
+        // Moins long que reverse sear car la viande est déjà chaude après saisie
+        const stage2Minutes = Math.round(10 + (thicknessCm - 2) * 8 + (weightG / 100) * 2)
+
+        return {
+          isTwoStage: true,
+          methodName: lang === 'en' ? 'Sear then cook' : 'Saisie puis cuisson',
+          stage1: {
+            name: lang === 'en' ? twoStageData.stage1.name_en : twoStageData.stage1.name,
+            totalSeconds: stage1Seconds,
+            totalMinutes: Math.floor(stage1Seconds / 60),
+            remainingSeconds: stage1Seconds % 60,
+            description: lang === 'en' ? 'High heat sear, 45s-1min per side' : 'Saisie feu vif, 45s-1min par face'
+          },
+          stage2: {
+            name: lang === 'en' ? twoStageData.stage2.name_en : twoStageData.stage2.name,
+            totalMinutes: stage2Minutes,
+            temp: ovenTempSPC,
+            description: lang === 'en'
+              ? `Oven at ${ovenTempSPC}°C until ${pullTemp}°C internal`
+              : `Four à ${ovenTempSPC}°C jusqu'à ${pullTemp}°C à cœur`
+          },
+          totalSeconds: stage1Seconds + stage2Minutes * 60,
+          totalMinutes: Math.ceil(stage1Seconds / 60) + stage2Minutes,
+          remainingSeconds: 0,
+          restSeconds,
+          restMinutes: Math.floor(restSeconds / 60),
+          targetTemp,
+          pullTemp,
+          carryover: twoStageData.carryover,
+          donenessName: getText(donenessData, 'name') || doneness
+        }
       }
     }
 
@@ -717,15 +780,17 @@ function Calculator() {
       doneness: result.donenessName,
       targetTemp: result.targetTemp,
       restSeconds: result.restSeconds,
-      // Intensité et température de l'outil
+      // Intensité et température de l'outil (étape 1)
       toolIntensity: intensity,
-      toolTemp: ovenTemp
+      toolTemp: ovenTemp,
+      surfaceTemp: surfaceTemp
     }
 
     if (result.isTwoStage) {
-      // Cuisson en deux étapes (reverse sear, sous-vide, etc.)
+      // Cuisson en deux étapes (reverse sear, sous-vide, saisie_puis_cuisson, etc.)
       timerData.isTwoStage = true
-      timerData.stage1Seconds = result.stage1.totalMinutes * 60
+      // Utiliser totalSeconds si disponible, sinon calculer depuis totalMinutes
+      timerData.stage1Seconds = result.stage1.totalSeconds || (result.stage1.totalMinutes * 60)
       timerData.stage2Seconds = result.stage2.totalSeconds || (result.stage2.totalMinutes * 60)
       timerData.pullTemp = result.pullTemp
       timerData.methodName = result.methodName
@@ -741,6 +806,13 @@ function Calculator() {
       timerData.stage2Tool = selectedTool2?.name
       timerData.stage2Tool_en = selectedTool2?.name_en
       timerData.stage2ToolIcon = selectedTool2?.icon
+      // Températures par étape
+      timerData.stage1Intensity = intensity
+      timerData.stage1OvenTemp = ovenTemp
+      timerData.stage1SurfaceTemp = surfaceTemp
+      timerData.stage2Intensity = intensity2
+      timerData.stage2OvenTemp = ovenTemp2
+      timerData.stage2SurfaceTemp = surfaceTemp2
     } else {
       // Cuisson simple
       timerData.totalSeconds = result.totalSeconds
@@ -1116,7 +1188,7 @@ function Calculator() {
           <div className="card">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-text-dark flex items-center gap-2">
-                📏 {lang === 'en' ? 'Thickness' : 'Épaisseur'}
+                📏 {lang === 'en' ? 'Cut thickness' : 'Épaisseur de la pièce'}
               </label>
               <span className="text-lg font-bold text-accent">
                 {thickness || (isImperial ? '1' : '2.5')} {isImperial ? 'in' : 'cm'}
@@ -1225,56 +1297,88 @@ function Calculator() {
               <span className="text-text-light text-sm">{isImperial ? 'oz' : 'g'}</span>
             </div>
 
-            {/* Quick weight adjustment buttons */}
-            <div className="flex justify-center gap-2 mt-2">
-              <button
-                type="button"
-                onClick={() => setWeight(Math.max(0, (parseFloat(weight) || 0) - (isImperial ? 4 : 100)).toString())}
-                className="px-3 py-1 rounded-lg bg-gray-200 text-text-dark text-sm font-medium active:scale-95 transition-transform"
-              >
-                {isImperial ? '-4' : '-100'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setWeight(Math.max(0, (parseFloat(weight) || 0) - (isImperial ? 2 : 50)).toString())}
-                className="px-3 py-1 rounded-lg bg-gray-200 text-text-dark text-sm font-medium active:scale-95 transition-transform"
-              >
-                {isImperial ? '-2' : '-50'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setWeight(((parseFloat(weight) || 0) + (isImperial ? 2 : 50)).toString())}
-                className="px-3 py-1 rounded-lg bg-accent-light text-accent text-sm font-medium active:scale-95 transition-transform"
-              >
-                {isImperial ? '+2' : '+50'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setWeight(((parseFloat(weight) || 0) + (isImperial ? 4 : 100)).toString())}
-                className="px-3 py-1 rounded-lg bg-accent-light text-accent text-sm font-medium active:scale-95 transition-transform"
-              >
-                {isImperial ? '+4' : '+100'}
-              </button>
-            </div>
+            {/* Quick weight adjustment buttons - adapté selon la taille du morceau */}
+            {(() => {
+              const avgWeight = selectedCut.poids_moyen || '300g'
+              const isLargeCut = selectedCut.isLargeCut || selectedCut.isWholeAnimal || avgWeight.includes('kg') || parseInt(avgWeight) > 1500
 
-            {/* Common weight presets */}
+              // Incréments pour grosses pièces (500g / 250g)
+              const largeInc = isImperial ? [8, 17] : [250, 500]
+              // Incréments pour morceaux standards (50g / 100g)
+              const smallInc = isImperial ? [2, 4] : [50, 100]
+
+              const inc = isLargeCut ? largeInc : smallInc
+
+              return (
+                <div className="flex justify-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setWeight(Math.max(0, (parseFloat(weight) || 0) - inc[1]).toString())}
+                    className="px-3 py-1 rounded-lg bg-gray-200 text-text-dark text-sm font-medium active:scale-95 transition-transform"
+                  >
+                    -{inc[1]}{isLargeCut ? '' : ''}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWeight(Math.max(0, (parseFloat(weight) || 0) - inc[0]).toString())}
+                    className="px-3 py-1 rounded-lg bg-gray-200 text-text-dark text-sm font-medium active:scale-95 transition-transform"
+                  >
+                    -{inc[0]}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWeight(((parseFloat(weight) || 0) + inc[0]).toString())}
+                    className="px-3 py-1 rounded-lg bg-accent-light text-accent text-sm font-medium active:scale-95 transition-transform"
+                  >
+                    +{inc[0]}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWeight(((parseFloat(weight) || 0) + inc[1]).toString())}
+                    className="px-3 py-1 rounded-lg bg-accent-light text-accent text-sm font-medium active:scale-95 transition-transform"
+                  >
+                    +{inc[1]}
+                  </button>
+                </div>
+              )
+            })()}
+
+            {/* Common weight presets - adapté selon le morceau */}
             <div className="flex flex-wrap justify-center gap-2 mt-2">
-              {(isImperial ? [5, 7, 9, 10, 14, 18, 26, 35] : [150, 200, 250, 300, 400, 500, 750, 1000]).map((w) => (
-                <button
-                  key={w}
-                  type="button"
-                  onClick={() => setWeight(w.toString())}
-                  className={`px-2 py-1 rounded-full text-xs font-medium transition-all ${
-                    parseFloat(weight) === w
-                      ? 'bg-accent text-white'
-                      : 'bg-surface text-text-light border border-gray-200'
-                  }`}
-                >
-                  {isImperial
-                    ? (w >= 32 ? `${(w/16).toFixed(1)}lb` : `${w}oz`)
-                    : (w >= 1000 ? `${w/1000}kg` : `${w}g`)}
-                </button>
-              ))}
+              {(() => {
+                // Générer des presets intelligents basés sur le poids moyen du morceau
+                const avgWeight = selectedCut.poids_moyen || '300g'
+                const isLargeCut = selectedCut.isLargeCut || selectedCut.isWholeAnimal || avgWeight.includes('kg') || parseInt(avgWeight) > 1500
+
+                // Presets pour grosses pièces (animaux entiers, rôtis)
+                const largePresets = isImperial
+                  ? [35, 53, 70, 88, 105, 140, 175, 210] // 1-6kg en oz
+                  : [1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000]
+
+                // Presets standard pour steaks/morceaux
+                const standardPresets = isImperial
+                  ? [5, 7, 9, 10, 14, 18, 26, 35]
+                  : [150, 200, 250, 300, 400, 500, 750, 1000]
+
+                const presets = isLargeCut ? largePresets : standardPresets
+
+                return presets.map((w) => (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() => setWeight(w.toString())}
+                    className={`px-2 py-1 rounded-full text-xs font-medium transition-all ${
+                      parseFloat(weight) === w
+                        ? 'bg-accent text-white'
+                        : 'bg-surface text-text-light border border-gray-200'
+                    }`}
+                  >
+                    {isImperial
+                      ? (w >= 32 ? `${(w/16).toFixed(1)}lb` : `${w}oz`)
+                      : (w >= 1000 ? `${w/1000}kg` : `${w}g`)}
+                  </button>
+                ))
+              })()}
             </div>
 
             <p className="text-xs text-text-light mt-2 text-center">
@@ -1322,354 +1426,7 @@ function Calculator() {
             </div>
           )}
 
-          {/* Cooking Method */}
-          <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
-              {t.cookingMethod}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {availableMethods.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setMethod(m.id)}
-                  className={`py-3 px-2 rounded-lg text-center transition-all ${
-                    method === m.id
-                      ? 'bg-accent text-white'
-                      : 'bg-surface text-text-dark'
-                  }`}
-                >
-                  <div className="text-xl">{m.icon}</div>
-                  <div className="text-xs font-medium">{getText(m, 'name')}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Temperature/Intensity based on method */}
-          {selectedMethodData?.hasIntensity && (
-            <div>
-              <label className="block text-sm font-semibold text-text-dark mb-2">
-                {t.fireIntensity}
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {intensityLevels.map((level) => (
-                  <button
-                    key={level.id}
-                    onClick={() => {
-                      setIntensity(level.id)
-                      // Set approximate surface temperature based on intensity
-                      const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
-                      setSurfaceTemp(tempMap[level.id] || 200)
-                    }}
-                    className={`py-2 rounded-lg text-xs font-semibold transition-all ${
-                      intensity === level.id
-                        ? 'bg-accent text-white'
-                        : 'bg-surface text-text-dark'
-                    }`}
-                  >
-                    {lang === 'en' ? level.name_en : level.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Advanced: Precise surface temperature control */}
-              {isAdvanced && (
-                <div className="mt-3 bg-purple-50 rounded-xl p-3 border border-purple-200" style={{ backgroundColor: '#9C27B010', borderColor: '#9C27B030' }}>
-                  <p className="text-xs text-purple font-medium mb-2">
-                    {t.preciseSurfaceTemp}
-                  </p>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <button
-                      type="button"
-                      onClick={() => setSurfaceTemp(Math.max(100, surfaceTemp - (isImperial ? 25 : 10)))}
-                      className="w-9 h-9 rounded-full bg-gray-200 text-text-dark font-bold text-xs active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '-25' : '-10'}
-                    </button>
-                    <div className="text-center">
-                      <input
-                        type="number"
-                        value={isImperial ? Math.round(unitConversion.celsiusToFahrenheit(surfaceTemp)) : surfaceTemp}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value) || 0
-                          if (isImperial) {
-                            setSurfaceTemp(Math.max(100, Math.min(300, unitConversion.fahrenheitToCelsius(val))))
-                          } else {
-                            setSurfaceTemp(Math.max(100, Math.min(300, val)))
-                          }
-                        }}
-                        className="w-16 text-xl font-bold text-purple text-center bg-transparent outline-none"
-                      />
-                      <span className="text-sm text-text-light">{isImperial ? '°F' : '°C'}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setSurfaceTemp(Math.min(300, surfaceTemp + (isImperial ? 25 : 10)))}
-                      className="w-9 h-9 rounded-full text-white font-bold text-xs active:scale-95 transition-transform"
-                      style={{ backgroundColor: '#9C27B0' }}
-                    >
-                      {isImperial ? '+25' : '+10'}
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-1">
-                    {(isImperial
-                      ? [250, 300, 350, 400, 450, 500]
-                      : [120, 150, 180, 200, 220, 250]
-                    ).map((temp) => {
-                      const targetCelsius = isImperial ? Math.round(unitConversion.fahrenheitToCelsius(temp)) : temp
-                      const isSelected = Math.abs(surfaceTemp - targetCelsius) < 10
-                      return (
-                        <button
-                          key={temp}
-                          type="button"
-                          onClick={() => setSurfaceTemp(targetCelsius)}
-                          className={`px-2 py-1 rounded-full text-xs font-medium transition-all ${
-                            isSelected
-                              ? 'text-white'
-                              : 'bg-white text-text-dark border border-gray-200'
-                          }`}
-                          style={isSelected ? { backgroundColor: '#9C27B0' } : {}}
-                        >
-                          {temp}°{isImperial ? 'F' : 'C'}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {selectedMethodData?.hasThermostat && (
-            <div>
-              <label className="block text-sm font-semibold text-text-dark mb-2">
-                {t.ovenTemp}
-              </label>
-              <div className="bg-surface rounded-xl p-4">
-                {/* Direct temperature input with +/- buttons */}
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  {/* Minus buttons */}
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.max(50, ovenTemp - (isImperial ? 25 : 10)))}
-                      className="w-10 h-10 rounded-full bg-gray-200 text-text-dark font-bold text-sm active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '-25' : '-10'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.max(50, ovenTemp - (isImperial ? 10 : 5)))}
-                      className="w-8 h-10 rounded-full bg-gray-100 text-text-light font-medium text-xs active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '-10' : '-5'}
-                    </button>
-                  </div>
-
-                  {/* Temperature display and direct input */}
-                  <div className="text-center">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={isImperial ? Math.round(unitConversion.celsiusToFahrenheit(ovenTemp)) : ovenTemp}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value) || 0
-                          if (isImperial) {
-                            setOvenTemp(Math.max(50, Math.min(300, unitConversion.fahrenheitToCelsius(val))))
-                          } else {
-                            setOvenTemp(Math.max(50, Math.min(300, val)))
-                          }
-                        }}
-                        className="w-24 text-3xl font-bold text-accent text-center bg-transparent outline-none"
-                      />
-                      <span className="text-lg text-text-light">{isImperial ? '°F' : '°C'}</span>
-                    </div>
-                    <div className="text-xs text-text-light">
-                      Th. {Math.round(ovenTemp / 30)}
-                    </div>
-                  </div>
-
-                  {/* Plus buttons */}
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.min(300, ovenTemp + (isImperial ? 10 : 5)))}
-                      className="w-8 h-10 rounded-full bg-accent-light text-accent font-medium text-xs active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '+10' : '+5'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.min(300, ovenTemp + (isImperial ? 25 : 10)))}
-                      className="w-10 h-10 rounded-full bg-accent text-white font-bold text-sm active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '+25' : '+10'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Common temperature presets */}
-                <div className="mb-3">
-                  <p className="text-xs text-text-light text-center mb-2">
-                    {t.commonTemps}
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {(isImperial
-                      ? [250, 300, 325, 350, 375, 400, 425, 450, 475, 500]
-                      : [100, 120, 150, 160, 180, 200, 210, 220, 240, 250]
-                    ).map((temp) => {
-                      const targetCelsius = isImperial ? Math.round(unitConversion.fahrenheitToCelsius(temp)) : temp
-                      const isSelected = Math.abs(ovenTemp - targetCelsius) < 5
-                      return (
-                        <button
-                          key={temp}
-                          type="button"
-                          onClick={() => setOvenTemp(targetCelsius)}
-                          className={`px-2 py-1 rounded-full text-xs font-medium transition-all ${
-                            isSelected
-                              ? 'bg-accent text-white'
-                              : 'bg-white text-text-dark border border-gray-200'
-                          }`}
-                        >
-                          {temp}°{isImperial ? 'F' : 'C'}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Slider */}
-                <input
-                  type="range"
-                  min="50"
-                  max="300"
-                  step="5"
-                  value={ovenTemp}
-                  onChange={(e) => setOvenTemp(parseInt(e.target.value))}
-                  className="w-full accent-accent"
-                />
-                <div className="flex justify-between text-xs text-text-light mt-1">
-                  <span>{unitConversion.formatTemperature(50, measurementSystem)}</span>
-                  <span>{unitConversion.formatTemperature(180, measurementSystem)}</span>
-                  <span>{unitConversion.formatTemperature(300, measurementSystem)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {selectedMethodData?.hasTemperature && (
-            <div>
-              <label className="block text-sm font-semibold text-text-dark mb-2">
-                {t.sousVideTemp}
-              </label>
-              <div className="bg-surface rounded-xl p-4">
-                {/* Direct temperature input with +/- buttons */}
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  {/* Minus buttons */}
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.max(45, ovenTemp - (isImperial ? 5 : 2)))}
-                      className="w-9 h-9 rounded-full bg-gray-200 text-text-dark font-bold text-xs active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '-5' : '-2'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.max(45, ovenTemp - 1))}
-                      className="w-8 h-9 rounded-full bg-gray-100 text-text-light font-medium text-xs active:scale-95 transition-transform"
-                    >
-                      -1
-                    </button>
-                  </div>
-
-                  {/* Temperature display and direct input */}
-                  <div className="text-center">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={isImperial ? Math.round(unitConversion.celsiusToFahrenheit(ovenTemp)) : ovenTemp}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 0
-                          if (isImperial) {
-                            setOvenTemp(Math.max(45, Math.min(95, unitConversion.fahrenheitToCelsius(val))))
-                          } else {
-                            setOvenTemp(Math.max(45, Math.min(95, val)))
-                          }
-                        }}
-                        className="w-20 text-2xl font-bold text-accent text-center bg-transparent outline-none"
-                      />
-                      <span className="text-sm text-text-light">{isImperial ? '°F' : '°C'}</span>
-                    </div>
-                  </div>
-
-                  {/* Plus buttons */}
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.min(95, ovenTemp + 1))}
-                      className="w-8 h-9 rounded-full bg-accent-light text-accent font-medium text-xs active:scale-95 transition-transform"
-                    >
-                      +1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOvenTemp(Math.min(95, ovenTemp + (isImperial ? 5 : 2)))}
-                      className="w-9 h-9 rounded-full bg-accent text-white font-bold text-xs active:scale-95 transition-transform"
-                    >
-                      {isImperial ? '+5' : '+2'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Sous-vide temperature presets */}
-                <div className="mb-3">
-                  <p className="text-xs text-text-light text-center mb-2">
-                    {t.presetTemps}
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {(isImperial
-                      ? [125, 130, 135, 140, 145, 150, 155, 165]
-                      : [52, 54, 56, 58, 60, 63, 68, 74]
-                    ).map((temp) => {
-                      const targetCelsius = isImperial ? Math.round(unitConversion.fahrenheitToCelsius(temp)) : temp
-                      const isSelected = Math.abs(ovenTemp - targetCelsius) < 2
-                      return (
-                        <button
-                          key={temp}
-                          type="button"
-                          onClick={() => setOvenTemp(targetCelsius)}
-                          className={`px-2 py-1 rounded-full text-xs font-medium transition-all ${
-                            isSelected
-                              ? 'bg-accent text-white'
-                              : 'bg-white text-text-dark border border-gray-200'
-                          }`}
-                        >
-                          {temp}°{isImperial ? 'F' : 'C'}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Slider */}
-                <input
-                  type="range"
-                  min="45"
-                  max="95"
-                  step="1"
-                  value={ovenTemp}
-                  onChange={(e) => setOvenTemp(parseInt(e.target.value))}
-                  className="w-full accent-accent"
-                />
-                <div className="flex justify-between text-xs text-text-light mt-1">
-                  <span>{unitConversion.formatTemperature(45, measurementSystem)}</span>
-                  <span>{unitConversion.formatTemperature(65, measurementSystem)}</span>
-                  <span>{unitConversion.formatTemperature(95, measurementSystem)}</span>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Note: Temperature/Intensity controls are now in Step 7 after tool selection */}
 
           {/* Initial Temperature */}
           <div>
@@ -1938,14 +1695,19 @@ function Calculator() {
             {t.chooseTool}
           </h2>
 
-          {/* Two-stage technique: show both tools */}
+          {/* Two-stage technique: show both tools with their temperature controls */}
           {selectedTechnique.isTwoStage ? (
             <>
-              {/* Stage 1 Tool */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-text-dark">
-                  {t.stage1Tool} - {getText(selectedTechnique, 'name')}
-                </label>
+              {/* ========== ÉTAPE 1 ========== */}
+              <div className="border-2 border-blue-300 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                  <label className="text-sm font-semibold text-text-dark">
+                    {t.stage1Tool} - {getText(selectedTechnique, 'name')}
+                  </label>
+                </div>
+
+                {/* Stage 1 Tool Selection */}
                 <div className="grid grid-cols-3 gap-2">
                   {availableTools.map((tool) => (
                     <button
@@ -1953,7 +1715,7 @@ function Calculator() {
                       onClick={() => setSelectedToolId(tool.id)}
                       className={`py-3 px-2 rounded-lg text-center transition-all ${
                         selectedToolId === tool.id
-                          ? 'bg-accent text-white'
+                          ? 'bg-blue-500 text-white'
                           : 'bg-surface text-text-dark'
                       }`}
                     >
@@ -1962,14 +1724,76 @@ function Calculator() {
                     </button>
                   ))}
                 </div>
+
+                {/* Stage 1 Temperature Controls */}
+                {selectedTool?.hasIntensity && (
+                  <div>
+                    <label className="block text-sm font-medium text-blue-600 mb-2">
+                      {t.fireIntensity}
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {intensityLevels.map((level) => (
+                        <button
+                          key={level.id}
+                          onClick={() => {
+                            setIntensity(level.id)
+                            const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
+                            setSurfaceTemp(tempMap[level.id] || 200)
+                          }}
+                          className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+                            intensity === level.id
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-blue-50 text-text-dark'
+                          }`}
+                        >
+                          {lang === 'en' ? level.name_en : level.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedTool?.hasThermostat && (
+                  <div>
+                    <label className="block text-sm font-medium text-blue-600 mb-2">
+                      {t.ovenTemp}
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {[100, 120, 150, 180, 200, 220, 250].map((temp) => (
+                        <button
+                          key={temp}
+                          onClick={() => setOvenTemp(temp)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            ovenTemp === temp
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-blue-50 text-text-dark'
+                          }`}
+                        >
+                          {isImperial ? Math.round(temp * 9/5 + 32) : temp}°{isImperial ? 'F' : 'C'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedTool?.tips && (
+                  <div className="bg-blue-50 rounded-lg p-2 text-xs text-blue-700">
+                    💡 {lang === 'en' ? selectedTool.tips.en : selectedTool.tips.fr}
+                  </div>
+                )}
               </div>
 
-              {/* Stage 2 Tool (Searing) */}
+              {/* ========== ÉTAPE 2 (Saisie) ========== */}
               {availableTools2.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-text-dark">
-                    {t.stage2Tool}
-                  </label>
+                <div className="border-2 border-orange-300 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <label className="text-sm font-semibold text-text-dark">
+                      {t.stage2Tool} - {lang === 'en' ? 'Searing' : 'Saisie'}
+                    </label>
+                  </div>
+
+                  {/* Stage 2 Tool Selection */}
                   <div className="grid grid-cols-3 gap-2">
                     {availableTools2.map((tool) => (
                       <button
@@ -1977,7 +1801,7 @@ function Calculator() {
                         onClick={() => setSelectedTool2Id(tool.id)}
                         className={`py-3 px-2 rounded-lg text-center transition-all ${
                           selectedTool2Id === tool.id
-                            ? 'bg-accent text-white'
+                            ? 'bg-orange-500 text-white'
                             : 'bg-surface text-text-dark'
                         }`}
                       >
@@ -1986,85 +1810,144 @@ function Calculator() {
                       </button>
                     ))}
                   </div>
+
+                  {/* Stage 2 Temperature Controls */}
+                  {selectedTool2?.hasIntensity && (
+                    <div>
+                      <label className="block text-sm font-medium text-orange-600 mb-2">
+                        {t.fireIntensity}
+                      </label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {intensityLevels.map((level) => (
+                          <button
+                            key={level.id}
+                            onClick={() => {
+                              setIntensity2(level.id)
+                              const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
+                              setSurfaceTemp2(tempMap[level.id] || 250)
+                            }}
+                            className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+                              intensity2 === level.id
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-orange-50 text-text-dark'
+                            }`}
+                          >
+                            {lang === 'en' ? level.name_en : level.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTool2?.hasThermostat && (
+                    <div>
+                      <label className="block text-sm font-medium text-orange-600 mb-2">
+                        {t.ovenTemp}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {[200, 220, 250, 280].map((temp) => (
+                          <button
+                            key={temp}
+                            onClick={() => setOvenTemp2(temp)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                              ovenTemp2 === temp
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-orange-50 text-text-dark'
+                            }`}
+                          >
+                            {isImperial ? Math.round(temp * 9/5 + 32) : temp}°{isImperial ? 'F' : 'C'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTool2?.tips && (
+                    <div className="bg-orange-50 rounded-lg p-2 text-xs text-orange-700">
+                      💡 {lang === 'en' ? selectedTool2.tips.en : selectedTool2.tips.fr}
+                    </div>
+                  )}
                 </div>
               )}
             </>
           ) : (
             /* Single-stage technique: show one tool selection */
-            <div className="grid grid-cols-3 gap-2">
-              {availableTools.map((tool) => (
-                <button
-                  key={tool.id}
-                  onClick={() => setSelectedToolId(tool.id)}
-                  className={`py-3 px-2 rounded-lg text-center transition-all ${
-                    selectedToolId === tool.id
-                      ? 'bg-accent text-white'
-                      : 'bg-surface text-text-dark'
-                  }`}
-                >
-                  <div className="text-xl">{tool.icon}</div>
-                  <div className="text-xs font-medium mt-1">{getText(tool, 'name')}</div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Tool tips */}
-          {selectedTool?.tips && (
-            <div className="bg-surface rounded-xl p-3 text-sm text-text-light">
-              💡 {lang === 'en' ? selectedTool.tips.en : selectedTool.tips.fr}
-            </div>
-          )}
-
-          {/* Intensity/Temperature based on tool */}
-          {selectedTool?.hasIntensity && (
-            <div>
-              <label className="block text-sm font-semibold text-text-dark mb-2">
-                {t.fireIntensity}
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {intensityLevels.map((level) => (
+            <>
+              <div className="grid grid-cols-3 gap-2">
+                {availableTools.map((tool) => (
                   <button
-                    key={level.id}
-                    onClick={() => {
-                      setIntensity(level.id)
-                      const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
-                      setSurfaceTemp(tempMap[level.id] || 200)
-                    }}
-                    className={`py-2 rounded-lg text-xs font-semibold transition-all ${
-                      intensity === level.id
+                    key={tool.id}
+                    onClick={() => setSelectedToolId(tool.id)}
+                    className={`py-3 px-2 rounded-lg text-center transition-all ${
+                      selectedToolId === tool.id
                         ? 'bg-accent text-white'
                         : 'bg-surface text-text-dark'
                     }`}
                   >
-                    {lang === 'en' ? level.name_en : level.name}
+                    <div className="text-xl">{tool.icon}</div>
+                    <div className="text-xs font-medium mt-1">{getText(tool, 'name')}</div>
                   </button>
                 ))}
               </div>
-            </div>
-          )}
 
-          {selectedTool?.hasThermostat && (
-            <div>
-              <label className="block text-sm font-semibold text-text-dark mb-2">
-                {t.ovenTemp}
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {[100, 120, 150, 180, 200, 220, 250].map((temp) => (
-                  <button
-                    key={temp}
-                    onClick={() => setOvenTemp(temp)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      ovenTemp === temp
-                        ? 'bg-accent text-white'
-                        : 'bg-surface text-text-dark'
-                    }`}
-                  >
-                    {isImperial ? Math.round(temp * 9/5 + 32) : temp}°{isImperial ? 'F' : 'C'}
-                  </button>
-                ))}
-              </div>
-            </div>
+              {/* Tool tips */}
+              {selectedTool?.tips && (
+                <div className="bg-surface rounded-xl p-3 text-sm text-text-light">
+                  💡 {lang === 'en' ? selectedTool.tips.en : selectedTool.tips.fr}
+                </div>
+              )}
+
+              {/* Intensity/Temperature based on tool */}
+              {selectedTool?.hasIntensity && (
+                <div>
+                  <label className="block text-sm font-semibold text-text-dark mb-2">
+                    {t.fireIntensity}
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {intensityLevels.map((level) => (
+                      <button
+                        key={level.id}
+                        onClick={() => {
+                          setIntensity(level.id)
+                          const tempMap = { doux: 130, moyen: 170, vif: 210, tres_vif: 250 }
+                          setSurfaceTemp(tempMap[level.id] || 200)
+                        }}
+                        className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+                          intensity === level.id
+                            ? 'bg-accent text-white'
+                            : 'bg-surface text-text-dark'
+                        }`}
+                      >
+                        {lang === 'en' ? level.name_en : level.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedTool?.hasThermostat && (
+                <div>
+                  <label className="block text-sm font-semibold text-text-dark mb-2">
+                    {t.ovenTemp}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {[100, 120, 150, 180, 200, 220, 250].map((temp) => (
+                      <button
+                        key={temp}
+                        onClick={() => setOvenTemp(temp)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          ovenTemp === temp
+                            ? 'bg-accent text-white'
+                            : 'bg-surface text-text-dark'
+                        }`}
+                      >
+                        {isImperial ? Math.round(temp * 9/5 + 32) : temp}°{isImperial ? 'F' : 'C'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Calculate Button */}
@@ -2099,6 +1982,11 @@ function Calculator() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
                   <h3 className="font-bold text-text-dark">{calculationResult.stage1.name}</h3>
+                  {selectedTool && (
+                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full ml-auto">
+                      {selectedTool.icon} {getText(selectedTool, 'name')}
+                    </span>
+                  )}
                 </div>
                 <div className="bg-blue-50 rounded-lg p-4 text-center mb-3">
                   <div className="text-3xl font-bold text-blue-600">
@@ -2106,12 +1994,27 @@ function Calculator() {
                   </div>
                   <div className="text-sm text-blue-500">{calculationResult.stage1.description}</div>
                 </div>
-                {calculationResult.pullTemp && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-light">{lang === 'en' ? 'Remove at' : 'Retirer à'}</span>
-                    <span className="font-bold text-blue-600">{unitConversion.formatTemperature(calculationResult.pullTemp, measurementSystem)} {lang === 'en' ? 'internal' : 'à cœur'}</span>
-                  </div>
-                )}
+                {/* Température étape 1 */}
+                <div className="space-y-1 text-sm">
+                  {selectedTool?.hasThermostat && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-light">🌡️ {lang === 'en' ? 'Oven temp' : 'Temp. four'}</span>
+                      <span className="font-semibold text-blue-600">{isImperial ? Math.round(ovenTemp * 9/5 + 32) : ovenTemp}°{isImperial ? 'F' : 'C'}</span>
+                    </div>
+                  )}
+                  {selectedTool?.hasIntensity && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-light">🔥 {lang === 'en' ? 'Surface temp' : 'Temp. surface'}</span>
+                      <span className="font-semibold text-blue-600">{isImperial ? Math.round(surfaceTemp * 9/5 + 32) : surfaceTemp}°{isImperial ? 'F' : 'C'}</span>
+                    </div>
+                  )}
+                  {calculationResult.pullTemp && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-light">{lang === 'en' ? 'Remove at' : 'Retirer à'}</span>
+                      <span className="font-bold text-blue-600">{unitConversion.formatTemperature(calculationResult.pullTemp, measurementSystem)} {lang === 'en' ? 'internal' : 'à cœur'}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Stage 2 */}
@@ -2119,6 +2022,11 @@ function Calculator() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
                   <h3 className="font-bold text-text-dark">{calculationResult.stage2.name}</h3>
+                  {selectedTool2 && (
+                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full ml-auto">
+                      {selectedTool2.icon} {getText(selectedTool2, 'name')}
+                    </span>
+                  )}
                 </div>
                 <div className="bg-orange-50 rounded-lg p-4 text-center mb-3">
                   <div className="text-3xl font-bold text-orange-600">
@@ -2126,6 +2034,21 @@ function Calculator() {
                     {calculationResult.stage2.remainingSeconds > 0 && `${calculationResult.stage2.remainingSeconds} ${t.sec}`}
                   </div>
                   <div className="text-sm text-orange-500">{calculationResult.stage2.description}</div>
+                </div>
+                {/* Température étape 2 */}
+                <div className="space-y-1 text-sm">
+                  {selectedTool2?.hasThermostat && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-light">🌡️ {lang === 'en' ? 'Oven temp' : 'Temp. four'}</span>
+                      <span className="font-semibold text-orange-600">{isImperial ? Math.round(ovenTemp2 * 9/5 + 32) : ovenTemp2}°{isImperial ? 'F' : 'C'}</span>
+                    </div>
+                  )}
+                  {selectedTool2?.hasIntensity && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-light">🔥 {lang === 'en' ? 'Surface temp' : 'Temp. surface'}</span>
+                      <span className="font-semibold text-orange-600">{isImperial ? Math.round(surfaceTemp2 * 9/5 + 32) : surfaceTemp2}°{isImperial ? 'F' : 'C'}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2237,6 +2160,39 @@ function Calculator() {
               )}
             </div>
           )}
+
+          {/* Recipes for this cut */}
+          {(() => {
+            const recipes = getRecipesByCut(selectedCutId, selectedMeatId)
+            if (recipes && recipes.length > 0) {
+              return (
+                <div className="card">
+                  <h3 className="font-bold text-text-dark mb-3">{t.recipes}</h3>
+                  <div className="space-y-2">
+                    {recipes.slice(0, 3).map((recipe) => (
+                      <button
+                        key={recipe.id}
+                        onClick={() => navigate(`/encyclopedia/${selectedMeatId}/${selectedSubcategoryId}/${selectedCutId}`, { state: { openRecipe: recipe.id } })}
+                        className="w-full flex items-center justify-between p-3 bg-surface rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{recipe.icon || '📖'}</span>
+                          <div className="text-left">
+                            <div className="font-medium text-text-dark">{lang === 'en' && recipe.name_en ? recipe.name_en : recipe.name}</div>
+                            <div className="text-xs text-text-light">
+                              {recipe.prepTime + recipe.cookTime} min • {lang === 'en' ? (recipe.difficulty === 'facile' ? 'Easy' : recipe.difficulty === 'moyen' ? 'Medium' : 'Hard') : recipe.difficulty}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-accent">→</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
+            return null
+          })()}
 
           {/* Actions */}
           <div className="space-y-2">
